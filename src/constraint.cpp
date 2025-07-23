@@ -1,5 +1,7 @@
 #include "../include/constraint.h"
 
+#include <iostream>
+
 Constraint::Constraint(std::vector<double> newLhs, std::string newConstraintType, double newRhs) {
     lhs = newLhs;
     if(newConstraintType == "<=") type = LESS_THAN_OR_EQUAL;
@@ -19,4 +21,32 @@ ConstraintType Constraint::getType() {
 
 double Constraint::getRhs() {
     return rhs;
+}
+
+double Constraint::setRhs(double newRhs) {
+    rhs = newRhs;
+}
+
+bool Constraint::operator==(Constraint otherConstraint) {
+    if(lhs.size() != otherConstraint.lhs.size()) return false;
+
+    // Check LHS coefficients
+    for(int i = 0; i < lhs.size(); i++) {
+        if(lhs[i] != otherConstraint.lhs[i]) return false;
+    }
+
+    // Check constraint type
+    if(type != otherConstraint.type) return false;
+
+    // Check RHS value
+    if(rhs != otherConstraint.rhs) return false;
+
+    return true;
+}
+
+void Constraint::removeFixedVariable(uint varIndex, double varValue) {
+    if(varIndex > lhs.size() - 1) std::cout << "varIndex out of bounds!" << std::endl;
+    double coeff = lhs[varIndex];
+    rhs -= coeff * varValue;
+    lhs.erase(lhs.begin() + varIndex);
 }

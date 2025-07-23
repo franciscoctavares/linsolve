@@ -4,16 +4,17 @@ lp:
 	g++ -c src/lp.cpp -o obj/lp.o
 ip:
 	g++ -c src/ip.cpp -o obj/ip.o
-file:
-	g++ -c src/file.cpp -o obj/file.o
+model_reader:
+	g++ -c src/model_reader.cpp -o obj/model_reader.o
 constraint:
 	g++ -c src/constraint.cpp -o obj/constraint.o
-main: clean matrix lp constraint file
+main:
 	g++ -c src/main.cpp -o obj/main.o
-	g++ -o ./bin/main obj/main.o obj/matrix.o obj/lp.o obj/constraint.o obj/file.o
+build: matrix lp constraint model_reader ip main
+	g++ -o ./bin/main obj/main.o obj/matrix.o obj/lp.o obj/constraint.o obj/model_reader.o obj/ip.o
+run: build
 	clear
 	./bin/main
 clean:
 	rm -f obj/* ./bin/main
-	rm -rf obj/
 	mkdir -p obj

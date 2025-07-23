@@ -22,6 +22,16 @@ class Constraint {
         std::vector<double> getLhs();
         ConstraintType getType();
         double getRhs();
+        double setRhs(double newRhs);
+
+        /**
+         * @brief Checks if the LHS coefficients, the constraint type and the RHS of two constraints are equal
+         * 
+         * @return true if the constraints are the same, false otherwise
+         */
+        bool operator==(Constraint otherConstraint);
+
+        void removeFixedVariable(uint varIndex, double varValue);
 };
 
 #endif

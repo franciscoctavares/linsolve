@@ -17,14 +17,27 @@ enum ProblemType {
     MAX
 };
 
+enum ProblemStatus {
+    NOT_YET_SOLVED,
+    SOLVED,
+    INFEASIBLE,
+    UNBOUNDED
+};
+
+typedef struct {
+    std::vector<uint> repeatedConstraints;
+    std::vector<std::pair<uint, double>> fixedVariables;
+    std::vector<uint> constraintsToRemove;
+    std::vector<std::pair<uint, uint>> pairsOfVars;
+}SimplifiedConstraintsHelper;
+
 class LpProblem {
     private:
         ProblemType type;
         Matrix objectiveFunction;
         std::vector<Constraint> constraints;
         Matrix optimalSolution;
-
-        bool isProblemCorrectlyFormulated(void);
+        ProblemStatus status;
 
         /**
          * @brief Checks the cj - zj row see if any of the elements is positive, to see if more simplex iterations are necessary
@@ -36,7 +49,7 @@ class LpProblem {
         /**
          * @brief Given the pivot column elements(), the b column elements, and the ratios column matrix, returns the index of the pivot row
          * 
-         * @return unsigned 
+         * @return unsigned - the index of the pivot row
          */
         unsigned getPivotRow(std::vector<double>, std::vector<double>, Matrix);
 
@@ -52,6 +65,12 @@ class LpProblem {
         Matrix getConstraintsLHS();
         std::vector<ConstraintType> getConstraintsTypes();
         Matrix getConstraintsRHS();
+
+        /**
+         * @brief removes repetead constraints, for example two or more instances of x1 <= 4
+         * 
+         */
+        void removeRepeatedConstraints();
     public:
         /**
          * @brief Default constructor
@@ -120,10 +139,10 @@ class LpProblem {
         Matrix solveSimplex();
 
         /**
-         * @brief Displays the optimal solution to the model
+         * @brief Displays the LP model and its optimal solution(if it exists)
          * 
          */
-        void displayProblem(Matrix optimalSolution);
+        void displayProblem();
         
         /**
          * @brief Adds a new constraint to the LP model
@@ -131,6 +150,13 @@ class LpProblem {
          * @param newConstraint - the new constraint to be added
          */
         void addConstraint(Constraint newConstraint);
+
+        /**
+         * @brief Removes the constraint with index constraintIndex
+         * 
+         * @param constraintIndex - the index of the constraint to remove
+         */
+        void removeConstraint(int constraintIndex);
         
         /**
          * @brief Checks if the output of the simplex solver is a feasible solution, that is, if all artificial variables(if present)
@@ -155,10 +181,23 @@ class LpProblem {
         ProblemType getType();
         Matrix getObjectiveFunction();
 
+        bool canProblemBeSimplified(SimplifiedConstraintsHelper* helper);
 
         // Auxiliary methods for fixing variable values
-        std::tuple<LpProblem, std::vector<std::pair<unsigned, unsigned>>, double> simplifyProblem(unsigned, double);
-        Matrix getSimplifiedProblemSolution(Matrix, std::vector<std::pair<unsigned, unsigned>>, unsigned, double);
+        bool simplifyProblem(SimplifiedConstraintsHelper* helper);
+        void simplifiedProblemSolution(SimplifiedConstraintsHelper* helper, Matrix simplifiedSolution);
+
+        void canVariablesBeFixed(SimplifiedConstraintsHelper* helper);
+        void checkForRepeatedConstraints(SimplifiedConstraintsHelper* helper);
+        void removeRepeatedFixedVariablesPairs(SimplifiedConstraintsHelper* helper);
+
+        void newVarsToOldVars(SimplifiedConstraintsHelper* helper);
+
+        void removeConstraints(SimplifiedConstraintsHelper* helper);
+        void removeOneFixedVariable(uint varIndex, double fixedVarValue);
+        void removeFixedVariables(SimplifiedConstraintsHelper* helper);
+
+        void solveProblem();
 };
 
 #endif
