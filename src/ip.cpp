@@ -32,13 +32,14 @@ unsigned BranchAndBoundNode::getBranchVariableIndex(Matrix solution) {
 }
 
 Matrix BranchAndBoundNode::solveChildrenNodes(unsigned n) {
-    std::cout << "solving lp model #" << n << std::endl;
+    //std::cout << "solving lp model #" << n << std::endl;
     problem.solveProblem();
     Matrix currentSol = problem.getOptimalSolution();
     
 
     if(isSolutionWhole(currentSol)) {
-        std::cout << "The solution to the problem " << n << " is whole." << std::endl;
+        std::cout << "The solution to the problem " << n << " is whole. ";
+        currentSol.displayMatrix();
         return currentSol;
     }
     else if(!problem.isProblemBounded(currentSol) || !problem.isProblemFeasible(currentSol)) return currentSol;
@@ -54,7 +55,7 @@ Matrix BranchAndBoundNode::solveChildrenNodes(unsigned n) {
     Matrix newLhs1 = basisVector(currentSol.columns(), branchIndex).transpose();
     Constraint newConstraint1(newLhs1.getElements(), "<=", valueChild1);
     child1Aux.addConstraint(newConstraint1);
-    child1 = new BranchAndBoundNode(child1Aux);
+    BranchAndBoundNode* child1 = new BranchAndBoundNode(child1Aux);
     Matrix child1Sol = child1->solveChildrenNodes(n + 1);
     delete child1;
 
@@ -63,7 +64,7 @@ Matrix BranchAndBoundNode::solveChildrenNodes(unsigned n) {
     Matrix newLhs2 = basisVector(currentSol.columns(), branchIndex).transpose();
     Constraint newConstraint2(newLhs2.getElements(), ">=", valueChild2);
     child2Aux.addConstraint(newConstraint2);
-    child2 = new BranchAndBoundNode(child2Aux);
+    BranchAndBoundNode* child2 = new BranchAndBoundNode(child2Aux);
     Matrix child2Sol = child2->solveChildrenNodes(n + 2);
     delete child2;
     //delete child2;
@@ -72,7 +73,7 @@ Matrix BranchAndBoundNode::solveChildrenNodes(unsigned n) {
     Matrix betterSol = compareChildrenSolutions(child1Sol, child2Sol, problem.getObjectiveFunction());
     //betterSol.displayMatrix();
 
-    delete child2;
+    //delete child2;
     return betterSol;
 }
 
