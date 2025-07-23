@@ -32,70 +32,48 @@ unsigned BranchAndBoundNode::getBranchVariableIndex(Matrix solution) {
 }
 
 Matrix BranchAndBoundNode::solveChildrenNodes(unsigned n) {
-    Matrix currentSol;
-
-    unsigned k = problem.getConstraintsLHS().rows();
-    std::vector<double> lhsAux = problem.getConstraintsLHS().getRow(k - 1);
-    std::vector<restrictionType> restTypes = problem.getConstraintsTypes();
-    double rhsAux = problem.getConstraintsRHS().getElement(k - 1, 0);
-    std::pair<int, double> simplifiedAux = canProblemBeSimplified(Matrix(lhsAux, 1, k), restTypes[k - 1], rhsAux);
-
-    if(simplifiedAux.first != -1) {
-        std::tuple<LpProblem, std::vector<std::pair<unsigned, unsigned>>, double> simplifiedProblemAux = problem.simplifyProblem(simplifiedAux.first, simplifiedAux.second);
-        LpProblem simplifiedProblem = std::get<0>(simplifiedProblemAux);
-        std::vector<std::pair<unsigned, unsigned>> oldToNewVars = std::get<1>(simplifiedProblemAux);
-        double whatever = std::get<2>(simplifiedProblemAux);
-
-        Matrix simplifiedProblemSolution = simplifiedProblem.solveSimplex();
-
-        currentSol = problem.getSimplifiedProblemSolution(simplifiedProblemSolution, oldToNewVars, simplifiedAux.first, simplifiedAux.second);
-        problem.setOptimalSolution(currentSol);
-    }
-    else currentSol = problem.solveSimplex();
-    //Matrix currentSol = problem.solveSimplex();
-    problem.displayProblem();
+    std::cout << "solving lp model #" << n << std::endl;
+    problem.solveProblem();
+    Matrix currentSol = problem.getOptimalSolution();
+    
 
     if(isSolutionWhole(currentSol)) {
-        //std::cout << "The solution to the problem " << n << " is whole." << std::endl;
+        std::cout << "The solution to the problem " << n << " is whole." << std::endl;
         return currentSol;
     }
-    else if(!problem.isProblemBounded() || !problem.isProblemFeasible()) return currentSol;
+    else if(!problem.isProblemBounded(currentSol) || !problem.isProblemFeasible(currentSol)) return currentSol;
 
     // calculate branching variable and its bounds for left and right child
     unsigned branchIndex = getBranchVariableIndex(currentSol);
     double value = currentSol.getElement(0, branchIndex);
     double valueChild1 = floor(value);
     double valueChild2 = ceil(value);
-    //std::cout << "The branching variable is x" << branchIndex + 1 << ". ";
 
     // Left child
     LpProblem child1Aux = problem;
-    Matrix newLhs = basisVector(currentSol.columns(), branchIndex).transpose();
-    child1Aux.addRestriction(newLhs, LESS_THAN_OR_EQUAL, valueChild1);
+    Matrix newLhs1 = basisVector(currentSol.columns(), branchIndex).transpose();
+    Constraint newConstraint1(newLhs1.getElements(), "<=", valueChild1);
+    child1Aux.addConstraint(newConstraint1);
     child1 = new BranchAndBoundNode(child1Aux);
     Matrix child1Sol = child1->solveChildrenNodes(n + 1);
+    delete child1;
 
     // Right child
     LpProblem child2Aux = problem;
-    newLhs = basisVector(currentSol.columns(), branchIndex).transpose();
-    child2Aux.addRestriction(newLhs, GREATER_THAN_OR_EQUAL, valueChild2);
-    //std::cout << "This is child2" << std::endl;
+    Matrix newLhs2 = basisVector(currentSol.columns(), branchIndex).transpose();
+    Constraint newConstraint2(newLhs2.getElements(), ">=", valueChild2);
+    child2Aux.addConstraint(newConstraint2);
     child2 = new BranchAndBoundNode(child2Aux);
     Matrix child2Sol = child2->solveChildrenNodes(n + 2);
+    delete child2;
     //delete child2;
 
     // Calculate the better solution
     Matrix betterSol = compareChildrenSolutions(child1Sol, child2Sol, problem.getObjectiveFunction());
     //betterSol.displayMatrix();
 
-    delete child1;
     delete child2;
     return betterSol;
-}
-
-Matrix BranchAndBoundNode::buildNewRestriction(unsigned varIndex, restrictionType restType, double rhs) {
-    Matrix lhs = basisVector(problem.getOptimalSolution().columns(), varIndex).transpose();
-
 }
 
 Matrix BranchAndBoundNode::compareChildrenSolutions(Matrix child1Sol, Matrix child2Sol, Matrix objectiveFunction) {
@@ -112,7 +90,7 @@ Matrix BranchAndBoundNode::compareChildrenSolutions(Matrix child1Sol, Matrix chi
     else if(!child1Valid && child2Valid) return child2Sol;
     else if(!child1Valid && !child2Valid) return child1Sol;
     else {
-        std::cout << "Both solutions are valid" << std::endl;
+        //std::cout << "Both solutions are valid" << std::endl;
         double child1Result = child1Sol.dotProduct(objectiveFunction);
         double child2Result = child2Sol.dotProduct(objectiveFunction);
         if(problem.getType() == MAX) return (child1Result > child2Result) ? child1Sol : child2Sol;
@@ -140,11 +118,4 @@ void IpProblem::solveBranchAndBound() {
     std::cout << std::endl;
     startingProblem.displayProblem();
     //bestSolution.displayMatrix();
-}
-
-std::pair<int, double> BranchAndBoundNode::canProblemBeSimplified(Matrix lhs, restrictionType restType, double rhs) {
-    int isLhsBasisVector = lhs.isBasisVector();
-
-    if(isLhsBasisVector != -1 && restType == LESS_THAN_OR_EQUAL && rhs == 0) return std::make_pair(isLhsBasisVector, rhs);
-    else return std::make_pair(-1, -1);
 }

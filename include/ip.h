@@ -34,9 +34,7 @@ class BranchAndBoundNode {
         bool isSolutionWhole(Matrix);
         unsigned getBranchVariableIndex(Matrix);
         Matrix solveChildrenNodes(unsigned);
-        Matrix buildNewRestriction(unsigned, restrictionType, double);
         Matrix compareChildrenSolutions(Matrix, Matrix, Matrix);
-        std::pair<int, double> canProblemBeSimplified(Matrix, restrictionType, double);
 };
 
 class BranchAndBoundTree {
