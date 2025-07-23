@@ -10,4 +10,4 @@ html/*
 
 # Extra stuff
 .vscode/*
-model.lp
+*.lp
