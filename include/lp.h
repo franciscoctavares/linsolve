@@ -204,6 +204,13 @@ class LpProblem {
         bool operator!=(ProblemStatus statusToCheck);
 
         void setSolutionType();
+
+        // auxiliary methods for integer solutions
+
+        bool isOptimalSolutionWhole();
+
 };
+
+std::pair<bool, double> isDoubleAnInteger(double number, double epsilon = 1e-10);
 
 #endif
