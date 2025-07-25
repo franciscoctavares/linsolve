@@ -1,5 +1,5 @@
 # Object files
-obj/*
+build/*
 
 # Binary
 bin/*
@@ -11,3 +11,4 @@ html/*
 # Extra stuff
 .vscode/*
 *.lp
+src/test.cpp

@@ -20,7 +20,7 @@ class Matrix {
         Matrix operator*(Matrix);
 
         // extra operator
-        //void operator=(Matrix);
+        void operator=(Matrix);
 
         std::vector<double> getRow(unsigned);
         Matrix getColumn(unsigned);
@@ -62,6 +62,8 @@ class Matrix {
 
         // More auxiliary methods...
         int isBasisVector();
+
+        bool operator==(Matrix matrix);
 };
 
 Matrix zeros(unsigned, unsigned);

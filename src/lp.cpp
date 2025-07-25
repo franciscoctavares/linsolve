@@ -539,8 +539,10 @@ Matrix LpProblem::solveSimplex() {
         }
 
         unsigned pivotRow = getPivotRow(simplexAux, bAux, ratios);
+        // unbounded problem
         if(pivotRow == -1) {
-            //optimalSolution = Matrix({INFINITY}, 1, 1);
+            status = UNBOUNDED;
+            optimalSolution = Matrix({INFINITY}, 1, 1);
             return Matrix({INFINITY}, 1, 1);
         }
         pivots.setElement(0, 0, pivotRow);
@@ -602,10 +604,14 @@ Matrix LpProblem::solveSimplex() {
     for(int k = 0; k < basisIndices.rows(); k++) {
         if(basisIndices.getElement(k, 0) < objectiveFunction.columns()) solution.setElement(0, basisIndices.getElement(k, 0), b.getElement(k, 0));
         else if(basisIndices.getElement(k, 0) >= objectiveFunction.columns() + n_surplus_slack_variables && b.getElement(k, 0) > 0) {
+            // infeasible problem
+            //std::cout << "Hello there" << std::endl;
+            status = INFEASIBLE;
             solution = Matrix({0}, 1, 1);
             break;
         }
     }
+
 
     optimalSolution = solution;
     return solution;
@@ -663,8 +669,8 @@ void LpProblem::displayProblem() {
     }
     std::cout << std::endl;
 
-    if(optimalSolution.rows() == 1 && optimalSolution.columns() == 1 && optimalSolution.getElement(0, 0) == 0) std::cout << "The problem is infeasible" << std::endl;
-    else if(optimalSolution.rows() == 1 && optimalSolution.columns() == 1 && optimalSolution.getElement(0, 0) == INFINITY) std::cout << "The problem is unbounded" << std::endl;
+    if(status == INFEASIBLE) std::cout << "The problem is infeasible" << std::endl;
+    else if(status == UNBOUNDED) std::cout << "The problem is unbounded" << std::endl;
     else {
         std::cout << "The optimal solution is (";
         for(int i = 0; i < optimalSolution.columns(); i++) {
@@ -757,6 +763,8 @@ bool LpProblem::canProblemBeSimplified(SimplifiedConstraintsHelper* helper) {
 }
 
 bool LpProblem::simplifyProblem(SimplifiedConstraintsHelper* helper) {
+    removeConstraints(helper);
+
     // para variaveis fixadas, eliminar essas variaveis e usar o modelo "oldVariablesToNewVariables"
 
     checkForRepeatedConstraints(helper);
@@ -780,23 +788,36 @@ bool LpProblem::simplifyProblem(SimplifiedConstraintsHelper* helper) {
     }
     std::sort(helper->constraintsToRemove.begin(), helper->constraintsToRemove.end(), std::greater<unsigned>());
 
-    removeConstraints(helper);
+    //removeConstraints(helper);
 
     //removeOneFixedVariable(1, 1);
     removeFixedVariables(helper);
 
-
-
     return true;
-
 }
 
 void LpProblem::simplifiedProblemSolution(SimplifiedConstraintsHelper* helper,  Matrix simplifiedSolution) {
+
+    Matrix unboundedSol = Matrix({INFINITY}, 1, 1);
+    Matrix infeasibleSol = Matrix({0}, 1, 1);
+
+    if(simplifiedSolution == infeasibleSol) {
+        status = INFEASIBLE;
+        optimalSolution = infeasibleSol;
+        return;
+    }
+    else if(simplifiedSolution == unboundedSol) {
+        status = UNBOUNDED;
+        optimalSolution = unboundedSol;
+        return;
+    }
 
     //std::cout << objectiveFunction.columns() << " vars" << std::endl;
 
     Matrix actualSolution = zeros(1, simplifiedSolution.columns() + helper->fixedVariables.size());
     //std::cout << "The final solution has " << actualSolution.columns() << " variables" << std::endl;
+    //actualSolution.displayMatrix();
+    //std::cout << "The simplified problem has " << simplifiedSolution.columns() << " + " << helper->fixedVariables.size() << std::endl;
     for(std::pair pairsOfVars : helper->pairsOfVars) {
         actualSolution.setElement(0, pairsOfVars.second, simplifiedSolution.getElement(0, pairsOfVars.first));
     }
@@ -965,12 +986,39 @@ void LpProblem::removeFixedVariables(SimplifiedConstraintsHelper* helper) {
 void LpProblem::solveProblem() {
     SimplifiedConstraintsHelper helper;
     if(canProblemBeSimplified(&helper)) {
+        //std::cout << "Will simplify problem: " << std::endl;
         LpProblem auxProblem(type, objectiveFunction.getElements(), constraints);
+        //auxProblem.displayProblem();
         auxProblem.simplifyProblem(&helper);
         auxProblem.solveSimplex();
+        //auxProblem.displayProblem();
         simplifiedProblemSolution(&helper, auxProblem.getOptimalSolution());
     }
     else {
         solveSimplex();
     }
+
+    setSolutionType();
+    //optimalSolution.displayMatrix();
+}
+
+bool LpProblem::operator==(ProblemStatus statusToCheck) {
+    return (status == statusToCheck) ? true : false;
+}
+
+bool LpProblem::operator!=(ProblemStatus statusToCheck) {
+    return (status != statusToCheck) ? true : false;
+}
+
+void LpProblem::setSolutionType() {
+    //std::cout << optimalSolution.columns() << " variables" << std::endl;
+    for(uint i = 0; i < optimalSolution.columns(); i++) {
+        //std::cout << optimalSolution.getElement(0, i) << " ";
+        if(floor(optimalSolution.getElement(0, i)) != optimalSolution.getElement(0, i)) {
+            status = CONTINUOUS_SOLUTION;
+            return;
+        }
+    }
+    //std::cout << std::endl;
+    status = WHOLE_SOLUTION;
 }

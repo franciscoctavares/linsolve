@@ -1,20 +1,28 @@
-matrix:
-	g++ -c src/matrix.cpp -o obj/matrix.o
-lp:
-	g++ -c src/lp.cpp -o obj/lp.o
-ip:
-	g++ -c src/ip.cpp -o obj/ip.o
 model_reader:
-	g++ -c src/model_reader.cpp -o obj/model_reader.o
+	g++ -c src/model_reader.cpp -o build/model_reader.o
 constraint:
-	g++ -c src/constraint.cpp -o obj/constraint.o
+	g++ -c src/constraint.cpp -o build/constraint.o
+matrix:
+	g++ -c src/matrix.cpp -o build/matrix.o
+lp:
+	g++ -c src/lp.cpp -o build/lp.o
+ip:
+	g++ -c src/ip.cpp -o build/ip.o
+bb_node:
+	g++ -c src/bb_node.cpp -o build/bb_node.o
+bb_tree:
+	g++ -c src/bb_tree.cpp -o build/bb_tree.o
 main:
-	g++ -c src/main.cpp -o obj/main.o
-build: matrix lp constraint model_reader ip main
-	g++ -o ./bin/main obj/main.o obj/matrix.o obj/lp.o obj/constraint.o obj/model_reader.o obj/ip.o
+	g++ -c src/main.cpp -o build/main.o
+build: main lp matrix constraint model_reader bb_node bb_tree
+	g++ -o bin/main build/main.o build/lp.o build/matrix.o build/constraint.o build/model_reader.o build/bb_node.o build/bb_tree.o
 run: build
 	clear
 	./bin/main
+test: matrix lp constraint model_reader bb_node bb_tree ip
+	g++ -c src/test.cpp -o build/test.o
+	g++ -o bin/test build/test.o build/matrix.o build/constraint.o build/model_reader.o build/bb_node.o build/bb_tree.o build/lp.o build/ip.o
+	clear
+	./bin/test
 clean:
-	rm -f obj/* ./bin/main
-	mkdir -p obj
+	rm -f build/* bin/*

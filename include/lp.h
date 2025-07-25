@@ -19,7 +19,8 @@ enum ProblemType {
 
 enum ProblemStatus {
     NOT_YET_SOLVED,
-    SOLVED,
+    CONTINUOUS_SOLUTION,
+    WHOLE_SOLUTION,
     INFEASIBLE,
     UNBOUNDED
 };
@@ -198,6 +199,11 @@ class LpProblem {
         void removeFixedVariables(SimplifiedConstraintsHelper* helper);
 
         void solveProblem();
+
+        bool operator==(ProblemStatus statusToCheck);
+        bool operator!=(ProblemStatus statusToCheck);
+
+        void setSolutionType();
 };
 
 #endif

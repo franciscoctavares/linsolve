@@ -140,7 +140,7 @@ Matrix Matrix::operator*(Matrix matrix) {
     }
     else throw std::runtime_error("Dimensions don't match");
 }
-/*
+
 void Matrix::operator=(Matrix matrix) {
     elements.clear();
     n = matrix.n;
@@ -149,7 +149,7 @@ void Matrix::operator=(Matrix matrix) {
         elements.push_back(matrix.elements[i]);
     }
 }
-*/
+
 
 
 std::vector<double> Matrix::getRow(unsigned r) {
@@ -467,4 +467,8 @@ int Matrix::isBasisVector() {
     }
     if(one_count == 1 && zero_count == elements.size() - 1) return index_of_only_one;
     else return -1;
+}
+
+bool Matrix::operator==(Matrix matrix) {
+    return (elements == matrix.elements && n == matrix.n && m == matrix.m) ? true : false;
 }
