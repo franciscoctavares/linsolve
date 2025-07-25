@@ -669,7 +669,8 @@ void LpProblem::displayProblem() {
     }
     std::cout << std::endl;
 
-    if(status == INFEASIBLE) std::cout << "The problem is infeasible" << std::endl;
+    if(status == NOT_YET_SOLVED) std::cout << "The problem was not solved yet" << std::endl;
+    else if(status == INFEASIBLE) std::cout << "The problem is infeasible" << std::endl;
     else if(status == UNBOUNDED) std::cout << "The problem is unbounded" << std::endl;
     else {
         std::cout << "The optimal solution is (";
@@ -680,13 +681,13 @@ void LpProblem::displayProblem() {
         std::cout << ") = (";
         for(int i = 0; i < optimalSolution.columns(); i++) {
             if(floor(optimalSolution.getElement(0, i)) == optimalSolution.getElement(0, i)) std::cout << unsigned(optimalSolution.getElement(0, i));
-            else std::cout << std::setprecision(3) << std::fixed << optimalSolution.getElement(0, i);
+            else std::cout << std::setprecision(15) << std::fixed << optimalSolution.getElement(0, i);
             if(i < optimalSolution.columns() - 1) std::cout << ", ";
         }
         std::cout << "), and Z = ";
         if(floor(optimalSolution.dotProduct(objectiveFunction)) == optimalSolution.dotProduct(objectiveFunction)) 
             std::cout << unsigned(optimalSolution.dotProduct(objectiveFunction)) << std::endl;
-        else std::cout << std::setprecision(3) << std::fixed << optimalSolution.dotProduct(objectiveFunction) << std::endl;
+        else std::cout << std::setprecision(15) << std::fixed << optimalSolution.dotProduct(objectiveFunction) << std::endl;
     }
 }
 
@@ -998,7 +999,9 @@ void LpProblem::solveProblem() {
         solveSimplex();
     }
 
-    setSolutionType();
+    //optimalSolution.displayMatrix();
+    //setSolutionType();
+    isOptimalSolutionWhole();
     //optimalSolution.displayMatrix();
 }
 
@@ -1021,4 +1024,26 @@ void LpProblem::setSolutionType() {
     }
     //std::cout << std::endl;
     status = WHOLE_SOLUTION;
+}
+
+
+
+bool LpProblem::isOptimalSolutionWhole() {
+    for(uint i = 0; i < optimalSolution.columns(); i++) {
+        std::pair<bool, double> currentPair = isDoubleAnInteger(optimalSolution.getElement(0, i), 1e-10);
+        if(!currentPair.first) {
+            status = CONTINUOUS_SOLUTION;
+            return false;
+        }
+        else optimalSolution.setElement(0, i, currentPair.second);
+    }
+    status = WHOLE_SOLUTION;
+    return true;
+}
+
+std::pair<bool, double> isDoubleAnInteger(double number, double epsilon) {
+    if(std::abs(number - std::round(number)) < epsilon) {
+        return std::make_pair(true, std::round(number));
+    }
+    else return std::make_pair(false, number);
 }
