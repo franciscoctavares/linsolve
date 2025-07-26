@@ -7,6 +7,6 @@ Cli tool for solving linear programming models, made in c++
 * will add fathoming to optimize the execution of the solver, as well as exploration and branching strategies
 
 ### Testing stuff
-```bash
+```
     make run
 ```
