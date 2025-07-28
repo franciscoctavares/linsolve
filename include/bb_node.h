@@ -38,6 +38,8 @@ class BaBNode {
          * 
          */
         Matrix solveNode();
+
+        LpProblem getProblem();
 };
 
 #endif
