@@ -681,13 +681,13 @@ void LpProblem::displayProblem() {
         std::cout << ") = (";
         for(int i = 0; i < optimalSolution.columns(); i++) {
             if(floor(optimalSolution.getElement(0, i)) == optimalSolution.getElement(0, i)) std::cout << unsigned(optimalSolution.getElement(0, i));
-            else std::cout << std::setprecision(15) << std::fixed << optimalSolution.getElement(0, i);
+            else std::cout << std::setprecision(3) << std::fixed << optimalSolution.getElement(0, i);
             if(i < optimalSolution.columns() - 1) std::cout << ", ";
         }
         std::cout << "), and Z = ";
         if(floor(optimalSolution.dotProduct(objectiveFunction)) == optimalSolution.dotProduct(objectiveFunction)) 
             std::cout << unsigned(optimalSolution.dotProduct(objectiveFunction)) << std::endl;
-        else std::cout << std::setprecision(15) << std::fixed << optimalSolution.dotProduct(objectiveFunction) << std::endl;
+        else std::cout << std::setprecision(3) << std::fixed << optimalSolution.dotProduct(objectiveFunction) << std::endl;
     }
 }
 
@@ -789,9 +789,6 @@ bool LpProblem::simplifyProblem(SimplifiedConstraintsHelper* helper) {
     }
     std::sort(helper->constraintsToRemove.begin(), helper->constraintsToRemove.end(), std::greater<unsigned>());
 
-    //removeConstraints(helper);
-
-    //removeOneFixedVariable(1, 1);
     removeFixedVariables(helper);
 
     return true;
@@ -901,6 +898,8 @@ void LpProblem::canVariablesBeFixed(SimplifiedConstraintsHelper* helper) {
     for(uint i : repeatedIndexes) {
         helper->fixedVariables.erase(helper->fixedVariables.begin() + i);
     }
+
+    std::sort(helper->fixedVariables.begin(), helper->fixedVariables.end(), [](const auto& a, const auto& b) { return a.first > b.first; });
 }
 
 void LpProblem::checkForRepeatedConstraints(SimplifiedConstraintsHelper* helper) {
@@ -980,11 +979,13 @@ void LpProblem::removeOneFixedVariable(uint varIndex, double fixedVarValue) {
 void LpProblem::removeFixedVariables(SimplifiedConstraintsHelper* helper) {
     for(std::pair fixedVars : helper->fixedVariables) {
         //std::cout << fixedVars.first << ", " << fixedVars.second << std::endl;
+        //objectiveFunction.displayMatrix();
         removeOneFixedVariable(fixedVars.first, fixedVars.second);
     }
 }
 
 void LpProblem::solveProblem() {
+    //displayProblem();
     SimplifiedConstraintsHelper helper;
     if(canProblemBeSimplified(&helper)) {
         //std::cout << "Will simplify problem: " << std::endl;
@@ -1026,8 +1027,6 @@ void LpProblem::setSolutionType() {
     status = WHOLE_SOLUTION;
 }
 
-
-
 bool LpProblem::isOptimalSolutionWhole() {
     for(uint i = 0; i < optimalSolution.columns(); i++) {
         std::pair<bool, double> currentPair = isDoubleAnInteger(optimalSolution.getElement(0, i), 1e-10);
@@ -1039,6 +1038,22 @@ bool LpProblem::isOptimalSolutionWhole() {
     }
     status = WHOLE_SOLUTION;
     return true;
+}
+
+void LpProblem::operator=(LpProblem problemToCopy) {
+    type = problemToCopy.type;
+    objectiveFunction = problemToCopy.objectiveFunction;
+    constraints = problemToCopy.constraints;
+    optimalSolution = problemToCopy.optimalSolution;
+    status = problemToCopy.status;
+}
+
+std::vector<Constraint> LpProblem::getConstraints() {
+    return constraints;
+}
+
+ProblemStatus LpProblem::getStatus() {
+    return status;
 }
 
 std::pair<bool, double> isDoubleAnInteger(double number, double epsilon) {

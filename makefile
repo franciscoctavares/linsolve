@@ -6,8 +6,6 @@ matrix:
 	g++ -c src/matrix.cpp -o build/matrix.o
 lp:
 	g++ -c src/lp.cpp -o build/lp.o
-ip:
-	g++ -c src/ip.cpp -o build/ip.o
 bb_node:
 	g++ -c src/bb_node.cpp -o build/bb_node.o
 bb_tree:

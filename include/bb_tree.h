@@ -7,11 +7,10 @@ class BaBTree {
     private:
         BaBNode* headNode;
     public:
-        //BaBTree(void) = default;
-        BaBTree();
-        BaBTree(BaBNode newHeadNode);
+        BaBTree(BaBNode* newHeadNode);
         void setHeadNode(BaBNode* newHeadNode);
         Matrix solveTree();
+        void displayProblem(Matrix optimalWholeSolution);
 };
 
 #endif

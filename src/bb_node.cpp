@@ -52,14 +52,6 @@ Matrix BaBNode::compareChildrenSolutions(Matrix leftChildBestSol, Matrix rightCh
     Matrix rightSolution = rightChild->problem.getOptimalSolution();
     Matrix objFun = problem.getObjectiveFunction();
 
-    /*
-    std::cout << "left branch solution: ";
-    leftSolution.displayMatrix();
-    std::cout << "right branch solution: ";
-    rightSolution.displayMatrix();
-    std::cout << std::endl;
-    */
-
     Matrix unboundedSol = Matrix({INFINITY}, 1, 1);
     Matrix infeasibleSol = Matrix({0}, 1, 1);
 
@@ -74,26 +66,6 @@ Matrix BaBNode::compareChildrenSolutions(Matrix leftChildBestSol, Matrix rightCh
         if(problem.getType() == MAX) return (leftObjFunVal > rightObjFunVal) ? leftChildBestSol : rightChildBestSol;
         else if(problem.getType() == MIN) return (leftObjFunVal < rightObjFunVal) ? leftChildBestSol : rightChildBestSol;
     }
-    /*
-    //return objFun;
-    // if both left and right branches are whole solutions
-    if(leftChild->problem == WHOLE_SOLUTION && rightChild->problem == WHOLE_SOLUTION) {
-        double leftObjFunVal = leftSolution.dotProduct(objFun);
-        double rightObjFunVal = rightSolution.dotProduct(objFun);
-        if(problem.getType() == MAX) return (leftObjFunVal > rightObjFunVal) ? leftSolution : rightSolution;
-        else if(problem.getType() == MIN) return (leftObjFunVal < rightObjFunVal) ? leftSolution : rightSolution;
-    }
-    // if left branch is a whole solution and right branch is unbounded or infeasible
-    else if(leftChild->problem == WHOLE_SOLUTION && rightChild->problem != WHOLE_SOLUTION) return leftSolution;
-    //else if(leftChild->problem == WHOLE_SOLUTION && (rightChild->problem == INFEASIBLE || rightChild->problem == UNBOUNDED)) return leftSolution;
-    // if left branch is unbounded or infeasible and right branch is a whole solution
-    else if(leftChild->problem != WHOLE_SOLUTION && rightChild->problem == WHOLE_SOLUTION) return rightSolution;
-    //else if((leftChild->problem == INFEASIBLE || leftChild->problem == UNBOUNDED) && rightChild->problem == WHOLE_SOLUTION) return rightSolution;
-    // if neither branch is a whole solution
-    else return leftSolution;
-    */
-
-
 }
 
 Matrix BaBNode::solveNode() {
@@ -110,12 +82,14 @@ Matrix BaBNode::solveNode() {
     Matrix leftChildBestSol = branchLeft(branchVarInfo.first, branchVarInfo.second);
     Matrix rightChildBestSol = branchRight(branchVarInfo.first, branchVarInfo.second);
     
-    //Matrix bestSol = zeros(1, 1);
     Matrix bestSol = compareChildrenSolutions(leftChildBestSol, rightChildBestSol);
 
     if(leftChild->problem == WHOLE_SOLUTION || leftChild->problem == INFEASIBLE || leftChild->problem == UNBOUNDED) delete leftChild;
     if(rightChild->problem == WHOLE_SOLUTION || rightChild->problem == INFEASIBLE || rightChild->problem == UNBOUNDED) delete rightChild;
 
     return bestSol;
+}
 
+LpProblem BaBNode::getProblem() {
+    return problem;
 }

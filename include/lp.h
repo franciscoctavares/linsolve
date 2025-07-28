@@ -209,6 +209,11 @@ class LpProblem {
 
         bool isOptimalSolutionWhole();
 
+        void operator=(LpProblem problemToCopy);
+
+        std::vector<Constraint> getConstraints();
+        ProblemStatus getStatus();
+
 };
 
 std::pair<bool, double> isDoubleAnInteger(double number, double epsilon = 1e-10);
