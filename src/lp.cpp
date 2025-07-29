@@ -813,7 +813,8 @@ void LpProblem::simplifiedProblemSolution(SimplifiedConstraintsHelper* helper,  
     //std::cout << objectiveFunction.columns() << " vars" << std::endl;
 
     Matrix actualSolution = zeros(1, simplifiedSolution.columns() + helper->fixedVariables.size());
-    //std::cout << "The final solution has " << actualSolution.columns() << " variables" << std::endl;
+    std::cout << "The final solution has " << actualSolution.columns() << " variables";
+    std::cout << ", and the objective function has " << objectiveFunction.columns() << " variables" << std::endl;
     //actualSolution.displayMatrix();
     //std::cout << "The simplified problem has " << simplifiedSolution.columns() << " + " << helper->fixedVariables.size() << std::endl;
     for(std::pair pairsOfVars : helper->pairsOfVars) {
@@ -1028,6 +1029,18 @@ void LpProblem::setSolutionType() {
 }
 
 bool LpProblem::isOptimalSolutionWhole() {
+    Matrix infeasibleSol({0}, 1, 1);
+    Matrix unboundedSol({INFINITY}, 1, 1);
+
+    if(optimalSolution == infeasibleSol) {
+        status = INFEASIBLE;
+        return false;
+    }
+    else if(optimalSolution == unboundedSol) {
+        status = UNBOUNDED;
+        return false;
+    }
+
     for(uint i = 0; i < optimalSolution.columns(); i++) {
         std::pair<bool, double> currentPair = isDoubleAnInteger(optimalSolution.getElement(0, i), 1e-10);
         if(!currentPair.first) {

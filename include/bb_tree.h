@@ -11,6 +11,11 @@ class BaBTree {
         void setHeadNode(BaBNode* newHeadNode);
         Matrix solveTree();
         void displayProblem(Matrix optimalWholeSolution);
+
+        // new branch methods
+        std::vector<Matrix> newSolveTree();
+        void deleteTree();
+        void sortWholeSolutions(std::vector<Matrix> wholeSolutions);
 };
 
 #endif
