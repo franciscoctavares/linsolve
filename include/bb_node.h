@@ -2,6 +2,7 @@
 #define BB_NODE_H
 
 #include "lp.h"
+#include "bb_utils.h"
 
 enum NodeStatus {
     EVALUATING,
@@ -20,8 +21,8 @@ class BaBNode {
     public:
         BaBNode(void) = default;
         BaBNode(LpProblem nodeProblem);
-        Matrix branchLeft(uint varIndex, double varValue);
-        Matrix branchRight(uint varIndex, double varValue);
+        //Matrix branchLeft(uint varIndex, double varValue);
+        //Matrix branchRight(uint varIndex, double varValue);
 
         /**
          * @brief returns true if the status of the caller's node is equal to statusToCheck 
@@ -40,6 +41,12 @@ class BaBNode {
         Matrix solveNode();
 
         LpProblem getProblem();
+
+        // new branch methods
+        BaBNode* branchLeft(uint varIndex, double varValue);
+        BaBNode* branchRight(uint varIndex, double varValue);
+        Matrix solveProblem();
+        void deleteSubNodes();
 };
 
 #endif

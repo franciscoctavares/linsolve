@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
+#include <algorithm>
 
 BaBTree::BaBTree(BaBNode* newHeadNode) {
     headNode = newHeadNode;
@@ -13,7 +14,38 @@ void BaBTree::setHeadNode(BaBNode* newHeadNode) {
 }
 
 Matrix BaBTree::solveTree() {
-    return headNode->solveNode();
+    std::vector<BaBNode*> nodeQueue;
+    nodeQueue.push_back(headNode);
+
+    Matrix objectiveFunction = headNode->getProblem().getObjectiveFunction();
+
+    std::vector<Matrix> wholeSolutions;
+
+    uint solved_nodes = 0;
+    uint max_iterations = 1000;
+
+    for(uint i = 0; i < max_iterations; i++) {
+        if(nodeQueue.size() == 0) break;
+        nodeQueue[0]->solveProblem();
+        solved_nodes++;
+        std::pair<uint, double> branchVar = nodeQueue[0]->getBranchVariableInfo();
+        if(nodeQueue[0]->getProblem() == CONTINUOUS_SOLUTION) {
+            nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVar.first, branchVar.second));
+            nodeQueue.push_back(nodeQueue[0]->branchRight(branchVar.first, branchVar.second));
+        }
+        else if(nodeQueue[0]->getProblem() == WHOLE_SOLUTION) wholeSolutions.push_back(nodeQueue[0]->getProblem().getOptimalSolution());
+        nodeQueue.erase(nodeQueue.begin());
+    }
+
+    std::cout << solved_nodes << " nodes explored" << std::endl;
+
+    ProblemType typeAux = headNode->getProblem().getType();
+
+    sortWholeSolutions(wholeSolutions);
+
+
+    return wholeSolutions[0];
+    //return headNode->solveNode();
 }
 
 void BaBTree::displayProblem(Matrix optimalWholeSolution) {
@@ -95,5 +127,37 @@ void BaBTree::displayProblem(Matrix optimalWholeSolution) {
         if(floor(optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction())) == optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction())) 
             std::cout << unsigned(optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction())) << std::endl;
         else std::cout << std::setprecision(3) << std::fixed << optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction()) << std::endl;
+    }
+}
+
+void BaBTree::deleteTree() {
+    headNode->deleteSubNodes();
+}
+
+void BaBTree::sortWholeSolutions(std::vector<Matrix> wholeSolutions) {
+    Matrix objectiveFunction = headNode->getProblem().getObjectiveFunction();
+    ProblemType probType = headNode->getProblem().getType();
+    uint n = wholeSolutions.size();
+
+    for(Matrix m : wholeSolutions) {
+        m.displayMatrix();
+        std::cout << std::endl;
+    }
+
+    for(uint i = 0; i < n; i++) {
+        for(uint j = 0; j < n - i - 1; j++) {
+            if(probType == MAX)
+                if(wholeSolutions[j].dotProduct(objectiveFunction) < wholeSolutions[j + 1].dotProduct(objectiveFunction)) {
+                    Matrix aux = wholeSolutions[j];
+                    wholeSolutions[j] = wholeSolutions[j + 1];
+                    wholeSolutions[j + 1] = aux;
+                }
+            else if(probType == MIN)
+                if(wholeSolutions[j].dotProduct(objectiveFunction) > wholeSolutions[j + 1].dotProduct(objectiveFunction)) {
+                    Matrix aux = wholeSolutions[j];
+                    wholeSolutions[j] = wholeSolutions[j + 1];
+                    wholeSolutions[j + 1] = aux;
+                }
+        }
     }
 }

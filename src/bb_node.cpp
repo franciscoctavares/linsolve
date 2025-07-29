@@ -10,6 +10,7 @@ BaBNode::BaBNode(LpProblem nodeProblem) {
     status = EVALUATING;
 }
 
+/*
 Matrix BaBNode::branchLeft(uint varIndex, double varValue) {
     //std::cout << "Branched left" << std::endl;
     
@@ -33,6 +34,7 @@ Matrix BaBNode::branchRight(uint varIndex, double varValue) {
 
     return rightChild->solveNode();
 }
+*/
 
 bool BaBNode::operator==(NodeStatus statusToCheck) {
     return (status == statusToCheck) ? true : false;
@@ -79,10 +81,11 @@ Matrix BaBNode::solveNode() {
 
     std::pair<uint, double> branchVarInfo = getBranchVariableInfo();
 
-    Matrix leftChildBestSol = branchLeft(branchVarInfo.first, branchVarInfo.second);
-    Matrix rightChildBestSol = branchRight(branchVarInfo.first, branchVarInfo.second);
+    //Matrix leftChildBestSol = branchLeft(branchVarInfo.first, branchVarInfo.second);
+    //Matrix rightChildBestSol = branchRight(branchVarInfo.first, branchVarInfo.second);
     
-    Matrix bestSol = compareChildrenSolutions(leftChildBestSol, rightChildBestSol);
+    //Matrix bestSol = compareChildrenSolutions(leftChildBestSol, rightChildBestSol);
+    Matrix bestSol = zeros(1, problem.getObjectiveFunction().columns());
 
     if(leftChild->problem == WHOLE_SOLUTION || leftChild->problem == INFEASIBLE || leftChild->problem == UNBOUNDED) delete leftChild;
     if(rightChild->problem == WHOLE_SOLUTION || rightChild->problem == INFEASIBLE || rightChild->problem == UNBOUNDED) delete rightChild;
@@ -92,4 +95,37 @@ Matrix BaBNode::solveNode() {
 
 LpProblem BaBNode::getProblem() {
     return problem;
+}
+
+BaBNode* BaBNode::branchLeft(uint varIndex, double varValue) {
+    std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().columns(), varIndex).getElements();
+    Constraint newConstraint(newLhs, "<=", floor(varValue));
+    LpProblem newProblem = problem;
+    newProblem.addConstraint(newConstraint);
+    leftChild = new BaBNode(newProblem);
+
+    return leftChild;
+}
+
+BaBNode* BaBNode::branchRight(uint varIndex, double varValue) {
+    std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().columns(), varIndex).getElements();
+    Constraint newConstraint(newLhs, ">=", ceil(varValue));
+    LpProblem newProblem = problem;
+    newProblem.addConstraint(newConstraint);
+    rightChild = new BaBNode(newProblem);
+
+    return rightChild;
+}
+
+Matrix BaBNode::solveProblem() {
+    problem.solveProblem();
+    return problem.getOptimalSolution();
+}
+
+void BaBNode::deleteSubNodes() {
+    if(leftChild == NULL) delete leftChild;
+    else leftChild->deleteSubNodes();
+
+    if(rightChild == NULL) delete rightChild;
+    else rightChild->deleteSubNodes();
 }
