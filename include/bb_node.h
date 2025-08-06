@@ -2,10 +2,10 @@
 #define BB_NODE_H
 
 #include "lp.h"
-#include "bb_utils.h"
 
 enum NodeStatus {
-    EVALUATING,
+    NOT_EVALUATED,
+    EVALUATED,
     FATHOMED,
 };
 
@@ -47,6 +47,8 @@ class BaBNode {
         BaBNode* branchRight(uint varIndex, double varValue);
         Matrix solveProblem();
         void deleteSubNodes();
+        void setNodeStatus(NodeStatus newStatus);
+        double getObjectiveFunctionValue(); // assumes the node's problem is solved
 };
 
 #endif

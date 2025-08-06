@@ -2,6 +2,7 @@
 #define BB_TREE_H
 
 #include "bb_node.h"
+#include "bb_utils.h"
 
 class BaBTree {
     private:
@@ -15,7 +16,10 @@ class BaBTree {
         // new branch methods
         std::vector<Matrix> newSolveTree();
         void deleteTree();
-        void sortWholeSolutions(std::vector<Matrix> wholeSolutions);
+        void sortWholeSolutions(std::vector<Matrix>& wholeSolutions);
+        void sortNodeQueue(std::vector<BaBNode*>& nodeQueue, BranchingStrategy strategy);
+        void cutNodes(std::vector<BaBNode*>& nodeQueue, BaBNode* incumbentNode);
+        bool isNodeWorthExploring(BaBNode* node, BaBNode* incumbentSolution);
 };
 
 #endif

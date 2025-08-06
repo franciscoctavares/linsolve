@@ -7,7 +7,7 @@ BaBNode::BaBNode(LpProblem nodeProblem) {
     problem = nodeProblem;
     leftChild = NULL;
     rightChild = NULL;
-    status = EVALUATING;
+    status = NOT_EVALUATED;
 }
 
 /*
@@ -123,9 +123,24 @@ Matrix BaBNode::solveProblem() {
 }
 
 void BaBNode::deleteSubNodes() {
+    /*
     if(leftChild == NULL) delete leftChild;
     else leftChild->deleteSubNodes();
 
     if(rightChild == NULL) delete rightChild;
     else rightChild->deleteSubNodes();
+    */
+    if(*leftChild == FATHOMED || leftChild == NULL) delete leftChild;
+    else leftChild->deleteSubNodes();
+
+    if(*rightChild == FATHOMED || rightChild == NULL) delete rightChild;
+    else rightChild->deleteSubNodes();
+}
+
+void BaBNode::setNodeStatus(NodeStatus newStatus) {
+    status = newStatus;
+}
+
+double BaBNode::getObjectiveFunctionValue() {
+    return problem.getOptimalSolution().dotProduct(problem.getObjectiveFunction());
 }
