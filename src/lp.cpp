@@ -810,13 +810,8 @@ void LpProblem::simplifiedProblemSolution(SimplifiedConstraintsHelper* helper,  
         return;
     }
 
-    //std::cout << objectiveFunction.columns() << " vars" << std::endl;
-
     Matrix actualSolution = zeros(1, simplifiedSolution.columns() + helper->fixedVariables.size());
-    std::cout << "The final solution has " << actualSolution.columns() << " variables";
-    std::cout << ", and the objective function has " << objectiveFunction.columns() << " variables" << std::endl;
-    //actualSolution.displayMatrix();
-    //std::cout << "The simplified problem has " << simplifiedSolution.columns() << " + " << helper->fixedVariables.size() << std::endl;
+
     for(std::pair pairsOfVars : helper->pairsOfVars) {
         actualSolution.setElement(0, pairsOfVars.second, simplifiedSolution.getElement(0, pairsOfVars.first));
     }
@@ -826,8 +821,6 @@ void LpProblem::simplifiedProblemSolution(SimplifiedConstraintsHelper* helper,  
     }
 
     optimalSolution = actualSolution;
-
-    //actualSolution.displayMatrix();
 }
 
 void LpProblem::canVariablesBeFixed(SimplifiedConstraintsHelper* helper) {
