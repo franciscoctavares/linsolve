@@ -88,22 +88,6 @@ Matrix LpProblem::getBasisIndexes(Matrix extraCj) {
     return Matrix(basisIndices, constraintsTypes.size(), 1);
 }
 
-std::vector<std::pair<size_t, size_t>> LpProblem::getMaxWidth(std::vector<std::string> headers, Matrix matrix, std::string mode) {
-    if(mode == "single column") {
-        std::vector<std::pair<size_t, size_t>> maxWidth;
-        size_t maxHeaderWidth = 0;
-        size_t maxValueWidth = 0;
-
-        for (size_t i = 0; i < headers.size(); ++i) {
-            maxHeaderWidth = std::max(maxHeaderWidth, headers[i].length());
-            maxValueWidth = std::max(maxValueWidth, std::to_string(matrix.getElement(i, 0)).length());
-        }
-
-        maxWidth.push_back(std::make_pair(maxHeaderWidth, maxValueWidth));
-        return maxWidth;
-    }
-}
-
 std::vector<std::string> LpProblem::basisHeaders(Matrix cj, Matrix basisIndices) {
     Matrix extraCj = cj.subMatrix(0, 0, objectiveFunction.columns(), cj.columns());
     Matrix basisIndexes = getBasisIndexes(extraCj);
@@ -409,7 +393,8 @@ void LpProblem::displaySimplexTableau(Matrix tableau, Matrix cb, Matrix basisInd
     std::vector<std::string> headers = {"x1", "x2", "x3", "s1", "s2", "s3", "s4", "s5", "s6"};
     std::vector<double> values = {30, 50, 40, 0, 0, 0, 0, 0, 0};
 
-    std::vector<std::pair<size_t, size_t>> basisWidth = getMaxWidth(headers, cb, "single column");
+    //std::vector<std::pair<size_t, size_t>> basisWidth = getMaxWidth(headers, cb, "single column");
+    std::vector<std::pair<size_t, size_t>> basisWidth = {std::make_pair(10, 10)};
     size_t maxHeaderWidth = basisWidth[0].first;
     size_t maxCoeffsWidth = basisWidth[0].second;
 

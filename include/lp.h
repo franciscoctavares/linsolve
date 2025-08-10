@@ -60,7 +60,6 @@ class LpProblem {
          * @return Matrix 
          */
         Matrix getBasisIndexes(Matrix extraCj);
-        std::vector<std::pair<size_t, size_t>> getMaxWidth(std::vector<std::string>, Matrix, std::string mode = "matrix");
         std::vector<std::string> basisHeaders(Matrix, Matrix);
 
         Matrix getConstraintsLHS();

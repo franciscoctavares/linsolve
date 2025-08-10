@@ -6,4 +6,9 @@ enum BranchingStrategy {
     RANDOM,
 };
 
+enum ExplorationStrategy {
+    lol,
+    lol2,
+};
+
 #endif

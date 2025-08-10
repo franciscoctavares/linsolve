@@ -23,7 +23,7 @@ double Constraint::getRhs() {
     return rhs;
 }
 
-double Constraint::setRhs(double newRhs) {
+void Constraint::setRhs(double newRhs) {
     rhs = newRhs;
 }
 
