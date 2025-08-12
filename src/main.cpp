@@ -16,21 +16,21 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
     ModelFileReader reader;
-    LpProblem model = reader.readModel("model_test.lp");
+    LpProblem model = reader.readModel("model_2.lp");
     //model.displayProblem();
     //cout << endl;
 
     BaBNode newHeadNode(model);
     BaBTree babTree(&newHeadNode);
 
-    Matrix optimalWholeSolution = babTree.solveTree();
+    Matrix optimalWholeSolution = babTree.solveTree(BEST_OBJECTIVE_FUNCTION_VALUE);
     cout << "The solution to the IP model is: ";
     optimalWholeSolution.displayMatrix();
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
 
-    std::cout << "Execution time: " << elapsed.count() << " ms\n" << endl;
+    std::cout << "Execution time: " << elapsed.count() << " ms\n";
 
     babTree.deleteTree();
     //babTree.displayProblem(optimalWholeSolution);

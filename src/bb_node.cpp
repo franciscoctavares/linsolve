@@ -18,6 +18,10 @@ bool BaBNode::operator==(ProblemStatus statusToCheck) {
     return problem == statusToCheck;
 }
 
+bool BaBNode::operator!=(ProblemStatus statusToCheck) {
+    return problem != statusToCheck;
+}
+
 std::pair<uint, double> BaBNode::getBranchVariableInfo() {
     Matrix currentSolution = problem.getOptimalSolution();
 
@@ -35,6 +39,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo() {
 
 Matrix BaBNode::solveNode() {
     problem.solveProblem();
+    status = EVALUATED;
     return problem.getOptimalSolution();
 }
 

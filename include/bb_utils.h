@@ -2,13 +2,12 @@
 #define BB_UTILS_H
 
 enum BranchingStrategy {
-    BEST_OBJECTIVE_FUNCTION_VALUE,
-    RANDOM,
+    FIRST_INDEX,
 };
 
 enum ExplorationStrategy {
-    lol,
-    lol2,
+    BEST_OBJECTIVE_FUNCTION_VALUE,
+    RANDOM,
 };
 
 #endif

@@ -13,7 +13,8 @@ void BaBTree::setHeadNode(BaBNode* newHeadNode) {
     headNode = newHeadNode;
 }
 
-Matrix BaBTree::solveTree() {
+Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
+    /*
     std::vector<BaBNode*> nodeQueue;
     std::vector<Matrix> wholeSolutions;
     uint solvedNodes = 0;
@@ -25,6 +26,7 @@ Matrix BaBTree::solveTree() {
     do {
         nodeQueue[0]->solveNode();
         solvedNodes++;
+        //sortNodeQueue(nodeQueue, BEST_OBJECTIVE_FUNCTION_VALUE, solvedNodes);
 
         if(*nodeQueue[0] == WHOLE_SOLUTION) {
             if(incumbentSolution == NULL) incumbentSolution = nodeQueue[0];
@@ -56,6 +58,41 @@ Matrix BaBTree::solveTree() {
     sortWholeSolutions(wholeSolutions);
 
     //return wholeSolutions[0];
+    return incumbentSolution->getProblem().getOptimalSolution();
+    */
+    std::vector<BaBNode*> nodeQueue;
+    uint solvedNodes = 0;
+    BaBNode* incumbentSolution = NULL;
+
+    //nodeQueue.push_back(headNode);
+    headNode->solveNode();
+    solvedNodes++;
+
+    if(*headNode == CONTINUOUS_SOLUTION) {
+        std::pair<uint, double> branchVarInfo = headNode->getBranchVariableInfo();
+        nodeQueue.push_back(headNode->branchLeft(branchVarInfo.first, branchVarInfo.second));
+        nodeQueue.push_back(headNode->branchRight(branchVarInfo.first, branchVarInfo.second));
+    }
+
+    do {
+        solveNodeQueue(nodeQueue, solvedNodes);
+
+        fathomLeafNodes(nodeQueue, explorStrat, incumbentSolution);
+
+        sortNodeQueue(nodeQueue, explorStrat);
+
+        if(*nodeQueue[0] == CONTINUOUS_SOLUTION) {
+            std::pair<uint, double> branchVarInfo = nodeQueue[0]->getBranchVariableInfo();
+            nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarInfo.first, branchVarInfo.second));
+            nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarInfo.first, branchVarInfo.second));
+        }
+        if(nodeQueue.size() != 0) nodeQueue.erase(nodeQueue.begin());
+
+    }while(nodeQueue.size() > 0);
+
+
+    std::cout << solvedNodes << " solved nodes" << std::endl;
+
     return incumbentSolution->getProblem().getOptimalSolution();
 }
 
@@ -168,7 +205,7 @@ void BaBTree::sortWholeSolutions(std::vector<Matrix>& wholeSolutions) {
     }
 }
 
-void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, BranchingStrategy strategy) {
+void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
     ProblemType probType = headNode->getProblem().getType();
     if(strategy == BEST_OBJECTIVE_FUNCTION_VALUE) {
         uint n = nodeQueue.size();
@@ -193,114 +230,38 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, BranchingStrategy 
     }
 }
 
-void BaBTree::cutNodes(std::vector<BaBNode*>& nodeQueue, BaBNode* incumbentNode) {
-    std::vector<uint> nodesToCut;
-    ProblemType probType = headNode->getProblem().getType();
+void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes) {
+    for(uint i = 0; i < nodeQueue.size(); i++) {
+        if(*nodeQueue[i] == NOT_EVALUATED) {
+            nodeQueue[i]->solveNode();
+            solvedNodes++;
+        }
+    }
+}
+
+void BaBTree::fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy, BaBNode*& incumbentSolution) {
     for(int i = nodeQueue.size() - 1; i >= 0; i--) {
-        if(nodeQueue[i]->getProblem() == WHOLE_SOLUTION) {
-            std::cout << "Continuous solution: " << i << std::endl;
-            if(incumbentNode == NULL) {
-                incumbentNode = nodeQueue[i];
-            }
-            else {
-                if(probType == MAX) {
-                    if(nodeQueue[i]->getObjectiveFunctionValue() > incumbentNode->getObjectiveFunctionValue()) {
-                        incumbentNode = nodeQueue[i];
-                    }
-                }
-                else if(probType == MIN) {
-                    if(nodeQueue[i]->getObjectiveFunctionValue() < incumbentNode->getObjectiveFunctionValue()) {
-                        incumbentNode = nodeQueue[i];
-                    }     
-                }
-            }
+        if(*nodeQueue[i] == UNBOUNDED || *nodeQueue[i] == INFEASIBLE) {
+            nodeQueue[i]->setNodeStatus(FATHOMED);
             nodeQueue.erase(nodeQueue.begin() + i);
         }
-        else if(nodeQueue[i]->getProblem() == INFEASIBLE || nodeQueue[i]->getProblem() == UNBOUNDED) {
-            std::cout << "Infeasible or Unbounded solution: " << i << std::endl;
+        else if(*nodeQueue[i] == WHOLE_SOLUTION) {
+            updateIncumbentSolution(nodeQueue[i], incumbentSolution);
+            nodeQueue[i]->setNodeStatus(FATHOMED);
             nodeQueue.erase(nodeQueue.begin() + i);
         }
-        else if(nodeQueue[i]->getProblem() == CONTINUOUS_SOLUTION) {
-            if(incumbentNode == NULL) continue;
-            else {
-                if(!isNodeWorthExploring(nodeQueue[i], incumbentNode)) {
-                    nodeQueue[i]->setNodeStatus(FATHOMED);
-                    nodeQueue.erase(nodeQueue.begin() + i);
-                }
+        else if(*nodeQueue[i] == CONTINUOUS_SOLUTION) {
+            if(incumbentSolution != NULL && !nodeQueue[i]->isBetter(*incumbentSolution)) {
+                nodeQueue[i]->setNodeStatus(FATHOMED);
+                nodeQueue.erase(nodeQueue.begin() + i);
             }
         }
     }
 }
 
-bool BaBTree::isNodeWorthExploring(BaBNode* node, BaBNode* incumbentSolution) {
-    if(incumbentSolution == NULL) return true;
-
-    ProblemType probType = node->getProblem().getType();
-    if(probType == MAX) return (node->getObjectiveFunctionValue() > incumbentSolution->getObjectiveFunctionValue()) ? true : false;
-    else return (node->getObjectiveFunctionValue() < incumbentSolution->getObjectiveFunctionValue()) ? true : false;
-}
-
-void BaBTree::areBranchesWorthExploring(std::vector<BaBNode*>& nodeQueue, BaBNode* incumbentNode) {
-    uint n = nodeQueue.size();
-    // right branch
-    nodeQueue[n - 1]->solveNode();
-    if(nodeQueue[n - 1]->getProblem() == CONTINUOUS_SOLUTION) {
-        if(!isNodeWorthExploring(nodeQueue[n - 1], incumbentNode)) {
-            nodeQueue[n - 1]->setNodeStatus(FATHOMED);
-            nodeQueue.erase(nodeQueue.begin() + n - 1);
-        }
-    }
-    else if(*nodeQueue[n - 1] == UNBOUNDED || *nodeQueue[n - 1] == INFEASIBLE) {
-        nodeQueue[n - 1]->setNodeStatus(FATHOMED);
-        nodeQueue.erase(nodeQueue.begin() + n - 1);
-    }
-    else if(*nodeQueue[n - 1] == WHOLE_SOLUTION) {
-        if(incumbentNode == NULL) incumbentNode = nodeQueue[n - 1];
-        else {
-            ProblemType probType = headNode->getProblem().getType();
-            if(probType == MAX) {
-                if(nodeQueue[n - 1]->getObjectiveFunctionValue() > incumbentNode->getObjectiveFunctionValue()) {
-                    incumbentNode = nodeQueue[n - 1];
-                }
-            }
-            else if(probType == MIN) {
-                if(nodeQueue[n - 1]->getObjectiveFunctionValue() < incumbentNode->getObjectiveFunctionValue()) {
-                    incumbentNode = nodeQueue[n - 1];
-                }  
-            }
-        }
-        nodeQueue[n - 1]->setNodeStatus(FATHOMED);
-        nodeQueue.erase(nodeQueue.begin() + n - 1);   
-    }
-
-    // left branch
-    nodeQueue[n - 2]->solveNode();
-    if(nodeQueue[n - 2]->getProblem() == CONTINUOUS_SOLUTION) {
-        if(!isNodeWorthExploring(nodeQueue[n - 2], incumbentNode)) {
-            nodeQueue[n - 2]->setNodeStatus(FATHOMED);
-            nodeQueue.erase(nodeQueue.begin() + n - 2);
-        }
-    }
-    else if(*nodeQueue[n - 2] == UNBOUNDED || *nodeQueue[n - 2] == INFEASIBLE) {
-        nodeQueue[n - 2]->setNodeStatus(FATHOMED);
-        nodeQueue.erase(nodeQueue.begin() + n - 2);
-    }
-    else if(*nodeQueue[n - 2] == WHOLE_SOLUTION) {
-        if(incumbentNode == NULL) incumbentNode = nodeQueue[n - 2];
-        else {
-            ProblemType probType = headNode->getProblem().getType();
-            if(probType == MAX) {
-                if(nodeQueue[n - 1]->getObjectiveFunctionValue() > incumbentNode->getObjectiveFunctionValue()) {
-                    incumbentNode = nodeQueue[n - 2];
-                }
-            }
-            else if(probType == MIN) {
-                if(nodeQueue[n - 2]->getObjectiveFunctionValue() < incumbentNode->getObjectiveFunctionValue()) {
-                    incumbentNode = nodeQueue[n - 2];
-                }  
-            }
-        }
-        nodeQueue[n - 2]->setNodeStatus(FATHOMED);
-        nodeQueue.erase(nodeQueue.begin() + n - 2);   
+void BaBTree::updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSolution) {
+    if(incumbentSolution == NULL) incumbentSolution = candidate;
+    else if(incumbentSolution != NULL && candidate->isBetter(*incumbentSolution)) {
+        incumbentSolution = candidate;
     }
 }

@@ -27,6 +27,7 @@ class BaBNode {
         bool operator==(NodeStatus statusToCheck);
 
         bool operator==(ProblemStatus statusToCheck);
+        bool operator!=(ProblemStatus statusToCheck);
 
         std::pair<uint, double> getBranchVariableInfo();
 
