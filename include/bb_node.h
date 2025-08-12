@@ -44,8 +44,9 @@ class BaBNode {
         BaBNode* branchRight(uint varIndex, double varValue);
         void deleteSubNodes();
         void setNodeStatus(NodeStatus newStatus);
+        void operator=(NodeStatus newStatus);
         double getObjectiveFunctionValue(); // assumes the node's problem is solved
-        bool isBetter(BaBNode node);
+        bool isBetter(BaBNode* node);
 };
 
 #endif

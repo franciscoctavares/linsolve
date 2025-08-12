@@ -79,12 +79,18 @@ void BaBNode::setNodeStatus(NodeStatus newStatus) {
     status = newStatus;
 }
 
+void BaBNode::operator=(NodeStatus newStatus) {
+    status = newStatus;
+}
+
 double BaBNode::getObjectiveFunctionValue() {
     return problem.getOptimalSolution().dotProduct(problem.getObjectiveFunction());
 }
 
-bool BaBNode::isBetter(BaBNode node) {
+bool BaBNode::isBetter(BaBNode* node) {
     ProblemType probType = problem.getType();
 
-    return (probType == MAX) ? getObjectiveFunctionValue() > node.getObjectiveFunctionValue() : getObjectiveFunctionValue() < node.getObjectiveFunctionValue();
+    if(node == NULL) return false;
+
+    return (probType == MAX) ? getObjectiveFunctionValue() > node->getObjectiveFunctionValue() : getObjectiveFunctionValue() < node->getObjectiveFunctionValue();
 }

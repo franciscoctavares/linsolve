@@ -14,57 +14,10 @@ void BaBTree::setHeadNode(BaBNode* newHeadNode) {
 }
 
 Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
-    /*
-    std::vector<BaBNode*> nodeQueue;
-    std::vector<Matrix> wholeSolutions;
-    uint solvedNodes = 0;
-
-    BaBNode* incumbentSolution = NULL;
-
-    nodeQueue.push_back(headNode);
-
-    do {
-        nodeQueue[0]->solveNode();
-        solvedNodes++;
-        //sortNodeQueue(nodeQueue, BEST_OBJECTIVE_FUNCTION_VALUE, solvedNodes);
-
-        if(*nodeQueue[0] == WHOLE_SOLUTION) {
-            if(incumbentSolution == NULL) incumbentSolution = nodeQueue[0];
-            else {
-                if(nodeQueue[0]->isBetter(*incumbentSolution)) incumbentSolution = nodeQueue[0];
-            }
-            wholeSolutions.push_back(nodeQueue[0]->getProblem().getOptimalSolution());
-            nodeQueue[0]->setNodeStatus(FATHOMED);
-        }
-        else if(*nodeQueue[0] == CONTINUOUS_SOLUTION) {
-            if(incumbentSolution == NULL || nodeQueue[0]->isBetter(*incumbentSolution)) {
-                std::pair<uint, double> branchVarInfo = nodeQueue[0]->getBranchVariableInfo();
-                nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarInfo.first, branchVarInfo.second));
-                nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarInfo.first, branchVarInfo.second));
-            }
-            else if(!nodeQueue[0]->isBetter(*incumbentSolution)) {
-                nodeQueue[0]->setNodeStatus(FATHOMED);
-            }
-        }
-        else if(*nodeQueue[0] == INFEASIBLE || *nodeQueue[0] == UNBOUNDED) {
-            nodeQueue[0]->setNodeStatus(FATHOMED);
-        }
-
-        nodeQueue.erase(nodeQueue.begin());
-    }while(nodeQueue.size() != 0);
-
-    std::cout << solvedNodes << " solved nodes" << std::endl;
-
-    sortWholeSolutions(wholeSolutions);
-
-    //return wholeSolutions[0];
-    return incumbentSolution->getProblem().getOptimalSolution();
-    */
     std::vector<BaBNode*> nodeQueue;
     uint solvedNodes = 0;
     BaBNode* incumbentSolution = NULL;
 
-    //nodeQueue.push_back(headNode);
     headNode->solveNode();
     solvedNodes++;
 
@@ -208,6 +161,7 @@ void BaBTree::sortWholeSolutions(std::vector<Matrix>& wholeSolutions) {
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
     ProblemType probType = headNode->getProblem().getType();
     if(strategy == BEST_OBJECTIVE_FUNCTION_VALUE) {
+        /*
         uint n = nodeQueue.size();
         for(uint i = 0; i < n; i++) {
             for(uint j = 0; j < n - i - 1; j++) {
@@ -227,6 +181,11 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrateg
                 }
             }
         }
+        */
+        std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
+            if(node1->getProblem().getType() == MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
+            else return node1->getObjectiveFunctionValue() < node2->getObjectiveFunctionValue();
+        });
     }
 }
 
@@ -242,26 +201,25 @@ void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes
 void BaBTree::fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy, BaBNode*& incumbentSolution) {
     for(int i = nodeQueue.size() - 1; i >= 0; i--) {
         if(*nodeQueue[i] == UNBOUNDED || *nodeQueue[i] == INFEASIBLE) {
-            nodeQueue[i]->setNodeStatus(FATHOMED);
+            *nodeQueue[i] = FATHOMED;
             nodeQueue.erase(nodeQueue.begin() + i);
         }
         else if(*nodeQueue[i] == WHOLE_SOLUTION) {
             updateIncumbentSolution(nodeQueue[i], incumbentSolution);
-            nodeQueue[i]->setNodeStatus(FATHOMED);
+            *nodeQueue[i] = FATHOMED;
             nodeQueue.erase(nodeQueue.begin() + i);
         }
         else if(*nodeQueue[i] == CONTINUOUS_SOLUTION) {
-            if(incumbentSolution != NULL && !nodeQueue[i]->isBetter(*incumbentSolution)) {
-                nodeQueue[i]->setNodeStatus(FATHOMED);
-                nodeQueue.erase(nodeQueue.begin() + i);
+            if(strategy != EXPLORE_ALL_NODES) {
+                if(incumbentSolution != NULL && !nodeQueue[i]->isBetter(incumbentSolution)) {
+                    *nodeQueue[i] = FATHOMED;
+                    nodeQueue.erase(nodeQueue.begin() + i);
+                }
             }
         }
     }
 }
 
 void BaBTree::updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSolution) {
-    if(incumbentSolution == NULL) incumbentSolution = candidate;
-    else if(incumbentSolution != NULL && candidate->isBetter(*incumbentSolution)) {
-        incumbentSolution = candidate;
-    }
+   if(incumbentSolution == NULL || candidate->isBetter(incumbentSolution)) incumbentSolution = candidate;
 }
