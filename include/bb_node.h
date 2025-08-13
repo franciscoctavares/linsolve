@@ -15,10 +15,10 @@ class BaBNode {
         BaBNode* leftChild;
         BaBNode* rightChild;
         NodeStatus status;
-
+        uint depth;
     public:
         BaBNode(void) = default;
-        BaBNode(LpProblem nodeProblem);
+        BaBNode(LpProblem nodeProblem, uint newDepth);
 
         /**
          * @brief returns true if the status of the caller's node is equal to statusToCheck 
@@ -47,6 +47,8 @@ class BaBNode {
         void operator=(NodeStatus newStatus);
         double getObjectiveFunctionValue(); // assumes the node's problem is solved
         bool isBetter(BaBNode* node);
+
+        uint getDepth();
 };
 
 #endif

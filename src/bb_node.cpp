@@ -3,11 +3,12 @@
 #include <cmath>
 #include <iostream>
 
-BaBNode::BaBNode(LpProblem nodeProblem) {
+BaBNode::BaBNode(LpProblem nodeProblem, uint newDepth) {
     problem = nodeProblem;
     leftChild = NULL;
     rightChild = NULL;
     status = NOT_EVALUATED;
+    depth = newDepth;
 }
 
 bool BaBNode::operator==(NodeStatus statusToCheck) {
@@ -52,7 +53,7 @@ BaBNode* BaBNode::branchLeft(uint varIndex, double varValue) {
     Constraint newConstraint(newLhs, "<=", floor(varValue));
     LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
-    leftChild = new BaBNode(newProblem);
+    leftChild = new BaBNode(newProblem, depth + 1);
 
     return leftChild;
 }
@@ -62,7 +63,7 @@ BaBNode* BaBNode::branchRight(uint varIndex, double varValue) {
     Constraint newConstraint(newLhs, ">=", ceil(varValue));
     LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
-    rightChild = new BaBNode(newProblem);
+    rightChild = new BaBNode(newProblem, depth + 1);
 
     return rightChild;
 }
@@ -93,4 +94,8 @@ bool BaBNode::isBetter(BaBNode* node) {
     if(node == NULL) return false;
 
     return (probType == MAX) ? getObjectiveFunctionValue() > node->getObjectiveFunctionValue() : getObjectiveFunctionValue() < node->getObjectiveFunctionValue();
+}
+
+uint BaBNode::getDepth() {
+    return depth;
 }

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <chrono>
 #include <cmath>
 #include <iomanip>
 
@@ -14,12 +13,12 @@ using namespace std;
 
 int main() {
     ModelFileReader reader;
-    LpProblem model = reader.readModel("model_test.lp");
+    LpProblem model = reader.readModel("model_3.lp");
 
-    BaBNode newHeadNode(model);
+    BaBNode newHeadNode(model, 0);
     BaBTree babTree(&newHeadNode);
 
-    Matrix optimalWholeSolution = babTree.solveTree(BEST_OBJECTIVE_FUNCTION_VALUE);
+    Matrix optimalWholeSolution = babTree.solveTree(DEPTH);
     babTree.displayProblem(optimalWholeSolution);
 
     babTree.deleteTree();

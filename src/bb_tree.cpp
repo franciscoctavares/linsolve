@@ -33,6 +33,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
     }
 
     do {
+        //std::cout << "So far, " << solvedNodes << " nodes have been explored" << std::endl;
         solveNodeQueue(nodeQueue, solvedNodes);
 
         fathomLeafNodes(nodeQueue, explorStrat, incumbentSolution);
@@ -57,20 +58,20 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
     metrics.execution_time = elapsed.count();
     metrics.explored_nodes = solvedNodes;
     metrics.optimalWholeSolution = incumbentSolution->getProblem().getOptimalSolution();
+    metrics.optimalSolutionDepth = incumbentSolution->getDepth();
 
     return incumbentSolution->getProblem().getOptimalSolution();
 }
 
 void BaBTree::displayProblem(Matrix optimalWholeSolution) {
     std::cout << "Explored nodes: " << metrics.explored_nodes << std::endl;
-    std::cout << "Execution time: " << metrics.execution_time << " ms" << std::endl;
+    std::cout << "The optimal solution is located at depth " << metrics.optimalSolutionDepth << std::endl;
+    std::cout << "Execution time: "; //<< metrics.execution_time << " ms" << std::endl;
+    if(metrics.execution_time > 1000) std::cout << metrics.execution_time / 1000 << " s" << std::endl;
+    else if(metrics.execution_time < 1) std::cout << metrics.execution_time * 1000 << " us" << std::endl;
+    else std::cout << metrics.execution_time << " ms" << std::endl;
 
     std::cout << "The optimal solution is: (";
-    for(uint i = 0; i < metrics.optimalWholeSolution.columns(); i++) {
-        std::cout << "x" << i + 1;
-        if(i < metrics.optimalWholeSolution.columns() - 1) std::cout << ", ";
-    }
-    std::cout << ") = (";
     for(uint i = 0; i < metrics.optimalWholeSolution.columns(); i++) {
         std::cout << metrics.optimalWholeSolution.getElement(0, i);
         if(i < metrics.optimalWholeSolution.columns() - 1) std::cout << ", ";
@@ -118,6 +119,16 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrateg
         std::mt19937 g(rd());
 
         std::shuffle(nodeQueue.begin(), nodeQueue.end(), g);
+    }
+    else if(strategy == WIDTH) {
+        std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
+            return node1->getDepth() < node2->getDepth();
+        });
+    }
+    else if(strategy == DEPTH) {
+        std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
+            return node1->getDepth() > node2->getDepth();
+        });
     }
 }
 
