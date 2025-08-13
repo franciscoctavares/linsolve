@@ -7,12 +7,12 @@ Cli tool for solving linear programming models
     * Exploration strategies:
         * EXPLORE_ALL_NODES
         * BEST_OBJECTIVE_FUNCTION_VALUE
+        * RANDOM
     * Fathoming of nodes with continuous solutions worse than current incumbent solution
+    * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* Performance metrics for IP problem resolution
-* Displaying the performance metrics after solving the IP model
+* 2 new Exploration strategies: WIDTH and DEPTH
 
 ## Coming soon
-* 3 new Exploration strategies: RANDOM, WIDTH and DEPTH
 
