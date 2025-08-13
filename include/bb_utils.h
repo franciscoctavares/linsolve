@@ -14,6 +14,7 @@ enum ExplorationStrategy {
 typedef struct {
     uint explored_nodes;
     double execution_time;
-}PerformanceReport;
+    Matrix optimalWholeSolution;
+}PerformanceMetrics;
 
 #endif

@@ -13,22 +13,14 @@
 using namespace std;
 
 int main() {
-    auto start = std::chrono::high_resolution_clock::now();
-
     ModelFileReader reader;
     LpProblem model = reader.readModel("model_test.lp");
 
     BaBNode newHeadNode(model);
     BaBTree babTree(&newHeadNode);
 
-    Matrix optimalWholeSolution = babTree.solveTree(EXPLORE_ALL_NODES);
-    cout << "The solution to the IP model is(Z = " << optimalWholeSolution.dotProduct(model.getObjectiveFunction()) << "): ";
-    optimalWholeSolution.displayMatrix();
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> elapsed = end - start;
-
-    std::cout << "Execution time: " << elapsed.count() << " ms\n";
+    Matrix optimalWholeSolution = babTree.solveTree(BEST_OBJECTIVE_FUNCTION_VALUE);
+    babTree.displayProblem(optimalWholeSolution);
 
     babTree.deleteTree();
     return 0;

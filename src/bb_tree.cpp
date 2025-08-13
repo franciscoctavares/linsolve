@@ -5,6 +5,9 @@
 #include <iomanip>
 #include <algorithm>
 
+#include <random>
+#include <chrono>
+
 BaBTree::BaBTree(BaBNode* newHeadNode) {
     headNode = newHeadNode;
 }
@@ -14,6 +17,8 @@ void BaBTree::setHeadNode(BaBNode* newHeadNode) {
 }
 
 Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::vector<BaBNode*> nodeQueue;
     uint solvedNodes = 0;
     BaBNode* incumbentSolution = NULL;
@@ -44,91 +49,33 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
     }while(nodeQueue.size() > 0);
 
 
-    std::cout << solvedNodes << " solved nodes" << std::endl;
+    //std::cout << solvedNodes << " solved nodes" << std::endl;
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> elapsed = end - start;
+
+    metrics.execution_time = elapsed.count();
+    metrics.explored_nodes = solvedNodes;
+    metrics.optimalWholeSolution = incumbentSolution->getProblem().getOptimalSolution();
 
     return incumbentSolution->getProblem().getOptimalSolution();
 }
 
 void BaBTree::displayProblem(Matrix optimalWholeSolution) {
-    // Objective function
-    if(headNode->getProblem().getType() == MAX) std::cout << "max z: ";
-    else if(headNode->getProblem().getType() == MIN) std::cout << "min z: ";
+    std::cout << "Explored nodes: " << metrics.explored_nodes << std::endl;
+    std::cout << "Execution time: " << metrics.execution_time << " ms" << std::endl;
 
-    for(int i = 0; i < headNode->getProblem().getObjectiveFunction().columns(); i++) {
-        if(headNode->getProblem().getObjectiveFunction().getElement(0, i) < 0) std::cout << "- ";
-        else if(headNode->getProblem().getObjectiveFunction().getElement(0, i) > 0 && i > 0) std::cout << "+ ";
-
-        if(headNode->getProblem().getObjectiveFunction().getElement(0, i) != 1 && floor(headNode->getProblem().getObjectiveFunction().getElement(0, i)) != headNode->getProblem().getObjectiveFunction().getElement(0, i)) 
-            std::cout << std::setprecision(3) << std::fixed << headNode->getProblem().getObjectiveFunction().getElement(0, i);
-        else if(headNode->getProblem().getObjectiveFunction().getElement(0, i) != 1 && 
-                floor(headNode->getProblem().getObjectiveFunction().getElement(0, i) != 1) == headNode->getProblem().getObjectiveFunction().getElement(0, i) != 1)
-            std::cout << unsigned(headNode->getProblem().getObjectiveFunction().getElement(0, i));
+    std::cout << "The optimal solution is: (";
+    for(uint i = 0; i < metrics.optimalWholeSolution.columns(); i++) {
         std::cout << "x" << i + 1;
-
-        if(i < headNode->getProblem().getObjectiveFunction().columns() - 1) std::cout << " ";
+        if(i < metrics.optimalWholeSolution.columns() - 1) std::cout << ", ";
     }
-    std::cout << std::endl << std::endl;;
-
-    // Constraints
-    std::cout << "subject to:" << std::endl;
-    for(int i = 0; i < headNode->getProblem().getConstraints().size(); i++) {
-        bool hasWritten = false;
-        std::vector<double> lhs = headNode->getProblem().getConstraints()[i].getLhs();
-        ConstraintType currentType = headNode->getProblem().getConstraints()[i].getType();
-        double rhs = headNode->getProblem().getConstraints()[i].getRhs();
-        for(int j = 0; j < lhs.size(); j++) {
-            if(lhs[j] != 0) {
-                if(lhs[j] < 0) std::cout << "- ";
-                else if(lhs[j] > 0 && j > 0 && hasWritten) std::cout << "+ ";
-
-                if(lhs[j] != 1 && floor(lhs[j]) != lhs[j]) std::cout << std::setprecision(3) << std::fixed << fabs(lhs[j]);
-                else if(lhs[j] != 1 && floor(lhs[j]) == lhs[j]) std::cout << unsigned(lhs[j]);
-
-                std::cout << "x" << j + 1;
-                hasWritten = true;
-            }
-
-            if(j < lhs.size() - 1) std::cout << " ";
-        }
-
-        if(currentType == LESS_THAN_OR_EQUAL) std::cout << " <= ";
-        else if(currentType == GREATER_THAN_OR_EQUAL) std::cout << " >= ";
-        else if(currentType == EQUAL) std::cout << " = ";
-
-        if(rhs < 0) std::cout << "-";
-        if(floor(rhs) == rhs) std::cout << unsigned(rhs);
-        else std::cout << std::setprecision(3) << std::fixed << fabs(rhs);
-        std::cout << std::endl;
+    std::cout << ") = (";
+    for(uint i = 0; i < metrics.optimalWholeSolution.columns(); i++) {
+        std::cout << metrics.optimalWholeSolution.getElement(0, i);
+        if(i < metrics.optimalWholeSolution.columns() - 1) std::cout << ", ";
     }
-    //std::cout << std::endl;
-
-    //std::cout << "With ";
-    for(uint i = 0; i < optimalWholeSolution.columns(); i++) {
-        std::cout << "x" << i + 1;
-        if(i < optimalWholeSolution.columns() - 1) std::cout << ", ";
-    }
-    std::cout << " must be integers" << std::endl << std::endl;
-
-    if(headNode->getProblem().getStatus() == NOT_YET_SOLVED) std::cout << "The problem was not solved yet" << std::endl;
-    else if(headNode->getProblem().getStatus() == INFEASIBLE) std::cout << "The problem is infeasible" << std::endl;
-    else if(headNode->getProblem().getStatus() == UNBOUNDED) std::cout << "The problem is unbounded" << std::endl;
-    else {
-        std::cout << "The optimal solution is (";
-        for(int i = 0; i < optimalWholeSolution.columns(); i++) {
-            std::cout << "x" << i + 1;
-            if(i < optimalWholeSolution.columns() - 1) std::cout << ", ";
-        }
-        std::cout << ") = (";
-        for(int i = 0; i < optimalWholeSolution.columns(); i++) {
-            if(floor(optimalWholeSolution.getElement(0, i)) == optimalWholeSolution.getElement(0, i)) std::cout << unsigned(optimalWholeSolution.getElement(0, i));
-            else std::cout << std::setprecision(3) << std::fixed << optimalWholeSolution.getElement(0, i);
-            if(i < optimalWholeSolution.columns() - 1) std::cout << ", ";
-        }
-        std::cout << "), and Z = ";
-        if(floor(optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction())) == optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction())) 
-            std::cout << unsigned(optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction())) << std::endl;
-        else std::cout << std::setprecision(3) << std::fixed << optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction()) << std::endl;
-    }
+    std::cout << "), Z = " << metrics.optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction()) << std::endl;
 }
 
 void BaBTree::deleteTree() {
@@ -161,31 +108,16 @@ void BaBTree::sortWholeSolutions(std::vector<Matrix>& wholeSolutions) {
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
     ProblemType probType = headNode->getProblem().getType();
     if(strategy == BEST_OBJECTIVE_FUNCTION_VALUE) {
-        /*
-        uint n = nodeQueue.size();
-        for(uint i = 0; i < n; i++) {
-            for(uint j = 0; j < n - i - 1; j++) {
-                if(probType == MAX) {
-                    if(nodeQueue[j]->getObjectiveFunctionValue() < nodeQueue[j + 1]->getObjectiveFunctionValue()) {
-                        BaBNode* aux = nodeQueue[j];
-                        nodeQueue[j] = nodeQueue[j + 1];
-                        nodeQueue[j + 1] = aux;
-                    }
-                }
-                else if(probType == MIN) {
-                    if(nodeQueue[j]->getObjectiveFunctionValue() > nodeQueue[j + 1]->getObjectiveFunctionValue()) {
-                        BaBNode* aux = nodeQueue[j];
-                        nodeQueue[j] = nodeQueue[j + 1];
-                        nodeQueue[j + 1] = aux; 
-                    }
-                }
-            }
-        }
-        */
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             if(node1->getProblem().getType() == MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
             else return node1->getObjectiveFunctionValue() < node2->getObjectiveFunctionValue();
         });
+    }
+    else if(strategy == RANDOM) {
+        std::random_device rd;
+        std::mt19937 g(rd());
+
+        std::shuffle(nodeQueue.begin(), nodeQueue.end(), g);
     }
 }
 

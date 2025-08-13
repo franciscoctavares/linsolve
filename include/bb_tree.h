@@ -7,6 +7,7 @@
 class BaBTree {
     private:
         BaBNode* headNode;
+        PerformanceMetrics metrics;
     public:
         BaBTree(BaBNode* newHeadNode);
         void setHeadNode(BaBNode* newHeadNode);
