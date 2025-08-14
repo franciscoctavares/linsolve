@@ -18,4 +18,3 @@ Cli tool for solving linear programming models
 
 ## Coming soon
 * Branching strategies
-

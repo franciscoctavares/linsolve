@@ -69,11 +69,15 @@ BaBNode* BaBNode::branchRight(uint varIndex, double varValue) {
 }
 
 void BaBNode::deleteSubNodes() {
-    if(*leftChild == FATHOMED || leftChild == NULL) delete leftChild;
-    else leftChild->deleteSubNodes();
+    if(leftChild != NULL) {
+        if(*leftChild == FATHOMED) delete leftChild;
+        else leftChild->deleteSubNodes();
+    }
 
-    if(*rightChild == FATHOMED || rightChild == NULL) delete rightChild;
-    else rightChild->deleteSubNodes();
+    if(rightChild != NULL) {
+        if(*rightChild == FATHOMED) delete rightChild;
+        else rightChild->deleteSubNodes();
+    }
 }
 
 void BaBNode::setNodeStatus(NodeStatus newStatus) {

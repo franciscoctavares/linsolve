@@ -6,8 +6,8 @@ enum BranchingStrategy {
 };
 
 enum ExplorationStrategy {
-    BEST_OBJECTIVE_FUNCTION_VALUE,
     EXPLORE_ALL_NODES,
+    BEST_OBJECTIVE_FUNCTION_VALUE,
     WIDTH,
     DEPTH,
     RANDOM,

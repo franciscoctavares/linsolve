@@ -31,6 +31,17 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
         nodeQueue.push_back(headNode->branchLeft(branchVarInfo.first, branchVarInfo.second));
         nodeQueue.push_back(headNode->branchRight(branchVarInfo.first, branchVarInfo.second));
     }
+    else if(*headNode == WHOLE_SOLUTION) {
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = end - start;
+
+        metrics.execution_time = elapsed.count();
+        metrics.explored_nodes = solvedNodes;
+        metrics.optimalWholeSolution = headNode->getProblem().getOptimalSolution();
+        metrics.optimalSolutionDepth = headNode->getDepth();
+    
+        return headNode->getProblem().getOptimalSolution();
+    }
 
     do {
         //std::cout << "So far, " << solvedNodes << " nodes have been explored" << std::endl;
