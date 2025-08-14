@@ -12,7 +12,7 @@ bb_tree:
 	g++ -c src/bb_tree.cpp -o build/bb_tree.o
 main:
 	g++ -c src/main.cpp -o build/main.o
-build: main lp matrix constraint model_reader bb_node bb_tree
+build: clean main lp matrix constraint model_reader bb_node bb_tree
 	g++ -o bin/main build/main.o build/lp.o build/matrix.o build/constraint.o build/model_reader.o build/bb_node.o build/bb_tree.o
 run: build
 	clear
@@ -24,3 +24,4 @@ test: matrix lp constraint model_reader bb_node bb_tree ip
 	./bin/test
 clean:
 	rm -f build/* bin/*
+	mkdir -p build bin

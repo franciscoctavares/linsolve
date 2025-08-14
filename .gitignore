@@ -11,4 +11,3 @@ html/*
 # Extra stuff
 .vscode/*
 *.lp
-src/test.cpp
