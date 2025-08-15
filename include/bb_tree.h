@@ -16,7 +16,6 @@ class BaBTree {
 
         // new branch methods
         void deleteTree();
-        void sortWholeSolutions(std::vector<Matrix>& wholeSolutions);
         void sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy);
 
         void solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes);

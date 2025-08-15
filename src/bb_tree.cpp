@@ -94,29 +94,6 @@ void BaBTree::deleteTree() {
     headNode->deleteSubNodes();
 }
 
-void BaBTree::sortWholeSolutions(std::vector<Matrix>& wholeSolutions) {
-    Matrix objectiveFunction = headNode->getProblem().getObjectiveFunction();
-    ProblemType probType = headNode->getProblem().getType();
-    uint n = wholeSolutions.size();
-
-    for(uint i = 0; i < n; i++) {
-        for(uint j = 0; j < n - i - 1; j++) {
-            if(probType == MAX)
-                if(wholeSolutions[j].dotProduct(objectiveFunction) <= wholeSolutions[j + 1].dotProduct(objectiveFunction)) {
-                    Matrix aux = wholeSolutions[j];
-                    wholeSolutions[j] = wholeSolutions[j + 1];
-                    wholeSolutions[j + 1] = aux;
-                }
-            else if(probType == MIN)
-                if(wholeSolutions[j].dotProduct(objectiveFunction) >= wholeSolutions[j + 1].dotProduct(objectiveFunction)) {
-                    Matrix aux = wholeSolutions[j];
-                    wholeSolutions[j] = wholeSolutions[j + 1];
-                    wholeSolutions[j + 1] = aux;
-                }
-        }
-    }
-}
-
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
     ProblemType probType = headNode->getProblem().getType();
     if(strategy == BEST_OBJECTIVE_FUNCTION_VALUE) {

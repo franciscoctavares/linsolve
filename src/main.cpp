@@ -35,5 +35,6 @@ int main(int argc, char** argv) {
     babTree.displayProblem(optimalWholeSolution);
 
     babTree.deleteTree();
+
     return 0;
 }

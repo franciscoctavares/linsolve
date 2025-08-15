@@ -11,3 +11,4 @@ html/*
 # Extra stuff
 .vscode/*
 *.lp
+tabulate.hpp
