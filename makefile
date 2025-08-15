@@ -10,18 +10,15 @@ bb_node:
 	g++ -c src/bb_node.cpp -o build/bb_node.o
 bb_tree:
 	g++ -c src/bb_tree.cpp -o build/bb_tree.o
+bb_utils:
+	g++ -c src/bb_utils.cpp -o build/bb_utils.o
 main:
 	g++ -c src/main.cpp -o build/main.o
-build: clean main lp matrix constraint model_reader bb_node bb_tree
-	g++ -o bin/main build/main.o build/lp.o build/matrix.o build/constraint.o build/model_reader.o build/bb_node.o build/bb_tree.o
+build: clean main lp matrix constraint model_reader bb_node bb_tree bb_utils
+	g++ -o bin/main build/main.o build/lp.o build/matrix.o build/constraint.o build/model_reader.o build/bb_node.o build/bb_tree.o build/bb_utils.o
 run: build
 	clear
 	./bin/main
-test: matrix lp constraint model_reader bb_node bb_tree ip
-	g++ -c src/test.cpp -o build/test.o
-	g++ -o bin/test build/test.o build/matrix.o build/constraint.o build/model_reader.o build/bb_node.o build/bb_tree.o build/lp.o build/ip.o
-	clear
-	./bin/test
 clean:
 	rm -f build/* bin/*
 	mkdir -p build bin

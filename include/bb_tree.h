@@ -11,7 +11,7 @@ class BaBTree {
     public:
         BaBTree(BaBNode* newHeadNode);
         void setHeadNode(BaBNode* newHeadNode);
-        Matrix solveTree(ExplorationStrategy explorStrat);
+        Matrix solveTree(ExplorationStrategy explorStrat, BranchingStrategy branchStrat);
         void displayProblem(Matrix optimalWholeSolution);
 
         // new branch methods

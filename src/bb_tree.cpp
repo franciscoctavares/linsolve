@@ -16,7 +16,7 @@ void BaBTree::setHeadNode(BaBNode* newHeadNode) {
     headNode = newHeadNode;
 }
 
-Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
+Matrix BaBTree::solveTree(ExplorationStrategy explorStrat, BranchingStrategy branchStrat) {
     auto start = std::chrono::high_resolution_clock::now();
 
     std::vector<BaBNode*> nodeQueue;
@@ -27,7 +27,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
     solvedNodes++;
 
     if(*headNode == CONTINUOUS_SOLUTION) {
-        std::pair<uint, double> branchVarInfo = headNode->getBranchVariableInfo();
+        std::pair<uint, double> branchVarInfo = headNode->getBranchVariableInfo(branchStrat);
         nodeQueue.push_back(headNode->branchLeft(branchVarInfo.first, branchVarInfo.second));
         nodeQueue.push_back(headNode->branchRight(branchVarInfo.first, branchVarInfo.second));
     }
@@ -52,7 +52,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat) {
         sortNodeQueue(nodeQueue, explorStrat);
 
         if(*nodeQueue[0] == CONTINUOUS_SOLUTION) {
-            std::pair<uint, double> branchVarInfo = nodeQueue[0]->getBranchVariableInfo();
+            std::pair<uint, double> branchVarInfo = nodeQueue[0]->getBranchVariableInfo(branchStrat);
             nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarInfo.first, branchVarInfo.second));
             nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarInfo.first, branchVarInfo.second));
         }

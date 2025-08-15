@@ -2,6 +2,7 @@
 #define BB_NODE_H
 
 #include "lp.h"
+#include "bb_utils.h"
 
 enum NodeStatus {
     NOT_EVALUATED,
@@ -29,7 +30,7 @@ class BaBNode {
         bool operator==(ProblemStatus statusToCheck);
         bool operator!=(ProblemStatus statusToCheck);
 
-        std::pair<uint, double> getBranchVariableInfo();
+        std::pair<uint, double> getBranchVariableInfo(BranchingStrategy branchStrat);
 
         /**
          * @brief Solves the node's LP problem
