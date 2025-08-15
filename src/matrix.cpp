@@ -150,8 +150,6 @@ void Matrix::operator=(Matrix matrix) {
     }
 }
 
-
-
 std::vector<double> Matrix::getRow(unsigned r) {
     if(r >= 0 && r < n) {
         std::vector<double> aux;

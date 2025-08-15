@@ -2,14 +2,15 @@
 #define MATRIX_H
 
 #include <vector>
+#include <sys/types.h>
 
 class Matrix {
     private:
         std::vector<double> elements;
-        unsigned n, m;
+        uint n, m;
     public:
         Matrix(void) = default;
-        Matrix(std::vector<double>, unsigned, unsigned);
+        Matrix(std::vector<double>, uint, uint);
         void displayMatrix();
         
         // Basic Operations
@@ -22,19 +23,19 @@ class Matrix {
         // extra operator
         void operator=(Matrix);
 
-        std::vector<double> getRow(unsigned);
-        Matrix getColumn(unsigned);
+        std::vector<double> getRow(uint);
+        Matrix getColumn(uint);
 
-        void rowOperation(unsigned, unsigned, double);
-        void columnOperation(unsigned, unsigned, double);
+        void rowOperation(uint, uint, double);
+        void columnOperation(uint, uint, double);
         
         double dotProduct(Matrix); // dot product, when the 2 matrices are vectors
         
         unsigned rows(); // returns the number of rows
         unsigned columns(); // returns the number of columns
         
-        double getElement(unsigned, unsigned); // returns the element given the indices of the row and column
-        void setElement(unsigned, unsigned, double); // given the indices of the row and column, sets the element to the value specified by the argument
+        double getElement(uint, uint); // returns the element given the indices of the row and column
+        void setElement(uint, uint, double); // given the indices of the row and column, sets the element to the value specified by the argument
         
         void stackVertical(Matrix);
         void stackHorizontal(Matrix);
@@ -49,15 +50,15 @@ class Matrix {
 
         Matrix pointDivision(Matrix);
 
-        Matrix setRow(unsigned, Matrix);
-        Matrix setColumn(unsigned, Matrix);
+        Matrix setRow(uint, Matrix);
+        Matrix setColumn(uint, Matrix);
         
-        Matrix removeRow(unsigned);
-        void removeColumn(unsigned);
+        Matrix removeRow(uint);
+        void removeColumn(uint);
         
         unsigned findValueInVectorMatrix(double);
 
-        Matrix subMatrix(unsigned, unsigned, unsigned, unsigned);
+        Matrix subMatrix(uint, uint, uint, uint);
         std::vector<double> getElements();
 
         // More auxiliary methods...
@@ -66,7 +67,7 @@ class Matrix {
         bool operator==(Matrix matrix);
 };
 
-Matrix zeros(unsigned, unsigned);
-Matrix basisVector(unsigned, unsigned);
+Matrix zeros(uint, uint);
+Matrix basisVector(uint, uint);
 
 #endif
