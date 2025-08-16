@@ -19,17 +19,34 @@ class BaBNode {
         uint depth;
     public:
         BaBNode(void) = default;
+
+        /**
+         * @brief BaBNode class constructor
+         * 
+         */
         BaBNode(LpProblem nodeProblem, uint newDepth);
 
         /**
-         * @brief returns true if the status of the caller's node is equal to statusToCheck 
+         * @brief Checks if the status of the node is equal to statusToCheck
          * 
          */
         bool operator==(NodeStatus statusToCheck);
 
+        /**
+         * @brief Checks if the status of the node's problem is equal to statusToCheck
+         */
         bool operator==(ProblemStatus statusToCheck);
+
+        /**
+         * @brief Checks if the status of the node's problem is not equal to statusToCheck
+         */
         bool operator!=(ProblemStatus statusToCheck);
 
+        /**
+         * @brief Retrieves the branching variable and its current value based on the branching strategy
+         *        , passed as an argument
+         * 
+         */
         std::pair<uint, double> getBranchVariableInfo(BranchingStrategy branchStrat);
 
         /**
@@ -38,17 +55,52 @@ class BaBNode {
          */
         Matrix solveNode();
 
+        /**
+         * @brief Retrieves the node's LP problem
+         * 
+         */
         LpProblem getProblem();
 
-        // new branch methods
+        /**
+         * @brief Given the branching variable and its value, creates the left branch and returns a pointer to it
+         * 
+         */
         BaBNode* branchLeft(uint varIndex, double varValue);
+
+        /**
+         * @brief Given the branching variable and its value, creates the right branch and returns a pointer to it
+         * 
+         */
         BaBNode* branchRight(uint varIndex, double varValue);
+
+        /**
+         * @brief Delete all the caller's children nodes
+         * 
+         */
         void deleteSubNodes();
-        void setNodeStatus(NodeStatus newStatus);
+
+        /**
+         * @brief Sets a new node status
+         * 
+         */
         void operator=(NodeStatus newStatus);
-        double getObjectiveFunctionValue(); // assumes the node's problem is solved
+
+        /**
+         * @brief Assuming the node's problem is solved, returns the optimal solution's objective function value
+         * 
+         */
+        double getObjectiveFunctionValue();
+
+        /**
+         * @brief Checks if the caller's solution is better than the argument node's solution
+         * 
+         */
         bool isBetter(BaBNode* node);
 
+        /**
+         * @brief Retrieves the node's depth
+         * 
+         */
         uint getDepth();
 };
 

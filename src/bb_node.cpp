@@ -132,10 +132,6 @@ void BaBNode::deleteSubNodes() {
     }
 }
 
-void BaBNode::setNodeStatus(NodeStatus newStatus) {
-    status = newStatus;
-}
-
 void BaBNode::operator=(NodeStatus newStatus) {
     status = newStatus;
 }
