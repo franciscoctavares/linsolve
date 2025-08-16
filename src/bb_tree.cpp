@@ -4,7 +4,6 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
-
 #include <random>
 #include <chrono>
 
@@ -24,6 +23,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat, BranchingStrategy bra
     BaBNode* incumbentSolution = NULL;
 
     headNode->solveNode();
+    //std::cout << "Solved a node, Z = " << headNode->getObjectiveFunctionValue() <<std::endl;
     solvedNodes++;
 
     if(*headNode == CONTINUOUS_SOLUTION) {
@@ -44,11 +44,11 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat, BranchingStrategy bra
     }
 
     do {
-        //std::cout << "So far, " << solvedNodes << " nodes have been explored" << std::endl;
         solveNodeQueue(nodeQueue, solvedNodes);
 
         fathomLeafNodes(nodeQueue, explorStrat, incumbentSolution);
 
+        if(nodeQueue.size() == 0) break;
         sortNodeQueue(nodeQueue, explorStrat);
 
         if(*nodeQueue[0] == CONTINUOUS_SOLUTION) {
@@ -56,12 +56,10 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorStrat, BranchingStrategy bra
             nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarInfo.first, branchVarInfo.second));
             nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarInfo.first, branchVarInfo.second));
         }
+
         if(nodeQueue.size() != 0) nodeQueue.erase(nodeQueue.begin());
 
     }while(nodeQueue.size() > 0);
-
-
-    //std::cout << solvedNodes << " solved nodes" << std::endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
@@ -96,6 +94,9 @@ void BaBTree::deleteTree() {
 
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
     ProblemType probType = headNode->getProblem().getType();
+
+    //std::cout << "Right now, the node queue has " << nodeQueue.size() << " elements" << std::endl;
+
     if(strategy == BEST_OBJECTIVE_FUNCTION_VALUE) {
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             if(node1->getProblem().getType() == MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
