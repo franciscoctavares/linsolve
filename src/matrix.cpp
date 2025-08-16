@@ -6,23 +6,6 @@
 
 #include <string>
 
-Matrix zeros(unsigned rows, unsigned columns) {
-    std::vector<double> vec;
-    for(int i = 0; i < rows * columns; i++) {
-        vec.push_back(0.0);
-    }
-    return Matrix(vec, rows, columns);
-}
-
-Matrix basisVector(unsigned size, unsigned index) {
-    std::vector<double> vec;
-    for(int i = 0; i < size; i++) {
-        if(i == index) vec.push_back(1.0);
-        else vec.push_back(0.0);
-    }
-    return Matrix(vec, size, 1);
-}
-
 Matrix::Matrix(std::vector<double> vec, unsigned a, unsigned b) {
     elements = vec;
     if(elements.size() != a * b) {
@@ -150,7 +133,7 @@ void Matrix::operator=(Matrix matrix) {
     }
 }
 
-std::vector<double> Matrix::getRow(unsigned r) {
+std::vector<double> Matrix::getRow(uint r) {
     if(r >= 0 && r < n) {
         std::vector<double> aux;
 
@@ -235,19 +218,19 @@ double Matrix::dotProduct(Matrix matrix) { // assumes both matrices are row/colu
 
 }
 
-unsigned Matrix::rows() {
+uint Matrix::rows() {
     return n;
 }
 
-unsigned Matrix::columns() {
+uint Matrix::columns() {
     return m;
 }
 
-double Matrix::getElement(unsigned row, unsigned column) {
+double Matrix::getElement(uint row, uint column) {
     return elements[row * m + column];
 }
 
-void Matrix::setElement(unsigned row, unsigned col, double value) {
+void Matrix::setElement(uint row, uint col, double value) {
     if(row < 0 || row >= n) {
         std::ostringstream errorMsg;
         errorMsg << "Error using setElement: The row argument must be between 0 and " << n - 1 << ", but the value provided was " << row;
@@ -267,12 +250,7 @@ void Matrix::stackVertical(Matrix matrix) {
         errorMsg << "Error using stackVertical: cannot vertically stack a matrix with " << matrix.m << " columns below a matrix with " << m << " columns";
         throw std::runtime_error(errorMsg.str());
     }
-    /*
-    std::vector<double> aux;
-    for(int i = 0; i < rows() * columns(); i++) aux.push_back(getElement(i / rows(), i % columns()));
-    for(int j = 0; j < matrix.rows() * matrix.columns(); j++) aux.push_back(matrix.getElement(j / matrix.rows(), j % matrix.columns()));
-    return Matrix(aux, n + matrix.rows(), m);
-    */
+
     for(int i = 0; i < matrix.n * matrix.m; i++) {
         elements.push_back(matrix.elements[i]);
     }
@@ -320,13 +298,13 @@ void Matrix::operator*=(double value) {
     for(int i = 0; i < n * m; i++) elements[i] *= value;
 }
 
-unsigned Matrix::maxValueIndex() {
+uint Matrix::maxValueIndex() {
     auto maxIt = std::max_element(elements.begin(), elements.end());
     size_t maxIndex = std::distance(elements.begin(), maxIt);
     return maxIndex;
 }
 
-unsigned Matrix::minValueIndex() {
+uint Matrix::minValueIndex() {
     auto minIt = std::min_element(elements.begin(), elements.end());
     size_t minIndex = std::distance(elements.begin(), minIt);
     return minIndex;
@@ -389,7 +367,7 @@ Matrix Matrix::setColumn(unsigned column, Matrix matrix) {
     return Matrix(aux, n, m);
 }
 
-Matrix Matrix::removeRow(unsigned row) {
+Matrix Matrix::removeRow(uint row) {
     if(row < 0 || row > rows() - 1) {
         std::ostringstream errorMsg;
         errorMsg << "Error using removeRow: the row argument must be between 0 and " << n - 1 << ", but the value provided was " << row;
@@ -406,7 +384,7 @@ Matrix Matrix::removeRow(unsigned row) {
     return Matrix(aux, n - 1, m);
 }
 
-void Matrix::removeColumn(unsigned column) {
+void Matrix::removeColumn(uint column) {
     if(column < 0 || column > columns() - 1) {
         std::ostringstream errorMsg;
         errorMsg << "Error using removeColumn: the column argument must be between 0 and " << m - 1 << ", but the value provided was " << column;
@@ -425,14 +403,14 @@ void Matrix::removeColumn(unsigned column) {
     m--;
 }
 
-unsigned Matrix::findValueInVectorMatrix(double value) {
+uint Matrix::findValueInVectorMatrix(double value) {
     for(int i = 0; i < elements.size(); i++) {
         if(elements[i] == value) return i;
     }
     return -1;
 }
 
-Matrix Matrix::subMatrix(unsigned r1, unsigned r2, unsigned c1, unsigned c2) {
+Matrix Matrix::subMatrix(uint r1, uint r2, uint c1, uint c2) {
     std::vector<double> aux;
 
     for(int i = 0; i < n; i++) {
@@ -469,4 +447,23 @@ int Matrix::isBasisVector() {
 
 bool Matrix::operator==(Matrix matrix) {
     return (elements == matrix.elements && n == matrix.n && m == matrix.m) ? true : false;
+}
+
+// Non Matrix class functions
+
+Matrix zeros(uint rows, uint columns) {
+    std::vector<double> vec;
+    for(int i = 0; i < rows * columns; i++) {
+        vec.push_back(0.0);
+    }
+    return Matrix(vec, rows, columns);
+}
+
+Matrix basisVector(uint size, uint index) {
+    std::vector<double> vec;
+    for(int i = 0; i < size; i++) {
+        if(i == index) vec.push_back(1.0);
+        else vec.push_back(0.0);
+    }
+    return Matrix(vec, size, 1);
 }
