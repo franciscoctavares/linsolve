@@ -18,10 +18,35 @@ class Constraint {
         double rhs;
     public:
         Constraint(void) = default;
-        Constraint(std::vector<double>, std::string, double);
+
+        /**
+         * @brief Constraint class constructor
+         * 
+         */
+        Constraint(std::vector<double> newLhs, std::string newConstraintType, double newRhs);
+
+        /**
+         * @brief Retrieves the LHS(left hand side) of the contraint
+         * 
+         */
         std::vector<double> getLhs();
+
+        /**
+         * @brief Retrieves the type(<=, >= or =) of the constraint
+         * 
+         */
         ConstraintType getType();
+
+        /**
+         * @brief Retrieves the RHS(right hand side) of the constraint
+         * 
+         */
         double getRhs();
+
+        /**
+         * @brief Sets a new value for the RHS(right hand side) of the constraint
+         * 
+         */
         void setRhs(double newRhs);
 
         /**
@@ -31,6 +56,12 @@ class Constraint {
          */
         bool operator==(Constraint otherConstraint);
 
+        /**
+         * @brief Removes a variable that has been fixed to a specific value(passed as an argument)
+         * 
+         * @param varIndex 
+         * @param varValue 
+         */
         void removeFixedVariable(uint varIndex, double varValue);
 };
 
