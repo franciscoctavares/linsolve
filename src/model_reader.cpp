@@ -10,9 +10,7 @@
 #include <iomanip>
 #include <cmath>
 
-ModelFileReader::ModelFileReader() {
-    
-}
+// private methods
 
 std::pair<std::string, std::vector<double>> ModelFileReader::readObjectiveFunction(std::string fileName) {
     std::ifstream file(fileName);
@@ -156,6 +154,12 @@ std::vector<std::tuple<std::vector<double>, std::string, double>> ModelFileReade
     }
 
     return allConstraints;
+}
+
+// public methods
+
+ModelFileReader::ModelFileReader() {
+    
 }
 
 LpProblem ModelFileReader::readModel(std::string fileName) {

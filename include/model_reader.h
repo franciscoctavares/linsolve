@@ -10,9 +10,24 @@
 
 class ModelFileReader {
     private:
-        std::pair<std::string, std::vector<double>> readObjectiveFunction(std::string);
-        std::vector<std::tuple<std::vector<double>, std::string, double>> readConstraints(std::string, unsigned varsNumber);
+
+        /**
+         * @brief Reads the problem's type and the objective function coefficients from the file whose name is fileName
+         * 
+         */
+        std::pair<std::string, std::vector<double>> readObjectiveFunction(std::string fileName);
+
+        /**
+         * @brief Reads the problem's constraints from the file whose name is fileName
+         * 
+         */
+        std::vector<std::tuple<std::vector<double>, std::string, double>> readConstraints(std::string fileName, unsigned varsNumber);
     public:
+
+        /**
+         * @brief Constructor for the ModelFileReader class
+         * 
+         */
         ModelFileReader();
         
         /**
