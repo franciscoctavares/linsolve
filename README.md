@@ -19,7 +19,6 @@ Cli tool for solving linear programming models
 
 ## Currently working on
 * Fixing occasional segmentation faults
-* Better code documentation
 
 ## Coming soon
 * More branching straegies
