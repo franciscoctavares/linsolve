@@ -25,6 +25,10 @@ typedef struct {
     uint optimalSolutionDepth;
 }PerformanceMetrics;
 
+/**
+ * @brief Checks if the the number argument is within a margin of error(epsilon argument) of being an integer
+ * 
+ */
 bool isNumberAnInteger(double number, double epsilon = 1e-10);
 
 #endif
