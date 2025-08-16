@@ -88,38 +88,6 @@ Matrix LpProblem::getBasisIndexes(Matrix extraCj) {
     return Matrix(basisIndices, constraintsTypes.size(), 1);
 }
 
-std::vector<std::string> LpProblem::basisHeaders(Matrix cj, Matrix basisIndices) {
-    Matrix extraCj = cj.subMatrix(0, 0, objectiveFunction.columns(), cj.columns());
-    Matrix basisIndexes = getBasisIndexes(extraCj);
-    basisIndexes = basisIndices;
-    std::vector<std::pair<int, int>> constraintsIndexes = getConstraintsIndexes(extraCj);
-
-    std::vector<std::string> basisHeaders;
-    for(int i = 0; i < basisIndexes.rows(); i++) {
-        unsigned currentIndex = basisIndexes.getElement(i, 0);
-        if(currentIndex >= objectiveFunction.columns()) {
-            for(int k = 0; k < constraintsIndexes.size(); k++) {
-                if(constraintsIndexes[k].first == currentIndex) {
-                    basisHeaders.push_back("s" + std::to_string(k + 1));
-                    constraintsIndexes[k].first = -2;
-                    break;
-                }
-                else if(constraintsIndexes[k].second == currentIndex) {
-                    basisHeaders.push_back("a" + std::to_string(k + 1));
-                    constraintsIndexes[k].second = -2;
-                    break;
-                }
-            }
-        }
-        else {
-            //std::cout << "Its a variable x" << std::endl;
-            basisHeaders.push_back("x" + std::to_string(currentIndex + 1));
-        }
-    }
-
-    return basisHeaders;
-}
-
 Matrix LpProblem::getConstraintsLHS() {
     Matrix aux(constraints[0].getLhs(), 1, constraints[0].getLhs().size());
     for(int i = 1; i < constraints.size(); i++) {
@@ -331,6 +299,7 @@ std::vector<std::pair<int, int>> LpProblem::getConstraintsIndexes(Matrix extraCj
 }
 
 void LpProblem::displaySimplexTableau(Matrix tableau, Matrix cb, Matrix basisIndexes, Matrix cj, Matrix b, Matrix zj, Matrix cj_minus_zj) {
+    /*
     Matrix extraCj = cj.subMatrix(0, 0, objectiveFunction.columns(), cj.columns() - 1);
     std::vector<std::pair<int, int>> restrictionsIndexes = getConstraintsIndexes(extraCj);
 
@@ -475,6 +444,7 @@ void LpProblem::displaySimplexTableau(Matrix tableau, Matrix cb, Matrix basisInd
     }
 
     std::cout << std::endl << std::endl;
+    */
 }
 
 Matrix LpProblem::solveSimplex() {
@@ -931,14 +901,6 @@ void LpProblem::newVarsToOldVars(SimplifiedConstraintsHelper* helper) {
     }
 
     helper->pairsOfVars = pairsOfVars;
-
-    /*
-    for(uint i = 0; i < helper->pairsOfVars.size(); i++) {
-        std::cout << "x'" << helper->pairsOfVars[i].first + 1 << " -> x" << helper->pairsOfVars[i].second + 1;
-        if(i < pairsOfVars.size() - 1) std::cout << ", ";
-    }
-    std::cout << std::endl;
-    */
 }
 
 void LpProblem::removeConstraints(SimplifiedConstraintsHelper* helper) {
@@ -957,32 +919,23 @@ void LpProblem::removeOneFixedVariable(uint varIndex, double fixedVarValue) {
 
 void LpProblem::removeFixedVariables(SimplifiedConstraintsHelper* helper) {
     for(std::pair fixedVars : helper->fixedVariables) {
-        //std::cout << fixedVars.first << ", " << fixedVars.second << std::endl;
-        //objectiveFunction.displayMatrix();
         removeOneFixedVariable(fixedVars.first, fixedVars.second);
     }
 }
 
 void LpProblem::solveProblem() {
-    //displayProblem();
     SimplifiedConstraintsHelper helper;
     if(canProblemBeSimplified(&helper)) {
-        //std::cout << "Will simplify problem: " << std::endl;
         LpProblem auxProblem(type, objectiveFunction.getElements(), constraints);
-        //auxProblem.displayProblem();
         auxProblem.simplifyProblem(&helper);
         auxProblem.solveSimplex();
-        //auxProblem.displayProblem();
         simplifiedProblemSolution(&helper, auxProblem.getOptimalSolution());
     }
     else {
         solveSimplex();
     }
 
-    //optimalSolution.displayMatrix();
-    //setSolutionType();
     isOptimalSolutionWhole();
-    //optimalSolution.displayMatrix();
 }
 
 bool LpProblem::operator==(ProblemStatus statusToCheck) {
@@ -1046,6 +999,8 @@ std::vector<Constraint> LpProblem::getConstraints() {
 ProblemStatus LpProblem::getStatus() {
     return status;
 }
+
+// Non LpProblem class functions
 
 std::pair<bool, double> isDoubleAnInteger(double number, double epsilon) {
     if(std::abs(number - std::round(number)) < epsilon) {

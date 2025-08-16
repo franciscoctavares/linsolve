@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include <limits>
+#include <sys/types.h>
 
 #define M 1000000
 
@@ -41,18 +42,18 @@ class LpProblem {
         ProblemStatus status;
 
         /**
-         * @brief Checks the cj - zj row see if any of the elements is positive, to see if more simplex iterations are necessary
+         * @brief Checks the cj - zj(passed as an argument) row see if any of the elements is positive, to see if more simplex iterations are necessary
          * 
-         * @return true if all values in the cj - zj row are less than or equal to zero, false otherwise
+         * @return true - if all values in the cj - zj row are less than or equal to zero, false otherwise
          */
-        bool isSimplexDone(Matrix);
+        bool isSimplexDone(Matrix cj_minus_zj);
 
         /**
          * @brief Given the pivot column elements(), the b column elements, and the ratios column matrix, returns the index of the pivot row
          * 
-         * @return unsigned - the index of the pivot row
+         * @return uint - the index of the pivot row
          */
-        unsigned getPivotRow(std::vector<double>, std::vector<double>, Matrix);
+        uint getPivotRow(std::vector<double> simplexAux, std::vector<double> bAux, Matrix ratios);
 
         /**
          * @brief Given the extraCj row matrix(cj row minus the objective function's coefficients), return the basic variables' indexes
@@ -60,22 +61,27 @@ class LpProblem {
          * @return Matrix 
          */
         Matrix getBasisIndexes(Matrix extraCj);
-        std::vector<std::string> basisHeaders(Matrix, Matrix);
 
+        /**
+         * @brief Retrieves all the constraints' LHS(left hand side) and returns them in matrix form
+         * 
+         */
         Matrix getConstraintsLHS();
+
+        /**
+         * @brief Retrieves all the constraints' types
+         * 
+         */
         std::vector<ConstraintType> getConstraintsTypes();
+
+        /**
+         * @brief Retrieves all the constraint's RHS(right hand side) and returns them in matrix form
+         * 
+         * @return Matrix 
+         */
         Matrix getConstraintsRHS();
 
-        /**
-         * @brief removes repetead constraints, for example two or more instances of x1 <= 4
-         * 
-         */
-        void removeRepeatedConstraints();
     public:
-        /**
-         * @brief Default constructor
-         * 
-         */
         LpProblem(void) = default;
         
         /**
@@ -94,6 +100,8 @@ class LpProblem {
          * @param potentialSolution - row matrix of the candidate solution(x1, x2, x3, ... values)
          * @param constraintIndex - the index of the constraint to check
          * @return true if the constraint is satisfied and false if otherwise
+         * 
+         * @throw std::runtime_error - if the constraintIndex argument is negative or greater than or equal the total number of constraints of the model
          */
         bool isConstraintSatisfied(Matrix potentialSolution, int constraintIndex);
 
@@ -112,14 +120,14 @@ class LpProblem {
         Matrix extraVariablesMatrix();
 
         /**
-         * @brief Builds the matrices of the initial simplex tableau
+         * @brief Builds all the matrices of the initial simplex tableau, and returns them encapsulated in an std::vector<Matrix> variable
          * 
          */
         std::vector<Matrix> initialSimplexTableau();
 
         /**
          * @brief Given the extraCj row matrix(cj row minus the objective function's coefficients), returns the extra variables' indexes in the extraCj matrix.
-         *        This method is auxiliary o some other methods
+         *        This method is auxiliary to some other methods
          * 
          * @return std::vector<std::vector<int>> 
          */
@@ -129,7 +137,7 @@ class LpProblem {
          * @brief Displays the current simplex tableau
          * 
          */
-        void displaySimplexTableau(Matrix, Matrix, Matrix, Matrix, Matrix, Matrix, Matrix);
+        void displaySimplexTableau(Matrix tableau, Matrix cb, Matrix basisIndexes, Matrix cj, Matrix b, Matrix zj, Matrix cj_minus_zj);
 
         /**
          * @brief Solves the LP model using the simplex method
@@ -147,7 +155,7 @@ class LpProblem {
         /**
          * @brief Adds a new constraint to the LP model
          * 
-         * @param newConstraint - the new constraint to be added
+         * @param newConstraint the new constraint to be added
          */
         void addConstraint(Constraint newConstraint);
 
@@ -163,7 +171,7 @@ class LpProblem {
          *        were eliminated
          * 
          * @param candidateSolution - the potential feasible solution 
-         * @return true if the solution is feasible, false otherwise
+         * @return true if the candidate solution is feasible, false otherwise
          */
         bool isProblemFeasible(Matrix candidateSolution);
 
@@ -175,46 +183,148 @@ class LpProblem {
          */
         bool isProblemBounded(Matrix candidateSolution);
 
-
+        /**
+         * @brief Retrieves the optimal solution to the LP model
+         * 
+         */
         Matrix getOptimalSolution();
-        void setOptimalSolution(Matrix);
+
+        /**
+         * @brief Sets a newn optimal solution
+         * 
+         */
+        void setOptimalSolution(Matrix newOptimalSolution);
+
+        /**
+         * @brief Retrieves the LP model type(MAX or MIN)
+         * 
+         */
         ProblemType getType();
+
+        /**
+         * @brief Retrieves the row matrix with the objective function coefficients
+         * 
+         */
         Matrix getObjectiveFunction();
 
+        /**
+         * @brief Checks if the LP problem can be simplified, and stores information about which constraints to remove 
+         *        and variables to fix in the helper variable passed as an argument
+         * 
+         */
         bool canProblemBeSimplified(SimplifiedConstraintsHelper* helper);
 
-        // Auxiliary methods for fixing variable values
+        /**
+         * @brief Uses the information stored in the helper variable passed as an argument to simplify the problem
+         */
         bool simplifyProblem(SimplifiedConstraintsHelper* helper);
+
+        /**
+         * @brief Uses the information stored in the helper variable passed as an argument and the simplified problem solution
+         *        to obtain the initial problem's solution
+         * 
+         */
         void simplifiedProblemSolution(SimplifiedConstraintsHelper* helper, Matrix simplifiedSolution);
 
+        /**
+         * @brief Checks if any variables can be fixed and stores the constraints to remove and the set values of the those fixed variables
+         *        in the helper variable passed as an argument
+         * 
+         */
         void canVariablesBeFixed(SimplifiedConstraintsHelper* helper);
+
+        /**
+         * @brief Checks for repeated constraints and stores the indexes of those repeated constraints in the
+         *        helper variable passed as an argument
+         * 
+         */
         void checkForRepeatedConstraints(SimplifiedConstraintsHelper* helper);
+
+        /**
+         * @brief Checks the helper variable passed as an argument and removes redundant information
+         */
         void removeRepeatedFixedVariablesPairs(SimplifiedConstraintsHelper* helper);
 
+        /**
+         * @brief For fixed variables, creates a correspondence between the original problem's variable's indexes 
+         *        and the simplified problem's variable's indexes, and stores it in the helper variable passed as an argument
+         * 
+         */
         void newVarsToOldVars(SimplifiedConstraintsHelper* helper);
 
+        /**
+         * @brief Removes the constraints from the model whose indexes are stored in the helper variable argument
+         * 
+         */
         void removeConstraints(SimplifiedConstraintsHelper* helper);
+        
+        /**
+         * @brief Sets a variable equal to the argument fixedVarValue, and removes it from the objective function and all constraints
+         * 
+         */
         void removeOneFixedVariable(uint varIndex, double fixedVarValue);
+
+        /**
+         * @brief Removes all fixed variables, as specified by the helper variable argument
+         * 
+         */
         void removeFixedVariables(SimplifiedConstraintsHelper* helper);
 
+        /**
+         * @brief Solves the LP model, after simplifying it(if possible)
+         * 
+         */
         void solveProblem();
 
+        /**
+         * @brief Checks if the status is equal to some value passed as an argument
+         * 
+         */
         bool operator==(ProblemStatus statusToCheck);
+        
+        /**
+         * @brief Checks if the status is not equal to some value passed as an argument
+         * 
+         */
         bool operator!=(ProblemStatus statusToCheck);
 
+        /**
+         * @brief Sets the solution type field according to the optimal solution
+         * 
+         */
         void setSolutionType();
 
         // auxiliary methods for integer solutions
 
+        /**
+         * @brief Checks if all variables of the optimal solution are integers
+         * 
+         */
         bool isOptimalSolutionWhole();
 
+        /**
+         * @brief Copies all fields of problemToCopy and stores them in the caller
+         * 
+         */
         void operator=(LpProblem problemToCopy);
 
+        /**
+         * @brief Retrieves all the LP model's constraints
+         * 
+         */
         std::vector<Constraint> getConstraints();
+
+        /**
+         * @brief Retrieves the problem status
+         * 
+         */
         ProblemStatus getStatus();
 
 };
 
+/**
+ * @brief Helper function for rounding integers that are within a margin of error(set by the epsilon variable)
+ */
 std::pair<bool, double> isDoubleAnInteger(double number, double epsilon = 1e-10);
 
 #endif
