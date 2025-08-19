@@ -1,6 +1,9 @@
 # linsolve
 Cli tool for solving linear programming models
 
+## Note
+This repo was migrated from a another account of mine in [Codeberg](https://codeberg.org/libertymaxi/linsolve)(now archived).
+
 ## Features
 * Simplex method for LP problems
 * Branch and Bound method for pure IP problems
