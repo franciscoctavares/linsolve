@@ -21,7 +21,7 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
     * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* Fixing occasional segmentation faults
+* Fixing occasional segmentation faults(adding to fix this by adding copy constructors)
 
 ## Coming soon
 * More branching straegies
