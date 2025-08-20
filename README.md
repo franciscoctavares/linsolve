@@ -21,7 +21,8 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
     * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* Fixing occasional segmentation faults(adding to fix this by adding copy constructors)
+* Fixing documentation
+* Changing methods visibility(only members that will stay public are those that are accessed outside the class)
 
 ## Coming soon
 * More branching straegies
