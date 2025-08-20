@@ -23,6 +23,7 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
 ## Currently working on
 * Fixing documentation
 * Changing methods visibility(only members that will stay public are those that are accessed outside the class)
+* Adding missing error handling and making all methods more error resistant in general
 
 ## Coming soon
 * More branching straegies
