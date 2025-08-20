@@ -94,6 +94,12 @@ class LpProblem {
         LpProblem(ProblemType modelType, std::vector<double> newObjectiveFunction, std::vector<Constraint> newConstraints);
 
         /**
+         * @brief Copy constructor
+         * 
+         */
+        LpProblem(const LpProblem& problem);
+
+        /**
          * @brief Checks if the provided candidate solution respects the constraint whose index is 
          *        provided by the constraintIndex argument
          * 
@@ -301,12 +307,6 @@ class LpProblem {
          * 
          */
         bool isOptimalSolutionWhole();
-
-        /**
-         * @brief Copies all fields of problemToCopy and stores them in the caller
-         * 
-         */
-        void operator=(LpProblem problemToCopy);
 
         /**
          * @brief Retrieves all the LP model's constraints

@@ -18,6 +18,12 @@ Matrix::Matrix(std::vector<double> vec, unsigned a, unsigned b) {
     }
 }
 
+Matrix::Matrix(const Matrix& matrix) {
+    elements = matrix.elements;
+    n = matrix.n;
+    m = matrix.m;
+}
+
 void Matrix::displayMatrix() {
     size_t maxWidth = 0;
     for(double val: elements) {
@@ -122,15 +128,6 @@ Matrix Matrix::operator*(Matrix matrix) {
         return newMatrix;
     }
     else throw std::runtime_error("Dimensions don't match");
-}
-
-void Matrix::operator=(Matrix matrix) {
-    elements.clear();
-    n = matrix.n;
-    m = matrix.m;
-    for(int i = 0; i < n * m; i++) {
-        elements.push_back(matrix.elements[i]);
-    }
 }
 
 std::vector<double> Matrix::getRow(uint r) {

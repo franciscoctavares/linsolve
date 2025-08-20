@@ -13,7 +13,7 @@ class BaBTree {
          * @brief BaBTree class constructor
          * 
          */
-        BaBTree(BaBNode* newHeadNode);
+        BaBTree(BaBNode* newHeadNode = nullptr);
 
         /**
          * @brief Sets a new headNode for the tree

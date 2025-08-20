@@ -7,10 +7,18 @@
 
 BaBNode::BaBNode(LpProblem nodeProblem, uint newDepth) {
     problem = nodeProblem;
-    leftChild = NULL;
-    rightChild = NULL;
+    leftChild = nullptr;
+    rightChild = nullptr;
     status = NOT_EVALUATED;
     depth = newDepth;
+}
+
+BaBNode::BaBNode(const BaBNode& otherNode) {
+    problem = otherNode.problem;
+    leftChild = otherNode.leftChild;
+    rightChild = otherNode.rightChild;
+    status = otherNode.status;
+    depth = otherNode.depth;
 }
 
 bool BaBNode::operator==(NodeStatus statusToCheck) {

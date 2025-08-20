@@ -21,6 +21,12 @@ class Matrix {
         Matrix(std::vector<double> vec, uint a, uint b);
 
         /**
+         * @brief Copy constructor
+         * 
+         */
+        Matrix(const Matrix& matrix);
+
+        /**
          * @brief Displays the matrix on the terminal
          * 
          */
@@ -63,13 +69,6 @@ class Matrix {
          * @return Matrix - the result of the multiplication
          */
         Matrix operator*(Matrix matrix);
-
-        /**
-         * @brief Copies a matrix
-         * 
-         * @param matrix the matrix to be copied
-         */
-        void operator=(Matrix matrix);
 
         /**
          * @brief Retrieves the specified row from the matrix

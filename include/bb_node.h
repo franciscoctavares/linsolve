@@ -27,6 +27,12 @@ class BaBNode {
         BaBNode(LpProblem nodeProblem, uint newDepth);
 
         /**
+         * @brief Copy constructor
+         * 
+         */
+        BaBNode(const BaBNode& otherNode);
+
+        /**
          * @brief Checks if the status of the node is equal to statusToCheck
          * 
          */

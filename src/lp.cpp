@@ -117,6 +117,14 @@ LpProblem::LpProblem(ProblemType modelType, std::vector<double> newObjectiveFunc
     status = NOT_YET_SOLVED;
 }
 
+LpProblem::LpProblem(const LpProblem& problem) {
+    type = problem.type;
+    objectiveFunction = problem.objectiveFunction;
+    constraints = problem.constraints;
+    optimalSolution = problem.optimalSolution;
+    status = problem.status;
+}
+
 bool LpProblem::isConstraintSatisfied(Matrix potentialSolution, int constraintIndex) {
     if(constraintIndex < 0 || constraintIndex >= constraints.size()) {
         std::ostringstream errorMsg;
@@ -926,10 +934,18 @@ void LpProblem::removeFixedVariables(SimplifiedConstraintsHelper* helper) {
 void LpProblem::solveProblem() {
     SimplifiedConstraintsHelper helper;
     if(canProblemBeSimplified(&helper)) {
-        LpProblem auxProblem(type, objectiveFunction.getElements(), constraints);
-        auxProblem.simplifyProblem(&helper);
-        auxProblem.solveSimplex();
-        simplifiedProblemSolution(&helper, auxProblem.getOptimalSolution());
+        if(helper.fixedVariables.size() == objectiveFunction.columns()) {
+	        optimalSolution = zeros(1, objectiveFunction.columns());
+            for(std::pair<uint, double> fixedVars: helper.fixedVariables) {
+                optimalSolution.setElement(0, fixedVars.first, fixedVars.second);
+            }
+        }
+        else {
+            LpProblem auxProblem(type, objectiveFunction.getElements(), constraints);
+            auxProblem.simplifyProblem(&helper);
+            auxProblem.solveSimplex();
+            simplifiedProblemSolution(&helper, auxProblem.getOptimalSolution());
+        }
     }
     else {
         solveSimplex();
@@ -982,14 +998,6 @@ bool LpProblem::isOptimalSolutionWhole() {
     }
     status = WHOLE_SOLUTION;
     return true;
-}
-
-void LpProblem::operator=(LpProblem problemToCopy) {
-    type = problemToCopy.type;
-    objectiveFunction = problemToCopy.objectiveFunction;
-    constraints = problemToCopy.constraints;
-    optimalSolution = problemToCopy.optimalSolution;
-    status = problemToCopy.status;
 }
 
 std::vector<Constraint> LpProblem::getConstraints() {
