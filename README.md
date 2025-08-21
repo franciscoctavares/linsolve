@@ -26,9 +26,10 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
 * Adding missing error handling and making all methods more error resistant in general
 
 ## Coming soon
+* Benchmarking code to compare performance of different combinations of exploration and branching strategies
 * More branching/exploration strategies
-* Cli basics(including the use of [Tabulate]() for formatting output into tables, when appropriate)
-* Advanced fathoming to reduce memory use in large IP models
+* Cli basics(including the use of [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file) for formatting output into tables, when appropriate)
+* Advanced fathoming to reduce memory usage in large IP models
 * Pure Binary programming support
 * Mixed Integer Linear Programming support, where variables can be continuous, integer or binary
 * Better syntax support(easier model comprehension)
