@@ -26,4 +26,11 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
 * Adding missing error handling and making all methods more error resistant in general
 
 ## Coming soon
-* More branching straegies
+* More branching/exploration strategies
+* Cli basics(including the use of [Tabulate]() for formatting output into tables, when appropriate)
+* Advanced fathoming to reduce memory use in large IP models
+* Pure Binary programming support
+* Mixed Integer Linear Programming support, where variables can be continuous, integer or binary
+* Better syntax support(easier model comprehension)
+* Support for more model file formats, similar to LPSolve
+* Better feature documentation(in this README file or in a wiki)
