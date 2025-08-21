@@ -7,236 +7,224 @@
 class Matrix {
     private:
         std::vector<double> elements;
-        uint n, m;
+        uint nRows, nColumns;
     public:
         Matrix(void) = default;
 
         /**
-         * @brief Matrix class constructor
+         * @brief Standard constructor
          * 
-         * @param vec vector with the newElements
-         * @param a number of rows
-         * @param b number of columns
+         * @throw std::invalid_argument - if `rows` <= 0
+         * @throw std::invalid_argument - if `columns` <= 0
+         * @throw std::invalid_argument - if `rows`x`columns` != `newElements`.size()
          */
-        Matrix(std::vector<double> vec, uint a, uint b);
+        Matrix(std::vector<double> newElements, int rows, int columns);
 
         /**
          * @brief Copy constructor
-         * 
          */
         Matrix(const Matrix& matrix);
 
         /**
          * @brief Displays the matrix on the terminal
-         * 
          */
         void displayMatrix();
 
         /**
-         * @brief Summation of two matrices, but only if the number of dimention matches. If not, it throws a std::runtime_error with an error message.
+         * @brief Sums 2 matrices and returns the resulting matrix
          * 
-         * @param matrix the second operator
-         * @return Matrix - the result of the sum
+         * @throw std::invalid_argument - if both matrices don't have the same number of rows and columns
          */
         Matrix operator+(Matrix matrix);
 
         /**
-         * @brief Summation of two matrices, but in a more compact way. Instead of returning the result as a new Matrix object, it stores the result in the caller.
+         * @brief Sums 2 matrices, but stores the result in the caller
          * 
-         * @param matrix the second operator
+         * @throw std::invalid_argument - if both matrices don't have the same number of rows and columns
          */
         void operator+=(Matrix matrix);
 
         /**
-         * @brief Subtraction of two matrices, but only if the number of dimention matches. If not, it throws a std::runtime_error with an error message.
+         * @brief Subtracts 2 matrices and returns the result
          * 
-         * @param matrix the second operator
-         * @return Matrix - the result of the subtraction
+         * std::invalid_argument - if both matrices don't have the same number of rows and columns
          */
         Matrix operator-(Matrix matrix);
 
         /**
-         * @brief Subtraction of two matrices, but in a more compact way. Instead of returning the result as a new Matrix object, it stores the result in the caller.
+         * @brief Subtracts 2 matrices, but stores the result in the caller
          * 
-         * @param matrix the second operator
+         * std::invalid_argument - if both matrices don't have the same number of rows and columns
          */
         void operator-=(Matrix matrix);
 
         /**
-         * @brief Multiplication of two matrices, but only if the dimensions of the matrices match. If not, it throws a std::runtime_error with an error message.
+         * @brief Multiplies 2 matrices and returns the result
          * 
-         * @param matrix the second operator
-         * @return Matrix - the result of the multiplication
+         * @throw std::invalid_argument - if `matrix`.rows() != number of columns of the first matrix
          */
         Matrix operator*(Matrix matrix);
 
         /**
-         * @brief Retrieves the specified row from the matrix
+         * @brief Returns a specified row of the matrix
          * 
-         * @param r the index of the row to retrieve
-         * @return std::vector<double> - a vector with elements of the specified row
-         * @throw std::runtime_error - if r is negative or greater than or equal than the total number of rows
+         * @throw std::invalid_argument - if `row` < 0 or `row` >= nRows
          */
-        std::vector<double> getRow(uint r);
+        Matrix getRow(int row);
 
         /**
-         * @brief Retrieves the specified column from the matrix
+         * @brief Returns a specified column of the matrix
          * 
-         * @param c the index of the column to retrieve
-         * @return Matrix - a column matrix whose elements are from the specified column
-         * @throw std::runtime_error - if c is negative or greater than or equal than the total number of columns
+         * std::invalid_argument - if `column` < 0 or `column` >= nColumns
          */
-        Matrix getColumn(uint c);
+        Matrix getColumn(int column);
 
         /**
-         * @brief Performs a row operation on the matrix, given a source row, a target row, and a factor.
+         * @brief Performs a row operation on the matrix(targetRow += sourceRow * factor)
          * 
-         * @param a the source row
-         * @param b the target row
-         * @param factor the factor number
-         * @throw std::runtime_error - if a or b are negative or greater than or equal than the total number of rows
+         * @throw std::invalid_argument - if `sourceRow` < 0 or `sourceRow` >= nRows
+         * @throw std::invalid_argument - if `targetRow` < 0 or `targetRow` >= nRows
          */
-        void rowOperation(uint a, uint b, double factor);
+        void rowOperation(int sourceRow, int targetRow, double factor);
 
         /**
-         * @brief Performs a column operation on the matrix, given a source column, a target column, and a factor.
+         * @brief Performs a column operation on the matrix(targetColumn += sourceColumn * factor)
          * 
-         * @param a the source column
-         * @param b the target column
-         * @param factor the factor number
-         * @throw std::runtime_error - if a or b are negative or greater than or equal than the total number of columns
+         * @throw std::invalid_argument - if `sourceColumn` < 0 or `sourceColumn` >= nColumns
+         * @throw std::invalid_argument - if `targetColumn` < 0 or `targetColumn` >= nColumns
          */
-        void columnOperation(uint a, uint b, double factor);
+        void columnOperation(int sourceColumn, int targetColumn, double factor);
         
         /**
-         * @brief Performs the dot product, if the matrices are vector(row or column) matrices
+         * @brief Computes the dot product of 2 vector matrices
          * 
-         * @param matrix the second operator
-         * @return double the dot product of the two matrices
-         * @throw std::runtime_error - if one or both matrices are not vector(row or column) matrices
+         * @throw std::invalid_argument - if any of the operators is not a row/column matrix(nRows == 1 or nColumns == 1)
          */
         double dotProduct(Matrix matrix);
         
         /**
-         * @brief Retrieves the number of rows of the matrix
-         * 
+         * @brief Returns the number of rows of the matrix
          */
-        uint rows();
+        uint getNRows();
 
         /**
-         * @brief Retrieves the number of columns of the matrix
-         * 
+         * @brief Returns the number of columns of the matrix
          */
-        uint columns();
+        uint getNColumns();
         
         /**
-         * @brief Retrieves the element of the matrix whose coordinates are specified by the arguments
-         *  
+         * @brief Returns a specific element from the matrix, given its coordinates
+         * 
+         * @throw std::invalid_argument - if `row` < 0 or `row` >= `nRows`
+         * @throw std::invalid_argument - if `column` < 0 or `column` >= `nColumns`
          */
-        double getElement(uint row, uint column);
+        double getElement(int row, int column);
 
         /**
-         * @brief Replaces the element specified by arguments(row and col) by a new value
+         * @brief Sets the value of a specific element from the matrix, given its coordinates and the value
          * 
+         * @throw std::invalid_argument - if `row` < 0 or `row` >= `nRows`
+         * @throw std::invalid_argument - if `col` < 0 or `col` >= `nColumns`
          */
-        void setElement(uint row, uint col, double value);
+        void setElement(int row, int col, double value);
         
         /**
-         * @brief Stacks two matrices vertically, and stores the result in the caller
+         * @brief Stacks 2 matrices vertically
          * 
-         * @throw std::runtime_error - if both matrices don't have the same number of columns
+         * @throw std::invalid_argument - if `nColumns` != `matrix.nColumns`
          */
         void stackVertical(Matrix matrix);
 
         /**
-         * @brief Stacks two matrices horizontally, and stores the result in the caller
+         * @brief Stacks 2 matrices horizontally
          * 
-         * @throw std::runtime_error - if both matrices don't have the same number of rows
+         * @throw std::invalid_argument - if `nRows` != `matrix.nRows`
          */
         void stackHorizontal(Matrix matrix);
         
         /**
          * @brief Returns the transpose of the caller
-         * 
          */
         Matrix transpose();
 
         /**
-         * @brief Multiplies all elements by a number passed as an argument and returns the result matrix
-         * 
+         * @brief Multiplies all elements of the matrix by a value and returns the resulting matrix
          */
         Matrix operator*(double value);
 
         /**
-         * @brief Multiplies all elements by a number passed as an argument, and stores the result in the caller
-         * 
+         * @brief Multiplies all elements of the matrix by a value, but stores the result in the caller
          */
         void operator*=(double value);
 
         /**
-         * @brief Retrieves the index of the highest element in the matrix
-         * 
+         * @brief Returns the index of the highest element in the matrix
          */
         uint maxValueIndex();
 
         /**
-         * @brief Retrieves the index of the lowest element in the matrix
-         * 
+         * @brief Returns the index of the lowest element in the matrix
          */
         uint minValueIndex();
 
         /**
-         * @brief Performs point-wise division, and returns the result matrix
+         * @brief Performs point-wise division, and returns the resulting matrix
          * 
-         * @throw std::runtime_error - if both matrices don't have the same number of rows and columns
+         * @throw std::invalid_argument - if `nRows` != `matrix.nRows` or `nColumns` != `matrix.nColumns`
          */
         Matrix pointDivision(Matrix matrix);
 
         /**
-         * @brief Replaces the row of the caller specified by the argument by the column matrix passed as an argument, and returns the result matrix
+         * @brief Replaces the specified row of the matrix with a new row matrix and returns the resulting matrix
          * 
-         * @throw std::runtime_error - if row is negative or greater than or equal than the total number of rows
-         * @throw std::runtime_error - if the column matrix and the caller don't have the same number of columns
+         * @throw std::invalid_argument - if `row` < 0 or `row` >= `nRows`
+         * @throw std::invalid_argument - if `nColumns` != `newRow.nColumns`
          */
-        Matrix setRow(uint row, Matrix matrix);
+        Matrix setRow(int row, Matrix newRow);
 
         /**
-         * @brief Replaces the column of the caller specified by the argument by the row matrix passed as an argument, and returns the result matrix
+         * @brief Replaces the specified column of the matrix with a new column matrix and returns the resulting matrix
          * 
-         * @throw std::runtime_error - if column is negative or greater than or equal than the total number of column
-         * @throw std::runtime_error - if the row matrix and the caller don't have the same number of rows
+         * @throw std::invalid_argument - if `column` < 0 or `column` >= `nColumns`
+         * @throw std::invalid_argument - if `nRows` != `newRow.nRows`
          */
-        Matrix setColumn(uint column, Matrix matrix);
+        Matrix setColumn(int column, Matrix newColumn);
         
         /**
-         * @brief Removes the specified row from the matrix, and results the result matrix
+         * @brief Removes the specified row from the matrix and returns the resulting matrix
          * 
-         * @throw std::runtime_error - if row is negative or greater than or equal than the total number of rows
+         * @throw std::invalid_argument - if `row` < 0 || `row` >= `nRows`
          */
-        Matrix removeRow(uint row);
+        Matrix removeRow(int row);
 
         /**
-         * @brief Removes the specified column from the matrix, and results the result matrix
+         * @brief Removes the specified column from the matrix and returns the resulting matrix
          * 
-         * @throw std::runtime_error - if column is negative or greater than or equal than the total number of columns
+         * @throw std::invalid_argument - if `column` < 0 || `column` >= `nColumns`
          */
-        void removeColumn(uint column);
+        void removeColumn(int column);
         
         /**
          * @brief Searches the matrix(assumes its a vector matrix) for the value passed as an argument and returns its index if found. If not, it returns -1
          * 
          */
-        uint findValueInVectorMatrix(double value);
+        int findValueInVectorMatrix(double value);
 
         /**
-         * @brief Constructs the sub matrix contained within the rows and columns borders passed as arguments, and returns the sub matrix
+         * @brief Constructs the sub matrix contained within the rows and columns borders passed as arguments, and returns the resulting sub matrix
          * 
+         * @throw std::invalid_argument - if `startingRow` < 0 or `startingRow` >= ´nRows´
+         * @throw std::invalid_argument - if `endingRow` < 0 or `endingRow` >= ´nRows´
+         * @throw std::invalid_argument - if `startingRow` > `endingRow`
+         * 
+         * @throw std::invalid_argument - if `startingColumn` < 0 or `startingColumn` >= ´nColumns´
+         * @throw std::invalid_argument - if `endingColumn` < 0 or `endingColumn` >= ´nColumns´
+         * @throw std::invalid_argument - if `startingColumn` > `endingColumn`
          */
-        Matrix subMatrix(uint r1, uint r2, uint c1, uint c2);
+        Matrix subMatrix(int startingRow, int endingRow, int startingColumn, int endingColumn);
 
         /**
          * @brief Retrieves the elements of the matrix
-         * 
          */
         std::vector<double> getElements();
 
@@ -255,13 +243,17 @@ class Matrix {
 /**
  * @brief Constructs and returns a matrix with specified dimensions which contains only zeros
  * 
+ * @throw std::invalid_argument - if `rows` <= 0
+ * @throw std::invalid_argument - if `columns` <= 0
  */
-Matrix zeros(uint rows, uint columns);
+Matrix zeros(int rows, int columns);
 
 /**
  * @brief Constructs and returns a basis vector matrix with the specified size, as well as the only non-zero element(1) being placed in the index passed as an argument
  * 
+ * @throw std::invalid_argument - if `size` <= 0
+ * @throw std::invalid_argument - if `index` < 0 or `index` >= `size`
  */
-Matrix basisVector(uint size, uint index);
+Matrix basisVector(int size, int index);
 
 #endif

@@ -6,11 +6,23 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
 
 ## Compilation
 
+
+
 ```
 make build
 ```
 
 ## Installation
+
+To install linsolve, simply execute the command below.
+
+```
+make install
+```
+
+By default, this command will copy the binary to a directory which most systems include in their PATH, making it accessible from anywhere.
+
+## Usage
 
 ## Features
 * Simplex method for LP problems
@@ -33,13 +45,13 @@ make build
 * Changing methods visibility(only members that will stay public are those that are accessed outside the class)
 * Adding missing error handling and making all methods more error resistant in general
 
-## Coming soon
+## Planned Features
 * Benchmarking code to compare performance of different combinations of exploration and branching strategies
 * More branching/exploration strategies
 * Cli basics(including the use of [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file) for formatting output into tables, when appropriate)
 * Advanced fathoming to reduce memory usage in large IP models
-* Pure Binary programming support
-* Mixed Integer Linear Programming support, where variables can be continuous, integer or binary
+* PBP(Pure Binary programming) support
+* MILP(Mixed Integer Linear Programming) support, in which any variable can be a real number(continuous), an integer, or binary
 * Better syntax support(easier model comprehension)
 * Support for more model file formats, similar to LPSolve
 * Better feature documentation(in this README file or in a wiki)
