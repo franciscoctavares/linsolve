@@ -75,8 +75,8 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrateg
 
 // PUBLIC METHODS
 
-BaBTree::BaBTree(BaBNode* newHeadNode) {
-    headNode = newHeadNode;
+BaBTree::BaBTree(LpProblem initialProblem) {
+    headNode = new BaBNode(initialProblem, 0);
 }
 
 Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat) {
@@ -154,6 +154,8 @@ void BaBTree::displayProblem(Matrix optimalWholeSolution) {
 
 void BaBTree::deleteTree() {
     headNode->deleteSubNodes();
+
+    delete headNode;
 }
 
 
