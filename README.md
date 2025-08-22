@@ -39,14 +39,11 @@ By default, this command will copy the binary to a directory which most systems 
     * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* Fixing documentation
-* Changing methods visibility(only members that will stay public are those that are accessed outside the class)
-* Adding missing error handling and making all methods more error resistant in general
+* Cli basics(including the use of [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file) for formatting output into tables, when appropriate)
+* Benchmarking code to compare performance of different combinations of exploration and branching strategies
 
 ## Planned Features
-* Benchmarking code to compare performance of different combinations of exploration and branching strategies
 * More branching/exploration strategies
-* Cli basics(including the use of [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file) for formatting output into tables, when appropriate)
 * Advanced fathoming to reduce memory usage in large IP models
 * PBP(Pure Binary programming) support
 * MILP(Mixed Integer Linear Programming) support, in which any variable can be a real number(continuous), an integer, or binary
