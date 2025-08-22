@@ -8,60 +8,48 @@ class BaBTree {
     private:
         BaBNode* headNode;
         PerformanceMetrics metrics;
+
+        /**
+         * @brief Fathoms(cuts) all necessary leaf nodes and updates `incumbentSolution` if necessary
+         */
+        void fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy, BaBNode*& incumbentSolution);
+
+        /**
+         * @brief Updates `incumbentSolution` if `candidate` has a better objective function value
+         */
+        void updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSolution);
+
+        /**
+         * @brief Solves all of the node queue's LP problems which aren't already solved
+         */
+        void solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes);
+
+        /**
+         * @brief Sorts the `nodeQueue`, according to an exploration strategy, meaning that, after sorting,
+         *        the first element of `nodeQueue` will be the next node to explore
+         */
+        void sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy);
+
     public:
         /**
-         * @brief BaBTree class constructor
-         * 
+         * @brief Standard constructor
          */
         BaBTree(BaBNode* newHeadNode = nullptr);
 
         /**
-         * @brief Sets a new headNode for the tree
-         * 
+         * @brief Given an exploration strategy and a branching strategy, solve the IP model using the Branch and Bound method
          */
-        void setHeadNode(BaBNode* newHeadNode);
+        Matrix solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat);
 
         /**
-         * @brief Given an exploration strategy and a branching strategy, solve the IP model using the branch and bound method
-         * 
-         */
-        Matrix solveTree(ExplorationStrategy explorStrat, BranchingStrategy branchStrat);
-
-        /**
-         * @brief Displays the solution to the IP model, along with a few performance metrics
-         * 
+         * @brief Displays the `optimalWholeSolution` to the IP model, along with a few performance metrics
          */
         void displayProblem(Matrix optimalWholeSolution);
 
         /**
          * @brief Deletes all tree nodes
-         * 
          */
         void deleteTree();
-
-        /**
-         * @brief Sorts the node queue(passed as an argument), according to an exploration strategy
-         * 
-         */
-        void sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy);
-
-        /**
-         * @brief Solves all of the node queue's LP problems which aren't already solved
-         * 
-         */
-        void solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes);
-
-        /**
-         * @brief Fathoms(cuts) all necessary leaf nodes and updates the incumbent solution if necessary
-         * 
-         */
-        void fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy, BaBNode*& incumbentSolution);
-
-        /**
-         * @brief Updates the incumbent solution if the candidate is better than it
-         * 
-         */
-        void updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSolution);
 };
 
 #endif
