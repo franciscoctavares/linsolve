@@ -13,15 +13,13 @@ class ModelFileReader {
 
         /**
          * @brief Reads the problem's type and the objective function coefficients from the file whose name is fileName
-         * 
          */
-        std::pair<std::string, std::vector<double>> readObjectiveFunction(std::string fileName);
+        static std::pair<std::string, std::vector<double>> readObjectiveFunction(std::string fileName);
 
         /**
          * @brief Reads the problem's constraints from the file whose name is fileName
-         * 
          */
-        std::vector<std::tuple<std::vector<double>, std::string, double>> readConstraints(std::string fileName, unsigned varsNumber);
+        static std::vector<std::tuple<std::vector<double>, std::string, double>> readConstraints(std::string fileName, unsigned varsNumber);
     public:
 
         /**
@@ -36,7 +34,7 @@ class ModelFileReader {
          * @param fileName the path to the model file
          * @return LpProblem - the model read, encapsulated in the LpProblem class
          */
-        LpProblem readModel(std::string fileName);
+        static LpProblem readModel(std::string fileName);
 };
 
 #endif
