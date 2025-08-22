@@ -6,8 +6,6 @@ This repo was migrated from a another account of mine in [Codeberg](https://code
 
 ## Compilation
 
-
-
 ```
 make build
 ```
