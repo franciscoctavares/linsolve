@@ -214,7 +214,7 @@ class LpProblem {
         void removeConstraint(int constraintIndex);
 
         /**
-         * @brief Returns the optimal solution to the LP model
+         * @brief Returns `optimalSolution`
          */
         Matrix getOptimalSolution();
 

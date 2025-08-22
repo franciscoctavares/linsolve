@@ -39,7 +39,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
     std::pair<uint, double> branchVarInfo;
 
     if(branchStrat == FIRST_INDEX) {
-        for(uint i = 0; i < currentSolution.columns(); i++) {
+        for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(floor(currentSolution.getElement(0, i)) != currentSolution.getElement(0, i)) {
                 branchVarInfo = std::make_pair(i, currentSolution.getElement(0, i));
                 break;
@@ -48,7 +48,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
     }
     else if(branchStrat == RANDOM_VAR) {
         std::vector<uint> contVarsIndexes;
-        for(uint i = 0; i < currentSolution.columns(); i++) {
+        for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(!isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
         }
 
@@ -62,7 +62,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
     }
     else if(branchStrat == BEST_COEFFICIENT) {
         std::vector<uint> contVarsIndexes;
-        for(uint i = 0; i < currentSolution.columns(); i++) {
+        for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(!isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
         }
 
@@ -108,8 +108,15 @@ LpProblem BaBNode::getProblem() {
     return problem;
 }
 
-BaBNode* BaBNode::branchLeft(uint varIndex, double varValue) {
-    std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().columns(), varIndex).getElements();
+BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
+    if(varIndex < 0 || varIndex >= problem.getObjectiveFunction().getNColumns()) {
+        std::ostringstream errorMsg;
+        errorMsg << "Error using branchRight: the model has " << problem.getObjectiveFunction().getNColumns()
+                 << " variables, but the user tried to branch variable with index " << varIndex;
+        throw std::invalid_argument(errorMsg.str());
+    }
+
+    std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().getNColumns(), varIndex).getElements();
     Constraint newConstraint(newLhs, "<=", floor(varValue));
     LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
@@ -118,8 +125,15 @@ BaBNode* BaBNode::branchLeft(uint varIndex, double varValue) {
     return leftChild;
 }
 
-BaBNode* BaBNode::branchRight(uint varIndex, double varValue) {
-    std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().columns(), varIndex).getElements();
+BaBNode* BaBNode::branchRight(int varIndex, double varValue) {
+    if(varIndex < 0 || varIndex >= problem.getObjectiveFunction().getNColumns()) {
+        std::ostringstream errorMsg;
+        errorMsg << "Error using branchRight: the model has " << problem.getObjectiveFunction().getNColumns()
+                 << " variables, but the user tried to branch variable with index " << varIndex;
+        throw std::invalid_argument(errorMsg.str());
+    }
+
+    std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().getNColumns(), varIndex).getElements();
     Constraint newConstraint(newLhs, ">=", ceil(varValue));
     LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
