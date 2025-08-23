@@ -49,13 +49,13 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrateg
 
     //std::cout << "Right now, the node queue has " << nodeQueue.size() << " elements" << std::endl;
 
-    if(strategy == BEST_OBJECTIVE_FUNCTION_VALUE) {
+    if(strategy == BEST_VALUE) {
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             if(node1->getProblem().getType() == MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
             else return node1->getObjectiveFunctionValue() < node2->getObjectiveFunctionValue();
         });
     }
-    else if(strategy == RANDOM) {
+    else if(strategy == RANDOM_NODE) {
         std::random_device rd;
         std::mt19937 g(rd());
 
@@ -156,6 +156,10 @@ void BaBTree::deleteTree() {
     headNode->deleteSubNodes();
 
     delete headNode;
+}
+
+PerformanceMetrics BaBTree::getMetrics() {
+    return metrics;
 }
 
 

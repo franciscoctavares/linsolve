@@ -15,6 +15,7 @@ typedef struct {
     std::string fileName;
     ExplorationStrategy explorationStrat;
     BranchingStrategy branchingStrat;
+    bool displayResults;
 }Command;
 
 class CLI {
@@ -25,6 +26,8 @@ class CLI {
         void validateCommand();
 
         void executeCommand();
+
+        void benchmark();
 
     public:
         /**

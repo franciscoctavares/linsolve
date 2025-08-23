@@ -50,6 +50,8 @@ class BaBTree {
          * @brief Deletes all tree nodes
          */
         void deleteTree();
+
+        PerformanceMetrics getMetrics();
 };
 
 #endif

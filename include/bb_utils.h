@@ -12,10 +12,10 @@ enum BranchingStrategy {
 
 enum ExplorationStrategy {
     EXPLORE_ALL_NODES,
-    BEST_OBJECTIVE_FUNCTION_VALUE,
+    BEST_VALUE,
     WIDTH,
     DEPTH,
-    RANDOM,
+    RANDOM_NODE,
 };
 
 typedef struct {
