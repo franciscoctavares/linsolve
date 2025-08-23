@@ -1,33 +1,23 @@
-# Compiler and flags
-CXX := g++
-CXXFLAGS := -Wall -Wextra -std=c++23
-SRC_DIR := src
-BUILD_DIR := build
+SRC := $(shell find src -name "*.cpp")
+OBJ := $(patsubst %.cpp,build/%.o,$(notdir $(SRC)))
+
 BIN_DIR := bin
 
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
+CXX := g++
+CXXFLAGS := -Wall
 TARGET := $(BIN_DIR)/main
 
-# Default target
-all: build
+all: $(TARGET)
 
-# Build target
-build: $(TARGET)
+$(TARGET): $(OBJ)
+	$(CXX) $(OBJ) -o $@
 
-$(TARGET): $(OBJS)
-	mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+# Pattern rule: build/foo.o from any foo.cpp
+build/%.o: 
+	@mkdir -p build bin
+	$(CXX) $(CXXFLAGS) -c $(filter %/$*.cpp,$(SRC)) -o $@
 
-# Compile rule for objects
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+build: clean $(TARGET)
 
-run: build
-	clear
-	./$(TARGET) model BEST_VALUE BEST_COEFFICIENT --show
-
-# Clean
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf build bin
