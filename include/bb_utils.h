@@ -3,14 +3,17 @@
 
 #include "matrix.h"
 #include <sys/types.h>
+#include <vector>
+#include <string>
 
-enum BranchingStrategy {
+
+enum class BranchingStrategy {
     FIRST_INDEX,
     RANDOM_VAR,
     BEST_COEFFICIENT,
 };
 
-enum ExplorationStrategy {
+enum class ExplorationStrategy {
     EXPLORE_ALL_NODES,
     BEST_VALUE,
     WIDTH,
@@ -30,5 +33,11 @@ typedef struct {
  * 
  */
 bool isNumberAnInteger(double number, double epsilon = 1e-10);
+
+std::vector<ExplorationStrategy> getPossibleExplorationStrategies();
+std::vector<BranchingStrategy> getPossibleBranchingStrategies();
+
+std::string convertExplorStratToString(ExplorationStrategy strat);
+std::string convertBranchStratToString(BranchingStrategy strat);
 
 #endif
