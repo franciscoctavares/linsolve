@@ -21,7 +21,7 @@ void BaBTree::fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrat
             nodeQueue.erase(nodeQueue.begin() + i);
         }
         else if(*nodeQueue[i] == CONTINUOUS_SOLUTION) {
-            if(strategy != EXPLORE_ALL_NODES) {
+            if(strategy != ExplorationStrategy::EXPLORE_ALL_NODES) {
                 if(incumbentSolution != NULL && !nodeQueue[i]->isBetter(incumbentSolution)) {
                     *nodeQueue[i] = FATHOMED;
                     nodeQueue.erase(nodeQueue.begin() + i);
@@ -49,24 +49,24 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrateg
 
     //std::cout << "Right now, the node queue has " << nodeQueue.size() << " elements" << std::endl;
 
-    if(strategy == BEST_VALUE) {
+    if(strategy == ExplorationStrategy::BEST_VALUE) {
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             if(node1->getProblem().getType() == MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
             else return node1->getObjectiveFunctionValue() < node2->getObjectiveFunctionValue();
         });
     }
-    else if(strategy == RANDOM_NODE) {
+    else if(strategy == ExplorationStrategy::RANDOM_NODE) {
         std::random_device rd;
         std::mt19937 g(rd());
 
         std::shuffle(nodeQueue.begin(), nodeQueue.end(), g);
     }
-    else if(strategy == WIDTH) {
+    else if(strategy == ExplorationStrategy::WIDTH) {
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             return node1->getDepth() < node2->getDepth();
         });
     }
-    else if(strategy == DEPTH) {
+    else if(strategy == ExplorationStrategy::DEPTH) {
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             return node1->getDepth() > node2->getDepth();
         });

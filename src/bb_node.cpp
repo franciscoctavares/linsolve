@@ -38,7 +38,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
 
     std::pair<uint, double> branchVarInfo;
 
-    if(branchStrat == FIRST_INDEX) {
+    if(branchStrat == BranchingStrategy::FIRST_INDEX) {
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(floor(currentSolution.getElement(0, i)) != currentSolution.getElement(0, i)) {
                 branchVarInfo = std::make_pair(i, currentSolution.getElement(0, i));
@@ -46,7 +46,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
             }
         }
     }
-    else if(branchStrat == RANDOM_VAR) {
+    else if(branchStrat == BranchingStrategy::RANDOM_VAR) {
         std::vector<uint> contVarsIndexes;
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(!isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
@@ -60,7 +60,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
 
         branchVarInfo = std::make_pair(contVarsIndexes[num], currentSolution.getElement(0, contVarsIndexes[num]));
     }
-    else if(branchStrat == BEST_COEFFICIENT) {
+    else if(branchStrat == BranchingStrategy::BEST_COEFFICIENT) {
         std::vector<uint> contVarsIndexes;
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(!isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
