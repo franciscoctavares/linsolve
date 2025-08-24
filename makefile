@@ -19,5 +19,9 @@ build/%.o:
 
 build: clean $(TARGET)
 
+bench:
+	clear
+	./bin/main --benchmark
+
 clean:
 	rm -rf build bin

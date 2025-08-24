@@ -40,7 +40,7 @@ By default, this command will copy the binary to a directory which most systems 
 
 ## Currently working on
 * Cli basics(including the use of [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file) for formatting output into tables, when appropriate)
-* Benchmarking code to compare performance of different combinations of exploration and branching strategies
+* Optimizing memory usage(reducing copying) to increase performance
 
 ## Planned Features
 * More branching/exploration strategies
