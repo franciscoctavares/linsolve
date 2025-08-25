@@ -9,27 +9,24 @@
 void Benchmark::displayBenchmarkResults(uint metricsIndex) {
     tabulate::Table results;
 
+    // sort the metrics by ascending order of average execution time
+    std::sort(metrics.things.begin(), metrics.things.end(), [](const std::tuple<double, std::pair<ExplorationStrategy, BranchingStrategy>, uint>& a,
+                                                               const std::tuple<double, std::pair<ExplorationStrategy, BranchingStrategy>, uint>& b) {
+                                                                return std::get<0>(a) < std::get<0>(b);
+                                                               });
+
     results.add_row({"Exploration strategy", "Branching strategy", "Average execution time"});
 
-    //results.add_row({"Iterations", std::to_string(iterations)});
-    //results.add_row({"Exploration strategy", convertExplorStratToString(metrics.strats[metricsIndex].first)});
-    //results.add_row({"Branching strategy", convertBranchStratToString(metrics.strats[metricsIndex].second)});
-    //results.add_row({"Explored nodes", std::to_string(metrics.explored_nodes[metricsIndex])});
-
-    for(int i = 0; i < metrics.avg_execution_times.size(); i++) {
+    for(int i = 0; i < metrics.things.size(); i++) {
         std::string time_str;
-        if(metrics.avg_execution_times[i] > 1000) time_str = std::to_string(metrics.avg_execution_times[i] / 1000) + " s";
-        else if(metrics.avg_execution_times[i] < 1) time_str = std::to_string(metrics.avg_execution_times[i] * 1000) + " us";
-        else time_str = std::to_string(metrics.avg_execution_times[i]) + " ms";
-        results.add_row({convertExplorStratToString(metrics.strats[i].first), convertBranchStratToString(metrics.strats[i].second), time_str});
+        if(std::get<0>(metrics.things[i]) > 1000) time_str = std::to_string(std::get<0>(metrics.things[i]) / 1000) + " s";
+        else if(std::get<0>(metrics.things[i]) < 1) time_str = std::to_string(std::get<0>(metrics.things[i]) * 1000) + " us";
+        else time_str = std::to_string(std::get<0>(metrics.things[i])) + " ms";
+
+        std::string currentExplorStratString = convertExplorStratToString(std::get<1>(metrics.things[i]).first);
+        std::string currentBranchStratString = convertBranchStratToString(std::get<1>(metrics.things[i]).second);
+        results.add_row({currentExplorStratString, currentBranchStratString, time_str});
     }
-
-    //std::string time_str;
-    //if(metrics.avg_execution_times[metricsIndex] > 1000) time_str = std::to_string(metrics.avg_execution_times[metricsIndex] / 1000) + " s";
-    //else if(metrics.avg_execution_times[metricsIndex] < 1) time_str = std::to_string(metrics.avg_execution_times[metricsIndex] * 1000) + " us";
-    //else time_str = std::to_string(metrics.avg_execution_times[metricsIndex]) + " ms";
-
-    //results.add_row({"Average execution time", time_str});
 
     std::cout << results << std::endl;
 }
@@ -73,10 +70,16 @@ void Benchmark::runBenchmark() {
 
             metrics.strats.push_back(std::make_pair(currentExplorStrat, currentBranchStrat));
             metrics.avg_execution_times.push_back(avg_execution_time);
+
+            
             if(currentBranchStrat != BranchingStrategy::RANDOM_VAR && currentExplorStrat != ExplorationStrategy::RANDOM_NODE) {
                 metrics.explored_nodes.push_back(deterministic_nodes);
+                metrics.things.push_back(std::make_tuple(avg_execution_time, std::make_pair(currentExplorStrat, currentBranchStrat), deterministic_nodes));
             }
-            else metrics.explored_nodes.push_back(avg_explored_nodes);
+            else {
+                metrics.explored_nodes.push_back(avg_explored_nodes);
+                metrics.things.push_back(std::make_tuple(avg_execution_time, std::make_pair(currentExplorStrat, currentBranchStrat), avg_explored_nodes));
+            }
 
             //if(currentExplorStrat != ExplorationStrategy::EXPLORE_ALL_NODES) displayBenchmarkResults(currentIndex);
             currentIndex++;
