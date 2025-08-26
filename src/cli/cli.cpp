@@ -1,10 +1,10 @@
-#include "../include/cli.h"
+#include "../../include/cli/cli.h"
 
 #include <filesystem>
 #include <iostream>
 
-#include "../include/model_reader.h"
-#include "../include/cli/benchmark.h"
+#include "../../include/model_reader.h"
+#include "../../include/cli/benchmark.h"
 
 // PRIVATE METHODS
 

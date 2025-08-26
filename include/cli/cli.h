@@ -3,9 +3,9 @@
 
 #include <string>
 #include <vector>
-#include "bb_utils.h"
-#include "bb_tree.h"
-#include "bb_node.h"
+#include "../bb_utils.h"
+#include "../bb_tree.h"
+#include "../bb_node.h"
 
 enum FileExtension {
     LP,
