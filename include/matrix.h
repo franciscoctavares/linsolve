@@ -26,6 +26,11 @@ class Matrix {
         Matrix(const Matrix& matrix);
 
         /**
+         * @brief Copy assignment operator
+         */
+        Matrix& operator=(const Matrix& otherMatrix);
+
+        /**
          * @brief Displays the matrix on the terminal
          */
         void displayMatrix();

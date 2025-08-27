@@ -192,6 +192,11 @@ class LpProblem {
         LpProblem(const LpProblem& problem);
 
         /**
+         * @brief Copy assignment operator
+         */
+        LpProblem& operator=(const LpProblem& otherProblem);
+
+        /**
          * @brief Displays the current simplex tableau on the terminal
          */
         void displaySimplexTableau(Matrix tableau, Matrix cb, Matrix basisIndexes, Matrix cj, Matrix b, Matrix zj, Matrix cj_minus_zj);

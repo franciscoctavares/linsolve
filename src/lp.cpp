@@ -192,7 +192,6 @@ Matrix LpProblem::extraVariablesMatrix() {
 }
 
 std::vector<Matrix> LpProblem::initialSimplexTableau() {
-    //Matrix simplexTableau = restrictionsLHS;
     std::vector<double> firstRow = constraints[0].getLhs();
     Matrix simplexTableau(firstRow, 1, firstRow.size());
     for(int i = 1; i < constraints.size(); i++) simplexTableau.stackVertical(Matrix(constraints[i].getLhs(), 1, firstRow.size()));
@@ -342,6 +341,7 @@ Matrix LpProblem::solveSimplex() {
         unsigned oldBasis = pivots.getElement(0, 0);
         unsigned newBasis = pivots.getElement(0, 1);
 
+        // Remove an artificial variable from the tableau
         if(cb.getElement(oldBasis, 0) == M || cb.getElement(oldBasis, 0) == -1 * M) {
             unsigned artificial_index = basisIndices.getElement(oldBasis, 0);
             //std::cout << "art_index = " << artificial_index << std::endl;
@@ -674,6 +674,17 @@ LpProblem::LpProblem(const LpProblem& problem) {
     constraints = problem.constraints;
     optimalSolution = problem.optimalSolution;
     status = problem.status;
+}
+
+LpProblem& LpProblem::operator=(const LpProblem& otherProblem) {
+    if(this != &otherProblem) {
+        type = otherProblem.type;
+        objectiveFunction = otherProblem.objectiveFunction;
+        constraints = otherProblem.constraints;
+        optimalSolution = otherProblem.optimalSolution;
+        status = otherProblem.status;
+    }
+    return *this;
 }
 
 void LpProblem::displaySimplexTableau(Matrix tableau, Matrix cb, Matrix basisIndexes, Matrix cj, Matrix b, Matrix zj, Matrix cj_minus_zj) {
