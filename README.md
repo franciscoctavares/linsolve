@@ -2,7 +2,7 @@
 Cli tool for solving linear programming models
 
 ## Note
-This repo was migrated from a another account of mine in [Codeberg](https://codeberg.org/libertymaxi/linsolve)(now archived).
+This repo was migrated from another account of mine in [Codeberg](https://codeberg.org/libertymaxi/linsolve)(now archived).
 
 ## Compilation
 
