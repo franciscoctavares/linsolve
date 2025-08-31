@@ -1,8 +1,8 @@
-#include "../../include/cli/benchmark.h"
-#include "../../include/tabulate.hpp"
-#include "../../include/lp.h"
-#include "../../include/model_reader.h"
-#include "../../include/bb_tree.h"
+#include "cli/benchmark.h"
+#include "tabulate.hpp"
+#include "lp.h"
+#include "model_reader.h"
+#include "bb_tree.h"
 
 // PRIVATE METHODS
 
@@ -15,7 +15,7 @@ void Benchmark::displayBenchmarkResults(uint metricsIndex) {
                                                                 return std::get<0>(a) < std::get<0>(b);
                                                                });
 
-    results.add_row({"Exploration strategy", "Branching strategy", "Average execution time"});
+    results.add_row({"Exploration strategy", "Branching strategy", "Explored nodes", "Average execution time"});
 
     for(int i = 0; i < metrics.things.size(); i++) {
         std::string time_str;
@@ -25,7 +25,8 @@ void Benchmark::displayBenchmarkResults(uint metricsIndex) {
 
         std::string currentExplorStratString = convertExplorStratToString(std::get<1>(metrics.things[i]).first);
         std::string currentBranchStratString = convertBranchStratToString(std::get<1>(metrics.things[i]).second);
-        results.add_row({currentExplorStratString, currentBranchStratString, time_str});
+        std::string currentExploredNodesString = std::to_string(std::get<2>(metrics.things[i]));
+        results.add_row({currentExplorStratString, currentBranchStratString, currentExploredNodesString, time_str});
     }
 
     std::cout << results << std::endl;
@@ -59,7 +60,7 @@ void Benchmark::runBenchmark() {
                 Matrix optimalWholeSolution = tree.solveTree(currentExplorStrat, currentBranchStrat);
 
                 avg_execution_time += tree.getMetrics().execution_time / iterations;
-                avg_explored_nodes += (double)(tree.getMetrics().explored_nodes / iterations);
+                avg_explored_nodes += ((double)tree.getMetrics().explored_nodes / (double)iterations);
 
                 tree.deleteTree();
 
@@ -81,7 +82,6 @@ void Benchmark::runBenchmark() {
                 metrics.things.push_back(std::make_tuple(avg_execution_time, std::make_pair(currentExplorStrat, currentBranchStrat), avg_explored_nodes));
             }
 
-            //if(currentExplorStrat != ExplorationStrategy::EXPLORE_ALL_NODES) displayBenchmarkResults(currentIndex);
             currentIndex++;
         }
     }

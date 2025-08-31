@@ -1,11 +1,12 @@
-#include "../include/bb_node.h"
+#include "bb_node.h"
 
 #include <cmath>
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <sstream>
 
-BaBNode::BaBNode(LpProblem nodeProblem, uint newDepth) {
+BaBNode::BaBNode(const LpProblem& nodeProblem, uint newDepth) {
     problem = nodeProblem;
     leftChild = nullptr;
     rightChild = nullptr;
@@ -19,18 +20,6 @@ BaBNode::BaBNode(const BaBNode& otherNode) {
     rightChild = otherNode.rightChild;
     status = otherNode.status;
     depth = otherNode.depth;
-}
-
-bool BaBNode::operator==(NodeStatus statusToCheck) {
-    return (status == statusToCheck) ? true : false;
-}
-
-bool BaBNode::operator==(ProblemStatus statusToCheck) {
-    return problem == statusToCheck;
-}
-
-bool BaBNode::operator!=(ProblemStatus statusToCheck) {
-    return problem != statusToCheck;
 }
 
 std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchStrat) {
@@ -104,10 +93,6 @@ Matrix BaBNode::solveNode() {
     return problem.getOptimalSolution();
 }
 
-LpProblem BaBNode::getProblem() {
-    return problem;
-}
-
 BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
     if(varIndex < 0 || varIndex >= problem.getObjectiveFunction().getNColumns()) {
         std::ostringstream errorMsg;
@@ -154,10 +139,6 @@ void BaBNode::deleteSubNodes() {
     }
 }
 
-void BaBNode::operator=(NodeStatus newStatus) {
-    status = newStatus;
-}
-
 double BaBNode::getObjectiveFunctionValue() {
     return problem.getOptimalSolution().dotProduct(problem.getObjectiveFunction());
 }
@@ -168,8 +149,4 @@ bool BaBNode::isBetter(BaBNode* node) {
     if(node == NULL) return false;
 
     return (probType == MAX) ? getObjectiveFunctionValue() > node->getObjectiveFunctionValue() : getObjectiveFunctionValue() < node->getObjectiveFunctionValue();
-}
-
-uint BaBNode::getDepth() {
-    return depth;
 }

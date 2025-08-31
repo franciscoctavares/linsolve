@@ -1,4 +1,4 @@
-#include "../include/bb_tree.h"
+#include "bb_tree.h"
 
 #include <iostream>
 #include <cmath>
@@ -45,10 +45,6 @@ void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes
 }
 
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
-    ProblemType probType = headNode->getProblem().getType();
-
-    //std::cout << "Right now, the node queue has " << nodeQueue.size() << " elements" << std::endl;
-
     if(strategy == ExplorationStrategy::BEST_VALUE) {
         std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
             if(node1->getProblem().getType() == MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
@@ -80,7 +76,7 @@ BaBTree::BaBTree(LpProblem initialProblem) {
 }
 
 Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat) {
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
 
     std::vector<BaBNode*> nodeQueue;
     uint solvedNodes = 0;
@@ -96,7 +92,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
         nodeQueue.push_back(headNode->branchRight(branchVarInfo.first, branchVarInfo.second));
     }
     else if(*headNode == WHOLE_SOLUTION) {
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::milli> elapsed = end - start;
 
         metrics.execution_time = elapsed.count();
@@ -125,7 +121,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
 
     }while(nodeQueue.size() > 0);
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
 
     metrics.execution_time = elapsed.count();

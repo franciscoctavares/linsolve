@@ -1,17 +1,13 @@
 #include <iostream>
-#include <cmath>
-#include <iomanip>
 
-#include "../include/matrix.h"
-#include "../include/constraint.h"
-#include "../include/lp.h"
-#include "../include/model_reader.h"
-#include "../include/bb_node.h"
-#include "../include/bb_tree.h"
-#include "../include/bb_utils.h"
-#include "../include/cli.h"
-
-#include <string>
+#include "matrix.h"
+#include "constraint.h"
+#include "lp.h"
+#include "model_reader.h"
+#include "bb_node.h"
+#include "bb_tree.h"
+#include "bb_utils.h"
+#include "cli/cli.h"
 
 using namespace std;
 

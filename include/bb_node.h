@@ -23,7 +23,7 @@ class BaBNode {
         /**
          * @brief Standard constructor
          */
-        BaBNode(LpProblem nodeProblem, uint newDepth);
+        BaBNode(const LpProblem& nodeProblem, uint newDepth);
 
         /**
          * @brief Copy constructor
@@ -33,17 +33,17 @@ class BaBNode {
         /**
          * @brief Checks if the node's `status` is equal to `statusToCheck`
          */
-        bool operator==(NodeStatus statusToCheck);
+        bool operator==(NodeStatus statusToCheck) { return status == statusToCheck; }
 
         /**
          * @brief Checks if the `status` of the node's problem is equal to `statusToCheck`
          */
-        bool operator==(ProblemStatus statusToCheck);
+        bool operator==(ProblemStatus statusToCheck) { return problem.getStatus() == statusToCheck; }
 
         /**
          * @brief Checks if the status of the node's problem is not equal to statusToCheck
          */
-        bool operator!=(ProblemStatus statusToCheck);
+        bool operator!=(ProblemStatus statusToCheck) { return problem.getStatus() != statusToCheck; }
 
         /**
          * @brief Computes and returns the branching variable and its current value based on the branching strategy(`branchStrat`)
@@ -56,9 +56,9 @@ class BaBNode {
         Matrix solveNode();
 
         /**
-         * @brief Returns the node's LP problem
+         * @brief Returns a reference to the node's LP problem
          */
-        LpProblem getProblem();
+        LpProblem& getProblem() { return problem; }
 
         /**
          * @brief Given the branching variable and its value, creates the left branch
@@ -86,7 +86,7 @@ class BaBNode {
         /**
          * @brief Sets a new node `status`
          */
-        void operator=(NodeStatus newStatus);
+        void operator=(NodeStatus newStatus) { status = newStatus; }
 
         /**
          * @brief Assuming the node's `problem` is solved, returns the optimal solution's objective function value
@@ -101,7 +101,7 @@ class BaBNode {
         /**
          * @brief Return the node's `depth`
          */
-        uint getDepth();
+        uint getDepth() { return depth; }
 };
 
 #endif

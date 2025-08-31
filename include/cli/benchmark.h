@@ -4,7 +4,7 @@
 #include <vector>
 #include <sys/types.h>
 
-#include "../bb_utils.h"
+#include "bb_utils.h"
 
 #include <string>
 #include <tuple>
@@ -31,9 +31,6 @@ class Benchmark {
         Benchmark(uint numIterations = 10);
 
         void runBenchmark();
-
-
-
 };
 
 #endif
