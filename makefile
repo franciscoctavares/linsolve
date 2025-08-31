@@ -6,7 +6,8 @@ BUILD_DIR := build
 BIN_DIR := bin
 
 CXX := g++
-CXXFLAGS := -Wall -Wextra -I$(INCLUDE_DIR)
+OPTIM_LEVEL := 0
+CXXFLAGS := -Wall -Wextra -I$(INCLUDE_DIR) -O$(OPTIM_LEVEL)
 TARGET := $(BIN_DIR)/main
 
 all: $(TARGET)
