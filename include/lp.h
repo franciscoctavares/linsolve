@@ -27,7 +27,6 @@ enum ProblemStatus {
 };
 
 typedef struct {
-    std::vector<uint> repeatedConstraints;
     std::vector<std::pair<uint, double>> fixedVariables;
     std::vector<uint> constraintsToRemove;
     std::vector<std::pair<uint, uint>> pairsOfVars;
@@ -46,21 +45,21 @@ class LpProblem {
          * 
          * @return true - if all values in the cj - zj row are less than or equal to zero, false otherwise
          */
-        bool isSimplexDone(Matrix cj_minus_zj);
+        bool isSimplexDone(Matrix& cj_minus_zj);
 
         /**
          * @brief Given the pivot column elements(), the b column elements, and the ratios column matrix, returns the index of the pivot row
          * 
          * @return uint - the index of the pivot row
          */
-        uint getPivotRow(std::vector<double> simplexAux, std::vector<double> bAux, Matrix ratios);
+        uint getPivotRow(Matrix& simplexAux, Matrix& bAux, Matrix& ratios);
 
         /**
          * @brief Given the extraCj row matrix(cj row minus the objective function's coefficients), return the basic variables' indexes
          * 
          * @return Matrix 
          */
-        Matrix getBasisIndexes(Matrix extraCj);
+        Matrix getBasisIndexes(Matrix& extraCj);
 
         /**
          * @brief Retrieves all the constraints' LHS(left hand side) and returns them in matrix form
@@ -112,8 +111,6 @@ class LpProblem {
 
         /**
          * @brief Solves the LP model using the simplex method
-         * 
-         * @return Matrix - optimal solution
          */
         Matrix solveSimplex();
 
@@ -132,7 +129,7 @@ class LpProblem {
          * @brief Uses the information stored in the `helper` variable argument and the simplified problem solution(`simplifiedSolution`)
          *        to obtain the initial problem's solution
          */
-        void simplifiedProblemSolution(SimplifiedConstraintsHelper* helper, Matrix simplifiedSolution);
+        void simplifiedProblemSolution(SimplifiedConstraintsHelper* helper, Matrix& simplifiedSolution);
 
         /**
          * @brief Checks if any variables can be fixed and stores the constraints to remove and the set values of the those fixed variables
@@ -209,7 +206,7 @@ class LpProblem {
         /**
          * @brief Adds `newConstraint` to the LP model
          */
-        void addConstraint(Constraint newConstraint);
+        void addConstraint(const Constraint& newConstraint);
 
         /**
          * @brief Removes the constraint with index `constraintIndex`
@@ -221,18 +218,23 @@ class LpProblem {
         /**
          * @brief Returns `optimalSolution`
          */
-        Matrix getOptimalSolution();
+        Matrix& getOptimalSolution() { return optimalSolution; }
 
         /**
          * @brief Returns the LP model type(MAX or MIN)
          */
-        ProblemType getType();
+        ProblemType getType() { return type; }
 
         /**
          * @brief Returns `objectiveFunction`
          */
-        Matrix getObjectiveFunction();
+        Matrix& getObjectiveFunction() { return objectiveFunction; }
         
+        /**
+         * @brief Returns the `status`
+         */
+        ProblemStatus getStatus() { return status; }
+
         /**
          * @brief Solves the LP model
          */
@@ -241,22 +243,19 @@ class LpProblem {
         /**
          * @brief Checks if `status` is equal to `statusToCheck`
          */
-        bool operator==(ProblemStatus statusToCheck);
+        bool operator==(ProblemStatus statusToCheck) { return status == statusToCheck; }
         
         /**
          * @brief Checks if `status` is not equal to `statusToCheck`
          */
-        bool operator!=(ProblemStatus statusToCheck);
+        bool operator!=(ProblemStatus statusToCheck) { return status != statusToCheck; }
 
         /**
          * @brief Checks if all variables of the optimal solution are integers
          */
         bool isOptimalSolutionWhole();
 
-        /**
-         * @brief Returns the `status`
-         */
-        ProblemStatus getStatus();
+        std::vector<Constraint>& getConstraints() { return constraints; }
 
 };
 
