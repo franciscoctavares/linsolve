@@ -26,9 +26,34 @@ class Matrix {
         Matrix(const Matrix& matrix);
 
         /**
+         * @brief Move constructor
+         */
+        Matrix(Matrix&& otherMatrix) noexcept;
+
+        /**
          * @brief Copy assignment operator
          */
         Matrix& operator=(const Matrix& otherMatrix);
+
+        /**
+         * @brief Move assignment operator
+         */
+        Matrix& operator=(Matrix&& otherMatrix) noexcept;
+
+        /**
+         * @brief Returns the number of rows of the matrix
+         */
+        uint getNRows() { return nRows; }
+
+        /**
+         * @brief Returns the number of columns of the matrix
+         */
+        uint getNColumns() { return nColumns; }
+
+        /**
+         * @brief Retrieves the elements of the matrix
+         */
+        std::vector<double> getElements() { return elements; }
 
         /**
          * @brief Displays the matrix on the terminal
@@ -40,7 +65,7 @@ class Matrix {
          * 
          * @throw std::invalid_argument - if both matrices don't have the same number of rows and columns
          */
-        Matrix operator+(Matrix matrix);
+        Matrix operator+(const Matrix& matrix);
 
         /**
          * @brief Sums 2 matrices, but stores the result in the caller
@@ -105,17 +130,7 @@ class Matrix {
          * 
          * @throw std::invalid_argument - if any of the operators is not a row/column matrix(nRows == 1 or nColumns == 1)
          */
-        double dotProduct(Matrix matrix);
-        
-        /**
-         * @brief Returns the number of rows of the matrix
-         */
-        uint getNRows();
-
-        /**
-         * @brief Returns the number of columns of the matrix
-         */
-        uint getNColumns();
+        double dotProduct(const Matrix& matrix);
         
         /**
          * @brief Returns a specific element from the matrix, given its coordinates
@@ -138,14 +153,14 @@ class Matrix {
          * 
          * @throw std::invalid_argument - if `nColumns` != `matrix.nColumns`
          */
-        void stackVertical(Matrix matrix);
+        void stackVertical(const Matrix& matrix);
 
         /**
          * @brief Stacks 2 matrices horizontally
          * 
          * @throw std::invalid_argument - if `nRows` != `matrix.nRows`
          */
-        void stackHorizontal(Matrix matrix);
+        void stackHorizontal(const Matrix& matrix);
         
         /**
          * @brief Returns the transpose of the caller
@@ -177,7 +192,7 @@ class Matrix {
          * 
          * @throw std::invalid_argument - if `nRows` != `matrix.nRows` or `nColumns` != `matrix.nColumns`
          */
-        Matrix pointDivision(Matrix matrix);
+        Matrix pointDivision(Matrix& matrix);
 
         /**
          * @brief Replaces the specified row of the matrix with a new row matrix and returns the resulting matrix
@@ -185,7 +200,7 @@ class Matrix {
          * @throw std::invalid_argument - if `row` < 0 or `row` >= `nRows`
          * @throw std::invalid_argument - if `nColumns` != `newRow.nColumns`
          */
-        Matrix setRow(int row, Matrix newRow);
+        Matrix setRow(int row, const Matrix& newRow);
 
         /**
          * @brief Replaces the specified column of the matrix with a new column matrix and returns the resulting matrix
@@ -193,7 +208,7 @@ class Matrix {
          * @throw std::invalid_argument - if `column` < 0 or `column` >= `nColumns`
          * @throw std::invalid_argument - if `nRows` != `newRow.nRows`
          */
-        Matrix setColumn(int column, Matrix newColumn);
+        void setColumn(int column, Matrix& newColumn);
         
         /**
          * @brief Removes the specified row from the matrix and returns the resulting matrix
@@ -229,20 +244,14 @@ class Matrix {
         Matrix subMatrix(int startingRow, int endingRow, int startingColumn, int endingColumn);
 
         /**
-         * @brief Retrieves the elements of the matrix
-         */
-        std::vector<double> getElements();
-
-        /**
          * @brief Checks if the matrix is a basis vector, and if it is, returns the index of the only non-zero element(1).
          */
         int isBasisVector();
 
         /**
          * @brief Checks if two matrices are equal, meaning all elements are the same and they have the number of rows and columns
-         * 
          */
-        bool operator==(Matrix matrix);
+        bool operator==(const Matrix& matrix);
 };
 
 /**
@@ -260,5 +269,7 @@ Matrix zeros(int rows, int columns);
  * @throw std::invalid_argument - if `index` < 0 or `index` >= `size`
  */
 Matrix basisVector(int size, int index);
+
+int isBasisVector(const std::vector<double>& vector);
 
 #endif
