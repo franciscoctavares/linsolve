@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <sstream>
 
 enum ConstraintType {
     LESS_THAN_OR_EQUAL,      // <=
@@ -21,48 +20,39 @@ class Constraint {
 
         /**
          * @brief Constraint class constructor
-         * 
          */
-        Constraint(std::vector<double> newLhs, std::string newConstraintType, double newRhs);
+        Constraint(std::vector<double>& newLhs, std::string newConstraintType, double newRhs);
+
+        /////////////// GETTERS ///////////////
 
         /**
-         * @brief Retrieves the LHS(left hand side) of the contraint
-         * 
+         * @brief Returns a reference to the LHS(left hand side) of the contraint
          */
-        std::vector<double> getLhs();
+        std::vector<double>& getLhs() { return lhs; }
 
         /**
-         * @brief Retrieves the type(<=, >= or =) of the constraint
-         * 
+         * @brief Returns the type(<=, >= or =) of the constraint
          */
-        ConstraintType getType();
+        ConstraintType getType() { return type; }
 
         /**
-         * @brief Retrieves the RHS(right hand side) of the constraint
-         * 
+         * @brief Returns the RHS(right hand side) of the constraint
          */
-        double getRhs();
+        double getRhs() { return rhs; }
 
-        /**
-         * @brief Sets a new value for the RHS(right hand side) of the constraint
-         * 
-         */
-        void setRhs(double newRhs);
+        ///////////////////////////////////////
 
         /**
          * @brief Checks if the LHS coefficients, the constraint type and the RHS of two constraints are equal
          * 
          * @return true if the constraints are the same, false otherwise
          */
-        bool operator==(Constraint otherConstraint);
+        bool operator==(const Constraint& otherConstraint);
 
         /**
-         * @brief Removes a variable that has been fixed to a specific value(passed as an argument)
-         * 
-         * @param varIndex 
-         * @param varValue 
+         * @brief Removes a variable(whose index is `varIndex`) that has been set to a specific value(`varValue`)
          */
-        void removeFixedVariable(uint varIndex, double varValue);
+        void removeFixedVariable(int varIndex, double varValue);
 };
 
 #endif
