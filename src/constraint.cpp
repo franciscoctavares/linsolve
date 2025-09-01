@@ -11,20 +11,7 @@ Constraint::Constraint(std::vector<double>& newLhs, std::string newConstraintTyp
 }
 
 bool Constraint::operator==(const Constraint& otherConstraint) {
-    if(lhs.size() != otherConstraint.lhs.size()) return false;
-
-    // Check LHS coefficients
-    for(int i = 0; i < lhs.size(); i++) {
-        if(lhs[i] != otherConstraint.lhs[i]) return false;
-    }
-
-    // Check constraint type
-    if(type != otherConstraint.type) return false;
-
-    // Check RHS value
-    if(rhs != otherConstraint.rhs) return false;
-
-    return true;
+    return lhs == otherConstraint.lhs && type == otherConstraint.type && rhs == otherConstraint.rhs;
 }
 
 void Constraint::removeFixedVariable(int varIndex, double varValue) {
@@ -33,7 +20,7 @@ void Constraint::removeFixedVariable(int varIndex, double varValue) {
         errorMsg << "Error using removeFixedVariable: varIndex must be between 0 and " << lhs.size() - 1 << ", but was provided the value " << varIndex;
         throw std::invalid_argument(errorMsg.str());
     }
-    //if(varIndex > lhs.size() - 1) std::cout << "varIndex out of bounds!" << std::endl;
+    
     double coeff = lhs[varIndex];
     rhs -= coeff * varValue;
     lhs.erase(lhs.begin() + varIndex);
