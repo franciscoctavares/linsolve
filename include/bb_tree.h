@@ -51,7 +51,7 @@ class BaBTree {
          */
         void deleteTree();
 
-        PerformanceMetrics getMetrics();
+        PerformanceMetrics& getMetrics() { return metrics; }
 };
 
 #endif

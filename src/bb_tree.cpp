@@ -153,9 +153,3 @@ void BaBTree::deleteTree() {
 
     delete headNode;
 }
-
-PerformanceMetrics BaBTree::getMetrics() {
-    return metrics;
-}
-
-
