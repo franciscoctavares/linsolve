@@ -10,6 +10,28 @@ This repo was migrated from another account of mine in [Codeberg](https://codebe
 make build
 ```
 
+### Dependencies
+
+This project only depends on [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file). Its single header file version is already included in the repository.
+
+This project was developed using g++ version 13. To ensure proper compilation, execute the following commands:
+
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+```
+
+```
+sudo apt update
+```
+
+```
+sudo apt install g++-13
+```
+
+```
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 20
+```
+
 ## Installation
 
 To install linsolve, simply execute the command below.
