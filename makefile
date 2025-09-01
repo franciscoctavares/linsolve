@@ -24,7 +24,7 @@ build: clean $(TARGET)
 
 test:
 	clear
-	@./bin/main bench BEST_VALUE BEST_COEFFICIENT --show
+	@./bin/main model BEST_VALUE BEST_COEFFICIENT --show
 
 bench:
 	clear
