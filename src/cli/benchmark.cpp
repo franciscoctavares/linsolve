@@ -20,7 +20,7 @@ void Benchmark::displayBenchmarkResults(uint metricsIndex) {
     for(int i = 0; i < metrics.things.size(); i++) {
         std::string time_str;
         if(std::get<0>(metrics.things[i]) > 1000) time_str = std::to_string(std::get<0>(metrics.things[i]) / 1000) + " s";
-        else if(std::get<0>(metrics.things[i]) < 1) time_str = std::to_string(std::get<0>(metrics.things[i]) * 1000) + " us";
+        else if(std::get<0>(metrics.things[i]) < 1) time_str = std::to_string(std::get<0>(metrics.things[i]) * 1000) + " \u03BCs";
         else time_str = std::to_string(std::get<0>(metrics.things[i])) + " ms";
 
         std::string currentExplorStratString = convertExplorStratToString(std::get<1>(metrics.things[i]).first);
