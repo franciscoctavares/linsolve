@@ -8,10 +8,14 @@
 #include "bb_tree.h"
 #include "bb_utils.h"
 #include "cli/cli.h"
+#include "tabulate.hpp"
+
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
 int main(int argc, char** argv) {
-    CLI interface(argc, argv);
+    CLI interface(argc, argv);    
     return 0;
 }

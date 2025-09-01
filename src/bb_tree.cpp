@@ -7,6 +7,8 @@
 #include <random>
 #include <chrono>
 
+#include <thread>
+
 // PRIVATE METHODS
 
 void BaBTree::fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy, BaBNode*& incumbentSolution) {
@@ -36,12 +38,28 @@ void BaBTree::updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSol
 }
 
 void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes) {
+    /*
     for(uint i = 0; i < nodeQueue.size(); i++) {
         if(*nodeQueue[i] == NOT_EVALUATED) {
             nodeQueue[i]->solveNode();
             solvedNodes++;
         }
     }
+    */
+
+    /*
+    nodeQueue[nodeQueue.size() - 1]->solveNode();
+    nodeQueue[nodeQueue.size() - 2]->solveNode();
+    solvedNodes += 2;
+    */
+
+    std::thread t1(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 1]);
+    std::thread t2(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 2]);
+
+    t1.join();
+    t2.join();
+
+    solvedNodes += 2;
 }
 
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
@@ -83,7 +101,6 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
     BaBNode* incumbentSolution = NULL;
 
     headNode->solveNode();
-    //std::cout << "Solved a node, Z = " << headNode->getObjectiveFunctionValue() <<std::endl;
     solvedNodes++;
 
     if(*headNode == CONTINUOUS_SOLUTION) {
