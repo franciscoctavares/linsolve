@@ -57,7 +57,8 @@ void Benchmark::runBenchmark() {
             for(int k = 0; k < iterations; k++) {
                 LP::LpProblem initialProblem = ModelFileReader::readModel("bench.lp");
                 BaBTree tree(initialProblem);
-                Matrix optimalWholeSolution = tree.solveTree(currentExplorStrat, currentBranchStrat);
+                bool multithreading = false;
+                Matrix optimalWholeSolution = tree.solveTree(currentExplorStrat, currentBranchStrat, multithreading);
 
                 avg_execution_time += tree.getMetrics().execution_time / iterations;
                 avg_explored_nodes += ((double)tree.getMetrics().explored_nodes / (double)iterations);

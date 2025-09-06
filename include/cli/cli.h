@@ -11,6 +11,7 @@ typedef struct {
     std::string fileName;
     ExplorationStrategy explorationStrat;
     BranchingStrategy branchingStrat;
+    bool multithreading;
     bool displayResults;
 }Command;
 

@@ -181,43 +181,6 @@ void LpProblem::removeConstraint(int constraintIndex) {
 }
 
 void LpProblem::solveProblem(SolvingMethod method) {
-    /*
-    LpProblem auxProblem(type, objectiveFunction.getElements(), constraints);
-
-    std::pair<LpProblem, SimplifierHelper> simplifiedResults = LPSimplifier::simplifyProblem(auxProblem);
-    
-    SimplifierHelper& helper = simplifiedResults.second;
-
-    LpProblem originalProblem(type, objectiveFunction.getElements(), constraints);
-
-    if(method == SIMPLEX) {
-        if(helper.isHelperEmpty()) {
-            SimplexSolver solver(originalProblem);
-            std::pair<Matrix, SolutionType> solverResults = solver.runSolver();
-
-            optimalSolution = solverResults.first;
-            solutionType = solverResults.second;
-        }
-        else {
-            //std::cout << std::format("Simplified problem has {} variables", simplifiedResults.first.getObjectiveFunction().getNColumns()) << std::endl;
-            SimplexSolver solver(simplifiedResults.first);
-
-            std::pair<Matrix, SolutionType> solverResults = solver.runSolver();
-
-            simplifiedProblemSolution(helper, simplifiedResults.first);
-        }
-
-
-        if(solutionType == CONTINUOUS_SOLUTION && isOptimalSolutionWhole()) {
-            solutionType = WHOLE_SOLUTION;
-            //std::cout << "Something happened. solutionType is marked as continuous, but the solution is whole" << std::endl;
-        }
-
-
-
-    }
-    */
-
     if(method == SIMPLEX) {
         LpProblem originalProblem(type, objectiveFunction.getElements(), constraints);
 

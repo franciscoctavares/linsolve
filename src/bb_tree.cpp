@@ -8,6 +8,7 @@
 #include <chrono>
 
 #include <format>
+#include "tabulate.hpp"
 
 #include <thread>
 
@@ -45,17 +46,23 @@ void BaBTree::updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSol
 	}
 }
 
-void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes) {
-	//std::thread t1(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 2]);
-	//std::thread t2(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 1]);
+void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes, bool multithreading) {
 
-	//t1.join();
-	//t2.join();
+    if(multithreading) {
+        std::thread t1(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 2]);
+        std::thread t2(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 1]);
 
-    nodeQueue[nodeQueue.size() - 2]->solveNode();
-    nodeQueue[nodeQueue.size() - 1]->solveNode();
+        t1.join();
+        t2.join();
+    }
+    else {
+        nodeQueue[nodeQueue.size() - 2]->solveNode();
+        nodeQueue[nodeQueue.size() - 1]->solveNode();
+    }
 
-    std::cout << "Solved 2 more nodes..." << std::endl;
+    //std::cout << "Solved 2 more nodes..." << std::endl;
+
+    //std::cout << std::format("\rExplored nodes: {}", solvedNodes) << std::flush;
 
 	solvedNodes += 2;
 }
@@ -91,7 +98,7 @@ BaBTree::BaBTree(LP::LpProblem initialProblem) {
 	headNode = new BaBNode(initialProblem, 0);
 }
 
-Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat) {
+Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat, bool multithreading) {
 	auto start = std::chrono::steady_clock::now();
 
 	std::vector<BaBNode*> nodeQueue;
@@ -129,7 +136,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
 	}
 
 	do {
-		solveNodeQueue(nodeQueue, solvedNodes);
+		solveNodeQueue(nodeQueue, solvedNodes, multithreading);
         //std::cout << "Just finished solving nodes and so far, " << solvedNodes << " nodes were explored" << std::endl;
 
 		fathomLeafNodes(nodeQueue, explorationStrat, incumbentSolution);
@@ -168,16 +175,47 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
 }
 
 void BaBTree::displayProblem(Matrix optimalWholeSolution) {
+    tabulate::Table results;
+
+    results.add_row({"Explored nodes", std::format("{}", metrics.explored_nodes)});
+    results.add_row({"Optimal solution depth", std::format("{}", metrics.optimalSolutionDepth)});
+
+    std::string time_str;
+
+	if(metrics.execution_time > 1000) {
+        time_str = std::format("{:.3f}", metrics.execution_time / 1000);
+        time_str += " s";
+    }
+	else if(metrics.execution_time < 1) {
+        time_str = std::format("{:.3f}", metrics.execution_time * 1000);
+        time_str += " us";
+    }
+	else {
+        time_str = std::format("{:.3f}", metrics.execution_time);
+        time_str += " ms";
+    }
+
+    results.add_row({"Execution time", time_str});
+
+    /*
 	std::cout << "Explored nodes: " << metrics.explored_nodes << std::endl;
 	std::cout << "The optimal solution is located at depth " << metrics.optimalSolutionDepth << std::endl;
 	std::cout << "Execution time: "; //<< metrics.execution_time << " ms" << std::endl;
 	if(metrics.execution_time > 1000) std::cout << metrics.execution_time / 1000 << " s" << std::endl;
 	else if(metrics.execution_time < 1) std::cout << metrics.execution_time * 1000 << " \u03BCs" << std::endl;
 	else std::cout << metrics.execution_time << " ms" << std::endl;
+    */
+
+    std::cout << results << std::endl;
 
 	std::cout << "The optimal solution is: (";
 	for(uint i = 0; i < metrics.optimalWholeSolution.getNColumns(); i++) {
-		std::cout << metrics.optimalWholeSolution.getElement(0, i);
+        if(LP::isNumberAnInteger(metrics.optimalWholeSolution.getElement(0, i))) {
+            std::cout << std::format("{:d}", static_cast<int>(metrics.optimalWholeSolution.getElement(0, i)));
+        }
+		else {
+            std::cout << std::format("{:.3f}", metrics.optimalWholeSolution.getElement(0, i));
+        }
 		if(i < metrics.optimalWholeSolution.getNColumns() - 1) std::cout << ", ";
 	}
 	std::cout << "), Z = " << metrics.optimalWholeSolution.dotProduct(headNode->getProblem().getObjectiveFunction()) << std::endl;

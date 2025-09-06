@@ -22,7 +22,7 @@ class BaBTree {
         /**
          * @brief Solves all of the node queue's LP problems which aren't already solved
          */
-        void solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes);
+        void solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes, bool multithreading);
 
         /**
          * @brief Sorts the `nodeQueue`, according to an exploration strategy, meaning that, after sorting,
@@ -39,7 +39,7 @@ class BaBTree {
         /**
          * @brief Given an exploration strategy and a branching strategy, solve the IP model using the Branch and Bound method
          */
-        Matrix solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat);
+        Matrix solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat, bool multithreading);
 
         /**
          * @brief Displays the `optimalWholeSolution` to the IP model, along with a few performance metrics

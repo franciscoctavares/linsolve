@@ -1,10 +1,11 @@
-#include "../../include/cli/cli.h"
+#include "cli/cli.h"
 
 #include <filesystem>
 #include <iostream>
+#include <algorithm>
 
-#include "../../include/model_reader.h"
-#include "../../include/cli/benchmark.h"
+#include "model_reader.h"
+#include "cli/benchmark.h"
 
 // PRIVATE METHODS
 
@@ -14,7 +15,7 @@ void CLI::validateCommand() {
         if(args[1] != "--benchmark") throw std::invalid_argument("Invalid number of arguments");
     }
     else {
-        if(args.size() != 5) {
+        if(args.size() != 6) {
             throw std::invalid_argument("Invalid number of arguments size 5");
         }
         
@@ -39,6 +40,9 @@ void CLI::validateCommand() {
         if(args[4] == "--show") command.displayResults = true;
         else if(args[4] == "--quiet") command.displayResults = false;
         else throw std::invalid_argument("Invalid option: " + args[4]);
+
+        command.multithreading = std::find(args.begin(), args.end(), std::string("--threads")) != args.end();
+        //command.multithreading = false;
     }
 
 }
@@ -52,7 +56,7 @@ void CLI::executeCommand() {
     LP::LpProblem initialProblem = ModelFileReader::readModel(command.fileName);
 
     BaBTree tree(initialProblem);
-    Matrix optimalWholeSolution = tree.solveTree(command.explorationStrat, command.branchingStrat);
+    Matrix optimalWholeSolution = tree.solveTree(command.explorationStrat, command.branchingStrat, command.multithreading);
 
     if(command.displayResults) tree.displayProblem(optimalWholeSolution);
 

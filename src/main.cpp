@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "matrix.h"
-#include "constraint.h"
+#include "lp/constraint.h"
 #include "lp/lp.h"
 #include "model_reader.h"
 #include "bb_node.h"
@@ -19,16 +19,5 @@ using namespace std;
 
 int main(int argc, char** argv) {
     CLI interface(argc, argv);
-
-
-    
-    /*
-    std::cout << std::endl;
-    double number = 27.5;
-    if(LP::isNumberAnInteger(number)) {
-        std::cout << "The number " << number << " is an integer" << std::endl;
-    }
-    else std::cout << "The number " << number << " is not an integer" << std::endl;
-    */
     return 0;
 }

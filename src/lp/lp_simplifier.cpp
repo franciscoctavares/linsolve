@@ -149,10 +149,11 @@ SimplifierHelper LPSimplifier::computeSimplifierHelper(LpProblem& originalProble
 }
 
 void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelper& helper) {
-
+    /*
     for(uint currentConstraintToRemove : helper.constraintsToRemove) {
         std::cout << currentConstraintToRemove << " ";
     }
+    */
 
     
     if(helper.isHelperEmpty()) {
@@ -176,8 +177,6 @@ void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelpe
         for(std::pair<uint, double>& currentFixedVar : helper.fixedVariables) {
             problemToSimplify.removeFixedVariable(currentFixedVar.first, currentFixedVar.second);
         }
-
-        //problemToSimplify.setOptimalSolution(zeros(1, problemToSimplify.getObjectiveFunction().getNColumns()));
     }
 
 }
