@@ -7,10 +7,6 @@
 #include "bb_tree.h"
 #include "bb_node.h"
 
-enum FileExtension {
-    LP,
-};
-
 typedef struct {
     std::string fileName;
     ExplorationStrategy explorationStrat;

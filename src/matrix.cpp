@@ -1,9 +1,12 @@
 #include "matrix.h"
+#include "tabulate.hpp"
+
 #include <cmath>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
 #include <string>
+#include <format>
 
 Matrix::Matrix(std::vector<double> newElements, int rows, int columns) {
     if(rows <= 0) {
@@ -64,33 +67,20 @@ Matrix& Matrix::operator=(Matrix&& otherMatrix) noexcept {
 }
 
 void Matrix::displayMatrix() {
-    size_t maxWidth = 0;
-    for(double val: elements) {
-        std::string str = std::to_string(val);
-        // Trim trailing zeroes for nicer formatting (optional)
-        str.erase(str.find_last_not_of('0') + 1, std::string::npos);
-        if (str.back() == '.') str.pop_back(); // remove trailing dot if needed
-        maxWidth = std::max(maxWidth, str.length());
-    }
-
-    unsigned padding = 1;
-    maxWidth += padding;
+    tabulate::Table table;
 
     for(int i = 0; i < nRows; i++) {
-        //for(int l = 0; l < 18 - 1; l++) std::cout << " ";
-        std::cout << "|";
+        tabulate::Table::Row_t currentRow;
         for(int j = 0; j < nColumns; j++) {
-            //if(elements[i * m + j] < 0) std::cout << "-";
-            //else std::cout << "+";
-            std::cout << std::setw(maxWidth) << elements[i * nColumns + j];
-            //std::cout << std::setprecision(3) << std::fixed << fabs(elements[i * m + j]);
-            //if(j < m - 1) std::cout << " ";
+            if(std::fabs(elements[i * nColumns + j] - std::round(elements[i * nColumns + j])) < 1e-10) {
+                currentRow.push_back(std::format("{:d}", static_cast<int>(elements[i * nColumns + j])));
+            }
+            else currentRow.push_back(std::format("{:.3f}", elements[i * nColumns + j]));
         }
-        for(int k = 0; k < padding; k++) std::cout << " ";
-        std::cout << "|" << std::endl;
-        //for(int k = 0; k < padding; k++)
+        table.add_row(currentRow);
     }
-    //for(int i = 0; i < padding; i++) std::cout
+
+    std::cout << table << std::endl;
 }
 
 Matrix Matrix::operator+(const Matrix& matrix) {

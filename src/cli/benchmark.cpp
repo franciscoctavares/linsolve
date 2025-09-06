@@ -1,6 +1,6 @@
 #include "cli/benchmark.h"
 #include "tabulate.hpp"
-#include "lp.h"
+#include "lp/lp.h"
 #include "model_reader.h"
 #include "bb_tree.h"
 
@@ -55,7 +55,7 @@ void Benchmark::runBenchmark() {
             avg_explored_nodes = 0;
 
             for(int k = 0; k < iterations; k++) {
-                LpProblem initialProblem = ModelFileReader::readModel("bench.lp");
+                LP::LpProblem initialProblem = ModelFileReader::readModel("bench.lp");
                 BaBTree tree(initialProblem);
                 Matrix optimalWholeSolution = tree.solveTree(currentExplorStrat, currentBranchStrat);
 

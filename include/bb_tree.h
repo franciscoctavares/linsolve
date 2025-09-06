@@ -34,7 +34,7 @@ class BaBTree {
         /**
          * @brief Standard constructor. Allocates memory and initializes the head node(or root node) of the tree with `initialProblem`
          */
-        BaBTree(LpProblem initialProblem);
+        BaBTree(LP::LpProblem initialProblem);
 
         /**
          * @brief Given an exploration strategy and a branching strategy, solve the IP model using the Branch and Bound method

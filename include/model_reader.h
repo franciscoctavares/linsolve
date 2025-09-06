@@ -5,7 +5,7 @@
 #include <string>
 #include <tuple>
 #include <utility>
-#include "lp.h"
+#include "lp/lp.h"
 
 
 class ModelFileReader {
@@ -22,10 +22,6 @@ class ModelFileReader {
         static std::vector<std::tuple<std::vector<double>, std::string, double>> readConstraints(std::string fileName, unsigned varsNumber);
     public:
 
-        /**
-         * @brief Constructor for the ModelFileReader class
-         * 
-         */
         ModelFileReader();
         
         /**
@@ -34,7 +30,7 @@ class ModelFileReader {
          * @param fileName the path to the model file
          * @return LpProblem - the model read, encapsulated in the LpProblem class
          */
-        static LpProblem readModel(std::string fileName);
+        static LP::LpProblem readModel(std::string fileName);
 };
 
 #endif

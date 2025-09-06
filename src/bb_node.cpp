@@ -1,12 +1,14 @@
 #include "bb_node.h"
+#include "lp/lp_utils.h"
 
 #include <cmath>
 #include <iostream>
 #include <random>
 #include <algorithm>
 #include <sstream>
+#include <format>
 
-BaBNode::BaBNode(const LpProblem& nodeProblem, uint newDepth) {
+BaBNode::BaBNode(const LP::LpProblem& nodeProblem, uint newDepth) {
     problem = nodeProblem;
     leftChild = nullptr;
     rightChild = nullptr;
@@ -24,12 +26,12 @@ BaBNode::BaBNode(const BaBNode& otherNode) {
 
 std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchStrat) {
     Matrix currentSolution = problem.getOptimalSolution();
-
+    
     std::pair<uint, double> branchVarInfo;
 
     if(branchStrat == BranchingStrategy::FIRST_INDEX) {
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
-            if(floor(currentSolution.getElement(0, i)) != currentSolution.getElement(0, i)) {
+            if(!LP::isNumberAnInteger(currentSolution.getElement(0, i))) {
                 branchVarInfo = std::make_pair(i, currentSolution.getElement(0, i));
                 break;
             }
@@ -38,7 +40,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
     else if(branchStrat == BranchingStrategy::RANDOM_VAR) {
         std::vector<uint> contVarsIndexes;
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
-            if(!isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
+            if(!LP::isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
         }
 
         std::random_device rd;
@@ -50,11 +52,12 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
         branchVarInfo = std::make_pair(contVarsIndexes[num], currentSolution.getElement(0, contVarsIndexes[num]));
     }
     else if(branchStrat == BranchingStrategy::BEST_COEFFICIENT) {
+        /*
         std::vector<uint> contVarsIndexes;
+        
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
-            if(!isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
+            if(!LP::isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
         }
-
         Matrix objFun = problem.getObjectiveFunction();
 
         std::vector<double> contVarsCoeffs;
@@ -62,13 +65,15 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
             contVarsCoeffs.push_back(objFun.getElement(0, contVarsIndexes[i]));
         }
 
-        if(problem.getType() == MAX) {
+
+        if(problem.getType() == LP::MAX) {
             size_t max_index;
             auto max_it = std::max_element(contVarsCoeffs.begin(), contVarsCoeffs.end());
             if (max_it != contVarsCoeffs.end()) {
                 max_index = std::distance(contVarsCoeffs.begin(), max_it);
             }
 
+            //std::cout << std::format(", and max index is {}", contVarsIndexes[max_index]) << std::endl;
             branchVarInfo = std::make_pair(contVarsIndexes[max_index], currentSolution.getElement(0, contVarsIndexes[max_index]));
         }
         else {
@@ -80,15 +85,39 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
 
             branchVarInfo = std::make_pair(contVarsIndexes[min_index], currentSolution.getElement(0, contVarsIndexes[min_index]));
         }
+        */
+
+        Matrix objFun = problem.getObjectiveFunction();
+        
+        
+        std::vector<std::pair<uint, double>> continuousVars;
 
 
+        for(uint i = 0; i < currentSolution.getNColumns(); i++) {
+            if(!LP::isNumberAnInteger(currentSolution.getElement(0, i))) continuousVars.push_back({i, objFun.getElement(0, i)});
+        }
+
+        if(problem.getType() == LP::MAX) {
+            std::sort(continuousVars.begin(), continuousVars.end(), [](std::pair<uint, double>& a, std::pair<uint, double>& b) {
+                return a.second > b.second;
+            });
+        }
+        else
+            std::sort(continuousVars.begin(), continuousVars.end(), [](std::pair<uint, double>& a, std::pair<uint, double>& b) {
+                return a.second < b.second;
+            });
+
+
+        //std::cout << std::format("Branching var = {}, Branching var value = {}", continuousVars[0].first, currentSolution.getElement(0, continuousVars[0].first)) << std::endl;
+
+        return std::make_pair(continuousVars[0].first, currentSolution.getElement(0, continuousVars[0].first));
     }
 
     return branchVarInfo;
 }
 
 Matrix BaBNode::solveNode() {
-    problem.solveProblem();
+    problem.solveProblem(LP::SIMPLEX);
     status = EVALUATED;
     return problem.getOptimalSolution();
 }
@@ -103,7 +132,7 @@ BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
 
     std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().getNColumns(), varIndex).getElements();
     Constraint newConstraint(newLhs, "<=", floor(varValue));
-    LpProblem newProblem = problem;
+    LP::LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
     leftChild = new BaBNode(newProblem, depth + 1);
 
@@ -120,7 +149,7 @@ BaBNode* BaBNode::branchRight(int varIndex, double varValue) {
 
     std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().getNColumns(), varIndex).getElements();
     Constraint newConstraint(newLhs, ">=", ceil(varValue));
-    LpProblem newProblem = problem;
+    LP::LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
     rightChild = new BaBNode(newProblem, depth + 1);
 
@@ -140,13 +169,28 @@ void BaBNode::deleteSubNodes() {
 }
 
 double BaBNode::getObjectiveFunctionValue() {
+    //problem.getOptimalSolution().displayMatrix();
+    //std::cout << std::endl;
+    //problem.getObjectiveFunction().displayMatrix();
+    //std::cout << std::endl;
+
     return problem.getOptimalSolution().dotProduct(problem.getObjectiveFunction());
 }
 
-bool BaBNode::isBetter(BaBNode* node) {
-    ProblemType probType = problem.getType();
+bool BaBNode::isBetter(BaBNode* otherNode) {
+    LP::ProblemType probType = problem.getType();
 
-    if(node == NULL) return false;
+    //problem.getOptimalSolution().displayMatrix();
+    //std::cout << std::endl << std::endl;
+    
+    //otherNode->getProblem().getOptimalSolution().displayMatrix();
+    //std::cout << std::endl << std::endl;
 
-    return (probType == MAX) ? getObjectiveFunctionValue() > node->getObjectiveFunctionValue() : getObjectiveFunctionValue() < node->getObjectiveFunctionValue();
+    if(otherNode == NULL) return false;
+
+    if(probType == LP::MAX) {
+        return getObjectiveFunctionValue() > otherNode->getObjectiveFunctionValue();
+    }
+    else return getObjectiveFunctionValue() < otherNode->getObjectiveFunctionValue();
+
 }

@@ -162,13 +162,13 @@ ModelFileReader::ModelFileReader() {
     
 }
 
-LpProblem ModelFileReader::readModel(std::string fileName) {
+LP::LpProblem ModelFileReader::readModel(std::string fileName) {
     std::pair<std::string, std::vector<double>> objectiveFunctionAux = readObjectiveFunction(fileName);
     std::vector<std::tuple<std::vector<double>, std::string, double>> constraintsAux = readConstraints(fileName, objectiveFunctionAux.second.size());
 
-    ProblemType type;
-    if(objectiveFunctionAux.first == "max") type = MAX;
-    else if(objectiveFunctionAux.first == "min") type = MIN;
+    LP::ProblemType type;
+    if(objectiveFunctionAux.first == "max") type = LP::MAX;
+    else if(objectiveFunctionAux.first == "min") type = LP::MIN;
 
     std::vector<double> objectiveFunction = objectiveFunctionAux.second;
     std::vector<Constraint> constraints;
@@ -176,5 +176,5 @@ LpProblem ModelFileReader::readModel(std::string fileName) {
         constraints.push_back(Constraint(std::get<0>(consts), std::get<1>(consts),std::get<2>(consts)));
     }
 
-    return LpProblem(type, objectiveFunction, constraints);
+    return LP::LpProblem(type, objectiveFunction, constraints);
 }

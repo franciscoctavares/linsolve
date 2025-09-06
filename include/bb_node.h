@@ -1,7 +1,7 @@
 #ifndef BB_NODE_H
 #define BB_NODE_H
 
-#include "lp.h"
+#include "lp/lp.h"
 #include "bb_utils.h"
 
 enum NodeStatus {
@@ -12,7 +12,7 @@ enum NodeStatus {
 
 class BaBNode {
     private:
-        LpProblem problem;
+        LP::LpProblem problem;
         BaBNode* leftChild;
         BaBNode* rightChild;
         NodeStatus status;
@@ -23,7 +23,7 @@ class BaBNode {
         /**
          * @brief Standard constructor
          */
-        BaBNode(const LpProblem& nodeProblem, uint newDepth);
+        BaBNode(const LP::LpProblem& nodeProblem, uint newDepth);
 
         /**
          * @brief Copy constructor
@@ -38,12 +38,12 @@ class BaBNode {
         /**
          * @brief Checks if the `status` of the node's problem is equal to `statusToCheck`
          */
-        bool operator==(ProblemStatus statusToCheck) { return problem.getStatus() == statusToCheck; }
+        bool operator==(LP::SolutionType typeToCheck) { return problem.getSolutionType() == typeToCheck; }
 
         /**
          * @brief Checks if the status of the node's problem is not equal to statusToCheck
          */
-        bool operator!=(ProblemStatus statusToCheck) { return problem.getStatus() != statusToCheck; }
+        bool operator!=(LP::SolutionType typeToCheck) { return problem.getSolutionType() != typeToCheck; }
 
         /**
          * @brief Computes and returns the branching variable and its current value based on the branching strategy(`branchStrat`)
@@ -58,7 +58,7 @@ class BaBNode {
         /**
          * @brief Returns a reference to the node's LP problem
          */
-        LpProblem& getProblem() { return problem; }
+        LP::LpProblem& getProblem() { return problem; }
 
         /**
          * @brief Given the branching variable and its value, creates the left branch
@@ -102,6 +102,10 @@ class BaBNode {
          * @brief Return the node's `depth`
          */
         uint getDepth() { return depth; }
+
+        bool doesNodeHaveASolution() { return problem.getSolutionType() == LP::CONTINUOUS_SOLUTION || problem.getSolutionType() == LP::WHOLE_SOLUTION; }
+
+        bool isNodeValid() { return problem.isSolutionAdmissible(problem.getOptimalSolution()); }
 };
 
 #endif

@@ -49,7 +49,7 @@ void CLI::executeCommand() {
         return;
     }
 
-    LpProblem initialProblem = ModelFileReader::readModel(command.fileName);
+    LP::LpProblem initialProblem = ModelFileReader::readModel(command.fileName);
 
     BaBTree tree(initialProblem);
     Matrix optimalWholeSolution = tree.solveTree(command.explorationStrat, command.branchingStrat);
