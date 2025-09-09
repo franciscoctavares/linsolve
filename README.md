@@ -7,7 +7,7 @@ This repo was migrated from another account of mine in [Codeberg](https://codebe
 ## Compilation
 
 ```
-make build
+make build OPTIM_LEVEL=2
 ```
 
 ### Dependencies
@@ -61,8 +61,7 @@ By default, this command will copy the binary to a directory which most systems 
     * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* Cli basics(including the use of [Tabulate](https://github.com/p-ranav/tabulate?tab=readme-ov-file) for formatting output into tables, when appropriate)
-* Optimizing memory usage(reducing copying) to increase performance
+* Fixing bugs when using certain branching or exploration strategies
 
 ## Planned Features
 * More branching/exploration strategies
