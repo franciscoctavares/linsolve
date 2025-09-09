@@ -40,7 +40,7 @@ class SimplexSolver {
          * 
          * @return uint - the index of the pivot row
          */
-        uint getPivotRow(Matrix& simplexAux, Matrix& bAux, Matrix& ratios);
+        std::size_t getPivotRow(Matrix& simplexAux, Matrix& bAux);
 
         /**
          * @brief Given the extraCj row matrix(cj row minus the objective function's coefficients), return the basic variables' indexes
@@ -107,12 +107,15 @@ class SimplexSolver {
 
         void computeOriginalProblemSolution(std::pair<Matrix, SolutionType>& simplifiedResult, SimplifierHelper& helper);
 
+        uint computePivotColumn(Matrix& cj_minus_zj);
 
     public:
         SimplexSolver(LpProblem problemToSolve);
 
         std::pair<Matrix, SolutionType> runSolver();
 };
+
+bool isNumberCloseToInteger(double number, int integerToCheck, double epsilon = 1e-10);
 
 }
 

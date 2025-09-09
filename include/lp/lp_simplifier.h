@@ -14,7 +14,7 @@ class LPSimplifier {
 
         static void searchForReducedFeasibleRegion(LpProblem& problemToSimplify, SimplifierHelper& helper);
 
-        static void removeRedundantInformationFromHelper(LpProblem& problemToSimplify, SimplifierHelper& helper);
+        static void removeRedundantInformationFromHelper(SimplifierHelper& helper);
 
         static void newVarsToOldVars(LpProblem& problemToSimplify, SimplifierHelper& helper);
     public:

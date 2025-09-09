@@ -9,7 +9,6 @@
 #include <tuple>
 
 #include <limits>
-#include <sys/types.h>
 
 #include "lp/lp_utils.h"
 #include "lp/lp.h"

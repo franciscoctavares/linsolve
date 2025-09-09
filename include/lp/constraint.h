@@ -22,7 +22,7 @@ class Constraint {
 
         double getRhs() { return rhs; }
 
-        bool operator==(const Constraint& otherConstraint);
+        bool operator==(const Constraint& otherConstraint) const;
 
         /**
          * @brief Removes a variable(whose index is `varIndex`) that has been set to a specific value(`varValue`)

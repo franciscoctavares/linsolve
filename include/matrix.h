@@ -2,12 +2,12 @@
 #define MATRIX_H
 
 #include <vector>
-#include <sys/types.h>
+#include <cstddef>
 
 class Matrix {
     private:
         std::vector<double> elements;
-        uint nRows, nColumns;
+        std::size_t nRows, nColumns;
     public:
         Matrix(void) = default;
 
@@ -43,12 +43,12 @@ class Matrix {
         /**
          * @brief Returns the number of rows of the matrix
          */
-        uint getNRows() { return nRows; }
+        std::size_t getNRows() { return nRows; }
 
         /**
          * @brief Returns the number of columns of the matrix
          */
-        uint getNColumns() { return nColumns; }
+        std::size_t getNColumns() { return nColumns; }
 
         /**
          * @brief Retrieves the elements of the matrix
@@ -180,12 +180,12 @@ class Matrix {
         /**
          * @brief Returns the index of the highest element in the matrix
          */
-        uint maxValueIndex();
+        std::size_t maxValueIndex();
 
         /**
          * @brief Returns the index of the lowest element in the matrix
          */
-        uint minValueIndex();
+        std::size_t minValueIndex();
 
         /**
          * @brief Performs point-wise division, and returns the resulting matrix
@@ -251,7 +251,7 @@ class Matrix {
         /**
          * @brief Checks if two matrices are equal, meaning all elements are the same and they have the number of rows and columns
          */
-        bool operator==(const Matrix& matrix);
+        bool operator==(const Matrix& matrix) const;
 };
 
 /**

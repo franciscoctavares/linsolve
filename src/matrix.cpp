@@ -19,7 +19,7 @@ Matrix::Matrix(std::vector<double> newElements, int rows, int columns) {
         errorMsg << "Error using Matrix(class constructor): nColumns must be a positive number but the value provided was " << nColumns;
         throw std::invalid_argument(errorMsg.str());
     }
-    if(rows * columns != newElements.size()) {
+    if(static_cast<std::size_t>(rows * columns) != newElements.size()) {
         std::ostringstream errorMsg;
         errorMsg << "Error using Matrix(class constructor): nRows x nColumns is not equal to the size of the newElements vector";
         throw std::invalid_argument(errorMsg.str());
@@ -69,9 +69,9 @@ Matrix& Matrix::operator=(Matrix&& otherMatrix) noexcept {
 void Matrix::displayMatrix() {
     tabulate::Table table;
 
-    for(int i = 0; i < nRows; i++) {
+    for(std::size_t i = 0; i < nRows; i++) {
         tabulate::Table::Row_t currentRow;
-        for(int j = 0; j < nColumns; j++) {
+        for(std::size_t j = 0; j < nColumns; j++) {
             if(std::fabs(elements[i * nColumns + j] - std::round(elements[i * nColumns + j])) < 1e-10) {
                 currentRow.push_back(std::format("{:d}", static_cast<int>(elements[i * nColumns + j])));
             }
@@ -92,7 +92,7 @@ Matrix Matrix::operator+(const Matrix& matrix) {
     }
 
     Matrix aux(elements, nRows, nColumns);
-    for(int i = 0; i < nRows * nColumns; i++) {
+    for(std::size_t i = 0; i < nRows * nColumns; i++) {
         aux.elements[i] += matrix.elements[i];
     }
     return aux;
@@ -106,7 +106,7 @@ void Matrix::operator+=(Matrix matrix) {
         throw std::runtime_error(errorMsg.str());
     }
 
-    for(int i = 0; i < nRows * nColumns; i++) {
+    for(std::size_t i = 0; i < nRows * nColumns; i++) {
         elements[i] += matrix.elements[i];
     }
 }
@@ -120,7 +120,7 @@ Matrix Matrix::operator-(Matrix matrix) {
     }
 
     Matrix aux(elements, nRows, nColumns);
-    for(int i = 0; i < nRows * nColumns; i++) {
+    for(std::size_t i = 0; i < nRows * nColumns; i++) {
         aux.elements[i] -= matrix.elements[i];
     }
     return aux;
@@ -134,21 +134,21 @@ void Matrix::operator-=(Matrix matrix) {
         throw std::runtime_error(errorMsg.str());
     }
     
-    for(int i = 0; i < nRows * nColumns; i++) {
+    for(std::size_t i = 0; i < nRows * nColumns; i++) {
         elements[i] -= matrix.elements[i];
     }
 }
 
 Matrix Matrix::operator*(Matrix matrix) {
     if(nColumns == matrix.nRows) {
-        std::vector<double> newStuff;
-        for(int i = 0; i < nRows * matrix.nColumns; i++) newStuff.push_back(0.0);
+        std::vector<double> newStuff(nRows * matrix.nColumns, 0.0);
+        //for(std::size_t i = 0; i < nRows * matrix.nColumns; i++) newStuff.push_back(0.0);
         Matrix newMatrix(newStuff, nRows, matrix.nColumns);
         double aux;
-        for(int i = 0; i < nRows; i++) {
-            for(int j = 0; j < matrix.nColumns; j++) {
+        for(std::size_t i = 0; i < nRows; i++) {
+            for(std::size_t j = 0; j < matrix.nColumns; j++) {
                 aux = 0;
-                for(int k = 0; k < nColumns; k++) {
+                for(std::size_t k = 0; k < nColumns; k++) {
                     aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nRows + j];
                 }
                 newMatrix.elements[i * matrix.nColumns + j] = aux;
@@ -160,63 +160,63 @@ Matrix Matrix::operator*(Matrix matrix) {
 }
 
 Matrix Matrix::getRow(int row) {
-    if(row < 0 || row >= nRows) {
+    if(row < 0 || static_cast<std::size_t>(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using getRow: row be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
     }
 
     std::vector<double> aux(nColumns, 0.0);
-    for(int j = 0; j < nColumns; j++) {
+    for(std::size_t j = 0; j < nColumns; j++) {
         aux[j] = elements[row * nColumns + j];
     }
     return Matrix(aux, 1, nColumns);
 }
 
 Matrix Matrix::getColumn(int column) {
-    if(column < 0 || column >= nColumns) {
+    if(column < 0 || static_cast<std::size_t>(column) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using getColumn: column be between 0 and " << nColumns - 1 << ", but the value provided was " << column;
         throw std::invalid_argument(errorMsg.str());    
     }
 
     std::vector<double> aux(nRows, 0.0);
-    for(int i = 0; i < nRows; i++) {
+    for(std::size_t i = 0; i < nRows; i++) {
         aux[i] = elements[i * nColumns + column];
     }
     return Matrix(aux, nRows, 1);
 }
 
 void Matrix::rowOperation(int sourceRow, int targetRow, double factor) {
-    if(sourceRow < 0 || sourceRow >= nRows) {
+    if(sourceRow < 0 || static_cast<std::size_t>(sourceRow) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using rowOperation: sourceRow must be between 0 and " << nRows - 1 << ", but the value provided was " << sourceRow;
         throw std::invalid_argument(errorMsg.str());
     }
-    if(targetRow < 0 || targetRow >= nRows) {
+    if(targetRow < 0 || static_cast<std::size_t>(targetRow) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using rowOperation: targetRow must be between 0 and " << nRows - 1 << ", but the value provided was " << targetRow;
         throw std::invalid_argument(errorMsg.str());
     }
 
-    for(int j = 0; j < nColumns; j++) {
+    for(std::size_t j = 0; j < nColumns; j++) {
         elements[targetRow * nColumns + j] += elements[sourceRow * nColumns + j] * factor;
     }
 }
 
 void Matrix::columnOperation(int sourceColumn, int targetColumn, double factor) {
-    if(sourceColumn < 0 || sourceColumn >= nColumns) {
+    if(sourceColumn < 0 || static_cast<std::size_t>(sourceColumn) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using columnOperation: sourceColumn must be between 0 and " << nColumns - 1 << ", but the value provided was " << sourceColumn;
         throw std::invalid_argument(errorMsg.str());    
     }
-    if(targetColumn < 0 || targetColumn >= nColumns) {
+    if(targetColumn < 0 || static_cast<std::size_t>(targetColumn) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using columnOperation: targetColumn must be between 0 and " << nColumns - 1 << ", but the value provided was " << targetColumn;
         throw std::invalid_argument(errorMsg.str()); 
     }
 
-    for(int i = 0; i < nRows; i++) {
+    for(std::size_t i = 0; i < nRows; i++) {
         elements[i * nColumns + targetColumn] += elements[i * nColumns + sourceColumn] * factor;
     }
 }
@@ -235,7 +235,7 @@ double Matrix::dotProduct(const Matrix& matrix) {
     }
 
     double result = 0;
-    for(int i = 0; i < elements.size(); i++) {
+    for(std::size_t i = 0; i < elements.size(); i++) {
         result += elements[i] * matrix.elements[i];
     }
     return result;
@@ -243,12 +243,12 @@ double Matrix::dotProduct(const Matrix& matrix) {
 }
 
 double Matrix::getElement(int row, int column) {
-    if(row < 0 || row >= nRows) {
+    if(row < 0 || std::size_t(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using getElement: row be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
     }
-    if(column < 0 || column >= nColumns) {
+    if(column < 0 || std::size_t(column) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using getElement: row be between 0 and " << nColumns - 1 << ", but the value provided was " << column;
         throw std::invalid_argument(errorMsg.str());
@@ -258,12 +258,12 @@ double Matrix::getElement(int row, int column) {
 }
 
 void Matrix::setElement(int row, int col, double value) {
-    if(row < 0 || row >= nRows) {
+    if(row < 0 || static_cast<std::size_t>(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using setElement: row must be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
     }
-    if(col < 0 || col >= nColumns) {
+    if(col < 0 || static_cast<std::size_t>(col) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using setElement: col must be between 0 and " << nColumns - 1 << ", but the value provided was " << col;
         throw std::invalid_argument(errorMsg.str());
@@ -279,7 +279,7 @@ void Matrix::stackVertical(const Matrix& matrix) {
         throw std::invalid_argument(errorMsg.str());
     }
 
-    for(int i = 0; i < matrix.nRows * matrix.nColumns; i++) {
+    for(std::size_t i = 0; i < matrix.nRows * matrix.nColumns; i++) {
         elements.push_back(matrix.elements[i]);
     }
     nRows += matrix.nRows;
@@ -293,8 +293,8 @@ void Matrix::stackHorizontal(const Matrix& matrix) {
     }
 
     unsigned current_index;
-    for(int i = 0; i < nRows; i++) {
-        for(int j = 0; j < matrix.nColumns; j++) {
+    for(std::size_t i = 0; i < nRows; i++) {
+        for(std::size_t j = 0; j < matrix.nColumns; j++) {
             current_index = i * (nColumns + matrix.nColumns) + (nColumns + j);
             elements.insert(elements.begin() + current_index, matrix.elements[i * matrix.nColumns + j]);
         }
@@ -306,8 +306,8 @@ void Matrix::stackHorizontal(const Matrix& matrix) {
 Matrix Matrix::transpose() {
     Matrix newMatrix = zeros(nColumns, nRows);
 
-    for(int i = 0; i < nRows; i++) {
-        for(int j = 0; j < nColumns; j++) {
+    for(std::size_t i = 0; i < nRows; i++) {
+        for(std::size_t j = 0; j < nColumns; j++) {
             newMatrix.setElement(j, i, getElement(i, j));
         }
     }
@@ -316,21 +316,21 @@ Matrix Matrix::transpose() {
 
 Matrix Matrix::operator*(double value) {
     std::vector<double> aux = elements;
-    for(int i = 0; i < nRows * nColumns; i++) aux[i] *= value;
+    for(std::size_t i = 0; i < nRows * nColumns; i++) aux[i] *= value;
     return Matrix(aux, nRows, nColumns);
 }
 
 void Matrix::operator*=(double value) {
-    for(int i = 0; i < nRows * nColumns; i++) elements[i] *= value;
+    for(std::size_t i = 0; i < nRows * nColumns; i++) elements[i] *= value;
 }
 
-uint Matrix::maxValueIndex() {
+std::size_t Matrix::maxValueIndex() {
     auto maxIt = std::max_element(elements.begin(), elements.end());
     size_t maxIndex = std::distance(elements.begin(), maxIt);
     return maxIndex;
 }
 
-uint Matrix::minValueIndex() {
+std::size_t Matrix::minValueIndex() {
     auto minIt = std::min_element(elements.begin(), elements.end());
     size_t minIndex = std::distance(elements.begin(), minIt);
     return minIndex;
@@ -344,7 +344,7 @@ Matrix Matrix::pointDivision(Matrix& matrix) {
     }
 
     std::vector<double> aux = elements;
-    for(int i = 0; i < nRows * nColumns; i++) {
+    for(std::size_t i = 0; i < nRows * nColumns; i++) {
         //aux /= matrix.elements[i];
         aux[i] /= matrix.getElement(i / nColumns, i % nColumns);
     }
@@ -352,7 +352,7 @@ Matrix Matrix::pointDivision(Matrix& matrix) {
 }
 
 Matrix Matrix::setRow(int row, const Matrix& newRow) {
-    if(row < 0 || row >= nRows) {
+    if(row < 0 || static_cast<std::size_t>(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using setRow: the row argument must be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
@@ -364,14 +364,14 @@ Matrix Matrix::setRow(int row, const Matrix& newRow) {
     }
 
     std::vector<double> aux = elements;
-    for(int j = 0; j < nColumns; j++) {
+    for(std::size_t j = 0; j < nColumns; j++) {
         aux[row * nColumns + j] = newRow.elements[j];
     }
     return Matrix(aux, nRows, nColumns);
 }
 
 void Matrix::setColumn(int column, Matrix& newColumn) {
-    if(column < 0 || column >= nColumns) {
+    if(column < 0 || static_cast<std::size_t>(column) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using setColumn: the column argument must be between 0 and " << nColumns - 1 << ", but the value provided was " << column;
         throw std::invalid_argument(errorMsg.str());
@@ -382,14 +382,14 @@ void Matrix::setColumn(int column, Matrix& newColumn) {
         throw std::invalid_argument(errorMsg.str());
     }
 
-    for(int i = 0; i < nRows; i++) {
+    for(std::size_t i = 0; i < nRows; i++) {
         elements[i * nColumns + column] = newColumn.getElement(i, 0);
         //aux[i * nColumns + column] = newColumn.elements[i * nColumns];
     }
 }
 
 Matrix Matrix::removeRow(int row) {
-    if(row < 0 || row >= nRows) {
+    if(row < 0 || static_cast<std::size_t>(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using removeRow: the row argument must be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
@@ -397,9 +397,9 @@ Matrix Matrix::removeRow(int row) {
 
 
     std::vector<double> aux;
-    for(int i = 0; i < nRows; i++) {
-        if(i == row) continue;
-        for(int j = 0; j < nColumns; j++) {
+    for(std::size_t i = 0; i < nRows; i++) {
+        if(i == static_cast<std::size_t>(row)) continue;
+        for(std::size_t j = 0; j < nColumns; j++) {
             aux.push_back(getElement(i, j));
         }
     }
@@ -407,7 +407,7 @@ Matrix Matrix::removeRow(int row) {
 }
 
 void Matrix::removeColumn(int column) {
-    if(column < 0 || column >= nColumns) {
+    if(column < 0 || static_cast<std::size_t>(column) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using removeColumn: the column argument must be between 0 and " << nColumns - 1 << ", but the value provided was " << column;
         throw std::invalid_argument(errorMsg.str());
@@ -422,19 +422,19 @@ void Matrix::removeColumn(int column) {
 }
 
 int Matrix::findValueInVectorMatrix(double value) {
-    for(int i = 0; i < elements.size(); i++) {
+    for(std::size_t i = 0; i < elements.size(); i++) {
         if(elements[i] == value) return i;
     }
     return -1;
 }
 
 Matrix Matrix::subMatrix(int startingRow, int endingRow, int startingColumn, int endingColumn) {
-    if(startingRow < 0 || startingRow >= nRows) {
+    if(startingRow < 0 || static_cast<std::size_t>(startingRow) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using subMatrix: startingRow must be between 0 and " << nRows - 1 << ", but the value provided was " << startingRow;
         throw std::invalid_argument(errorMsg.str());
     }
-    if(endingRow < 0 || endingRow >= nRows) {
+    if(endingRow < 0 || static_cast<std::size_t>(endingRow) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using subMatrix: endingRow must be between 0 and " << nRows - 1 << ", but the value provided was " << endingRow;
         throw std::invalid_argument(errorMsg.str());
@@ -444,12 +444,12 @@ Matrix Matrix::subMatrix(int startingRow, int endingRow, int startingColumn, int
         errorMsg << "Error using subMatrix: startingRow must be less than or equal than endingRow";
         throw std::invalid_argument(errorMsg.str());
     }
-    if(startingColumn < 0 || startingColumn >= nColumns) {
+    if(startingColumn < 0 || static_cast<std::size_t>(startingColumn) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using subMatrix: startingColumn must be between 0 and " << nColumns - 1 << ", but the value provided was " << startingColumn;
         throw std::invalid_argument(errorMsg.str());
     }
-    if(endingColumn < 0 || endingColumn >= nColumns) {
+    if(endingColumn < 0 || static_cast<std::size_t>(endingColumn) >= nColumns) {
         std::ostringstream errorMsg;
         errorMsg << "Error using subMatrix: endingColumn must be between 0 and " << nColumns - 1 << ", but the value provided was " << endingColumn;
         throw std::invalid_argument(errorMsg.str());
@@ -461,8 +461,8 @@ Matrix Matrix::subMatrix(int startingRow, int endingRow, int startingColumn, int
     }
     
     std::vector<double> aux;
-    for(int i = 0; i < nRows; i++) {
-        for(int j = 0; j < nColumns; j++) {
+    for(int i = 0; i < static_cast<int>(nRows); i++) {
+        for(int j = 0; j < static_cast<int>(nColumns); j++) {
             if(i >= startingRow && i <= endingRow && j >= startingColumn && j <= endingColumn) aux.push_back(elements[i * nColumns + j]);
         }
     }
@@ -475,7 +475,7 @@ int Matrix::isBasisVector() {
 
     int index_of_only_one;
 
-    for(int i = 0; i < elements.size(); i++) {
+    for(std::size_t i = 0; i < elements.size(); i++) {
         if(elements[i] == 0) zero_count++;
         else if(elements[i] == 1) {
             one_count++;
@@ -489,7 +489,7 @@ int Matrix::isBasisVector() {
     else return -1;
 }
 
-bool Matrix::operator==(const Matrix& matrix) {
+bool Matrix::operator==(const Matrix& matrix) const {
     return elements == matrix.elements && nRows == matrix.nRows && nColumns == matrix.nColumns;
 }
 
@@ -540,15 +540,15 @@ int isBasisVector(const std::vector<double>& vector) {
 
     int index_of_only_one;
 
-    for(int i = 0; i < vector.size(); i++) {
+    for(std::size_t i = 0; i < vector.size(); i++) {
         if(vector[i] == 0) zero_count++;
         else if(vector[i] == 1) {
             one_count++;
             index_of_only_one = i;
         }
-        else return false;
+        else return -1;
 
-        if(one_count > 1) return false;
+        if(one_count > 1) return -1;
     }
     if(one_count == 1 && zero_count == vector.size() - 1) return index_of_only_one;
     else return -1;

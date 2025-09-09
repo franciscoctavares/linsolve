@@ -24,7 +24,7 @@ void SimplifierHelper::displayConstraintsToRemove() {
     else std::cout << "There are some pairs of vars" << std::endl;
 
     std::cout << "Going to remove the following constraints: ";
-    for(int i = 0; i < constraintsToRemove.size(); i++) {
+    for(std::size_t i = 0; i < constraintsToRemove.size(); i++) {
         std::cout << constraintsToRemove[i];
         if(i < constraintsToRemove.size() - 1) std::cout << " ";
     }

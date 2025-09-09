@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <sstream>
 #include <format>
+#include <cstddef>
 
 BaBNode::BaBNode(const LP::LpProblem& nodeProblem, uint newDepth) {
     problem = nodeProblem;
@@ -123,7 +124,7 @@ Matrix BaBNode::solveNode() {
 }
 
 BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
-    if(varIndex < 0 || varIndex >= problem.getObjectiveFunction().getNColumns()) {
+    if(varIndex < 0 || static_cast<std::size_t>(varIndex) >= problem.getObjectiveFunction().getNColumns()) {
         std::ostringstream errorMsg;
         errorMsg << "Error using branchRight: the model has " << problem.getObjectiveFunction().getNColumns()
                  << " variables, but the user tried to branch variable with index " << varIndex;
@@ -140,7 +141,7 @@ BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
 }
 
 BaBNode* BaBNode::branchRight(int varIndex, double varValue) {
-    if(varIndex < 0 || varIndex >= problem.getObjectiveFunction().getNColumns()) {
+    if(varIndex < 0 || static_cast<std::size_t>(varIndex) >= problem.getObjectiveFunction().getNColumns()) {
         std::ostringstream errorMsg;
         errorMsg << "Error using branchRight: the model has " << problem.getObjectiveFunction().getNColumns()
                  << " variables, but the user tried to branch variable with index " << varIndex;

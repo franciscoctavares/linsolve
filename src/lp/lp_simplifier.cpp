@@ -3,22 +3,22 @@
 #include <algorithm>
 #include <iostream>
 #include <format>
+#include <cstddef>
 
 namespace LP {
 
 // PRIVATE METHODS
 
 void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, SimplifierHelper& helper) {
-    uint n_vars = problemToSimplify.getObjectiveFunction().getNColumns();
     std::vector<std::pair<uint, uint>> basisConstraintsInfo; // .first is the constraint index, .second is the index i in xi <=/=/>= k
     
     // store information of all constraints of the form xi <=/=/>= k in basisConstraintsInfo
-    for(int i = 0; i < problemToSimplify.getConstraints().size(); i++) {
+    for(std::size_t i = 0; i < problemToSimplify.getConstraints().size(); i++) {
         int basisVarIndex = isBasisVector(problemToSimplify.getConstraints()[i].getLhs());
         if(basisVarIndex != -1) basisConstraintsInfo.emplace_back(i, basisVarIndex);
     }
 
-    for(int i = 0; i < basisConstraintsInfo.size(); i++) {
+    for(std::size_t i = 0; i < basisConstraintsInfo.size(); i++) {
         int currentBasisConstraint_i = basisConstraintsInfo[i].first;
 
         // Check for constraints of the form xi = k, where i = 1,...,n and k is a real number
@@ -28,14 +28,13 @@ void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, Simplif
         }
 
         // checks for any constraint of the types xi <= k and xi >= k   
-        for(int j = i + 1; j < basisConstraintsInfo.size(); j++) {
+        for(std::size_t j = i + 1; j < basisConstraintsInfo.size(); j++) {
             int currentBasisConstraint_j = basisConstraintsInfo[j].first;
             if(problemToSimplify.getConstraints()[currentBasisConstraint_i].getLhs() == problemToSimplify.getConstraints()[currentBasisConstraint_j].getLhs() &&
                problemToSimplify.getConstraints()[currentBasisConstraint_i].getType() != problemToSimplify.getConstraints()[currentBasisConstraint_j].getType() &&
                problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs() == problemToSimplify.getConstraints()[currentBasisConstraint_j].getRhs() &&
                (problemToSimplify.getConstraints()[currentBasisConstraint_i].getType() != EQUAL && problemToSimplify.getConstraints()[currentBasisConstraint_j].getType() != EQUAL)) {
-                    helper.fixedVariables.push_back({basisConstraintsInfo[i].second, problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs()});
-                    //helper->fixedVariables.emplace_back(basisConstraintsInfo[i].second, constraints[currentBasisConstraint_i].getRhs());
+                    helper.fixedVariables.emplace_back(basisConstraintsInfo[i].second, problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs());
                     helper.constraintsToRemove.push_back(currentBasisConstraint_i);
                     helper.constraintsToRemove.push_back(currentBasisConstraint_j);
             }
@@ -43,7 +42,7 @@ void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, Simplif
 
         // Check for constraints of the form xi <= 0
         if(problemToSimplify.getConstraints()[currentBasisConstraint_i].getType() == LESS_THAN_OR_EQUAL && problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs() == 0) {
-            helper.fixedVariables.push_back({basisConstraintsInfo[i].second, 0});
+            helper.fixedVariables.emplace_back(basisConstraintsInfo[i].second, 0);
             //helper->fixedVariables.emplace_back(basisConstraintsInfo[i].second, 0);
             helper.constraintsToRemove.push_back(currentBasisConstraint_i);
         }
@@ -51,8 +50,8 @@ void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, Simplif
 }
 
 void LPSimplifier::searchForRepeatedConstraints(LpProblem& problemToSimplify, SimplifierHelper& helper) {
-    for(int i = 0; i < problemToSimplify.getConstraints().size(); i++) {
-        for(int j = i + 1; j < problemToSimplify.getConstraints().size(); j++) {
+    for(std::size_t i = 0; i < problemToSimplify.getConstraints().size(); i++) {
+        for(std::size_t j = i + 1; j < problemToSimplify.getConstraints().size(); j++) {
             if(problemToSimplify.getConstraints()[i] == problemToSimplify.getConstraints()[j])
                 helper.constraintsToRemove.push_back(j);
         }
@@ -60,7 +59,8 @@ void LPSimplifier::searchForRepeatedConstraints(LpProblem& problemToSimplify, Si
 }
 
 void LPSimplifier::searchForReducedFeasibleRegion(LpProblem& problemToSimplify, SimplifierHelper& helper) {
-
+    LpProblem h = problemToSimplify;
+    SimplifierHelper newHelper = helper;
 }
 
 void LPSimplifier::newVarsToOldVars(LpProblem& problemToSimplify, SimplifierHelper& helper) {
@@ -86,8 +86,9 @@ void LPSimplifier::newVarsToOldVars(LpProblem& problemToSimplify, SimplifierHelp
     //helper.pairsOfVars = pairsOfVars;
 }
 
-void LPSimplifier::removeRedundantInformationFromHelper(LpProblem& problemToSimplify, SimplifierHelper& helper) {
+void LPSimplifier::removeRedundantInformationFromHelper(SimplifierHelper& helper) {
     // constraints to remove
+    /*
     std::vector<uint> repeatedConstraintsIndexes;
     for(int i = 0; i < helper.constraintsToRemove.size(); i++) {
         for(int j = i + 1; j < helper.constraintsToRemove.size(); j++) {
@@ -96,13 +97,6 @@ void LPSimplifier::removeRedundantInformationFromHelper(LpProblem& problemToSimp
         }
     }
 
-    /*
-    std::cout << "Repeated constraints indexes: ";
-    for(uint k : repeatedConstraintsIndexes) {
-        std::cout << k << " ";
-    }
-    */
-
     std::sort(repeatedConstraintsIndexes.begin(), repeatedConstraintsIndexes.end(), [](uint& a, uint& b) {
         return a > b;
     });
@@ -110,12 +104,20 @@ void LPSimplifier::removeRedundantInformationFromHelper(LpProblem& problemToSimp
     for(int i = 0; i < repeatedConstraintsIndexes.size(); i++) {
         helper.constraintsToRemove.erase(helper.constraintsToRemove.begin() + repeatedConstraintsIndexes[i]);
     }
-
+    */
+    
+    // constraints to remove - NEW STRATEGY
+    std::sort(helper.constraintsToRemove.begin(), helper.constraintsToRemove.end());
+    auto last = std::unique(helper.constraintsToRemove.begin(), helper.constraintsToRemove.end());
+    helper.constraintsToRemove.erase(last, helper.constraintsToRemove.end());
+    /*
     std::sort(helper.constraintsToRemove.begin(), helper.constraintsToRemove.end(), [](uint& a, uint& b) {
         return a > b;
     });
+    */
 
     // fixed variables
+    /*
     std::vector<uint> repeatedFixedVariablesIndexes;
     for(int i = 0; i < helper.fixedVariables.size(); i++) {
         for(int j = i + 1; j < helper.fixedVariables.size(); j++) {
@@ -128,6 +130,11 @@ void LPSimplifier::removeRedundantInformationFromHelper(LpProblem& problemToSimp
         helper.fixedVariables.erase(helper.fixedVariables.begin() + repeatedFixedVariablesIndexes[i]);
     }
     std::sort(helper.fixedVariables.begin(), helper.fixedVariables.end(), [](const auto& a, const auto& b) { return a.first > b.first; });
+    */
+    std::sort(helper.fixedVariables.begin(), helper.fixedVariables.end());
+    auto stuff = std::unique(helper.fixedVariables.begin(), helper.fixedVariables.end());
+    helper.fixedVariables.erase(stuff, helper.fixedVariables.end());
+
 }
 
 // PUBLIC METHODS
@@ -139,7 +146,7 @@ SimplifierHelper LPSimplifier::computeSimplifierHelper(LpProblem& originalProble
 
     searchForRepeatedConstraints(originalProblem, helper);
 
-    removeRedundantInformationFromHelper(originalProblem, helper);
+    removeRedundantInformationFromHelper(helper);
 
     if(helper.fixedVariables.size() > 0) {
         newVarsToOldVars(originalProblem, helper);
@@ -162,20 +169,26 @@ void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelpe
 
     // remove all necessary constraints
     if(helper.constraintsToRemove.size() > 0) {
-        /*
         for(int i = helper.constraintsToRemove.size() - 1; i >= 0; i--) {
             problemToSimplify.removeConstraint(helper.constraintsToRemove[i]);
         }
-        */
+        /*
         for(int i = 0; i < helper.constraintsToRemove.size(); i++) {
             problemToSimplify.removeConstraint(helper.constraintsToRemove[i]);
         }
+        */
     }
 
     // remove all fixed variables
     if(helper.fixedVariables.size() > 0) {
+        /*
         for(std::pair<uint, double>& currentFixedVar : helper.fixedVariables) {
             problemToSimplify.removeFixedVariable(currentFixedVar.first, currentFixedVar.second);
+        }
+        */
+
+        for(int i =  helper.fixedVariables.size() - 1; i >= 0; i--) {
+            problemToSimplify.removeFixedVariable(helper.fixedVariables[i].first, helper.fixedVariables[i].second);
         }
     }
 

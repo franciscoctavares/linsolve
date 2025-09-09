@@ -10,12 +10,12 @@ Constraint::Constraint(std::vector<double>& newLhs, const std::string& newConstr
     rhs = newRhs;
 }
 
-bool Constraint::operator==(const Constraint& otherConstraint) {
+bool Constraint::operator==(const Constraint& otherConstraint) const {
     return lhs == otherConstraint.lhs && type == otherConstraint.type && rhs == otherConstraint.rhs;
 }
 
 void Constraint::removeFixedVariable(int varIndex, double varValue) {
-    if(varIndex < 0 || varIndex >= lhs.size()) {
+    if(varIndex < 0 || static_cast<std::size_t>(varIndex) >= lhs.size()) {
         std::ostringstream errorMsg;
         errorMsg << "Error using removeFixedVariable: varIndex must be between 0 and " << lhs.size() - 1 << ", but was provided the value " << varIndex;
         throw std::invalid_argument(errorMsg.str());

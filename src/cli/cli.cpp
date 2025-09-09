@@ -42,7 +42,6 @@ void CLI::validateCommand() {
         else throw std::invalid_argument("Invalid option: " + args[4]);
 
         command.multithreading = std::find(args.begin(), args.end(), std::string("--threads")) != args.end();
-        //command.multithreading = false;
     }
 
 }
@@ -58,7 +57,7 @@ void CLI::executeCommand() {
     BaBTree tree(initialProblem);
     Matrix optimalWholeSolution = tree.solveTree(command.explorationStrat, command.branchingStrat, command.multithreading);
 
-    if(command.displayResults) tree.displayProblem(optimalWholeSolution);
+    if(command.displayResults) tree.displayProblem();
 
     tree.deleteTree();
 }

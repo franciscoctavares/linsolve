@@ -47,8 +47,8 @@ void BaBTree::updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSol
 }
 
 void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes, bool multithreading) {
-
     if(multithreading) {
+        //std::cout << "Solving with multithreading..." << std::endl;
         std::thread t1(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 2]);
         std::thread t2(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 1]);
 
@@ -56,13 +56,10 @@ void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes
         t2.join();
     }
     else {
+        //std::cout << "Solving without multithreading..." << std::endl;
         nodeQueue[nodeQueue.size() - 2]->solveNode();
         nodeQueue[nodeQueue.size() - 1]->solveNode();
     }
-
-    //std::cout << "Solved 2 more nodes..." << std::endl;
-
-    //std::cout << std::format("\rExplored nodes: {}", solvedNodes) << std::flush;
 
 	solvedNodes += 2;
 }
@@ -174,7 +171,7 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
 	return incumbentSolution->getProblem().getOptimalSolution();
 }
 
-void BaBTree::displayProblem(Matrix optimalWholeSolution) {
+void BaBTree::displayProblem() {
     tabulate::Table results;
 
     results.add_row({"Explored nodes", std::format("{}", metrics.explored_nodes)});
@@ -196,15 +193,6 @@ void BaBTree::displayProblem(Matrix optimalWholeSolution) {
     }
 
     results.add_row({"Execution time", time_str});
-
-    /*
-	std::cout << "Explored nodes: " << metrics.explored_nodes << std::endl;
-	std::cout << "The optimal solution is located at depth " << metrics.optimalSolutionDepth << std::endl;
-	std::cout << "Execution time: "; //<< metrics.execution_time << " ms" << std::endl;
-	if(metrics.execution_time > 1000) std::cout << metrics.execution_time / 1000 << " s" << std::endl;
-	else if(metrics.execution_time < 1) std::cout << metrics.execution_time * 1000 << " \u03BCs" << std::endl;
-	else std::cout << metrics.execution_time << " ms" << std::endl;
-    */
 
     std::cout << results << std::endl;
 

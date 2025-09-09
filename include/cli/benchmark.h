@@ -2,7 +2,7 @@
 #define BENCHMARK_H
 
 #include <vector>
-#include <sys/types.h>
+#include <cstddef>
 
 #include "bb_utils.h"
 
@@ -20,15 +20,15 @@ typedef struct {
 
 class Benchmark {
     private:
-        uint iterations;
+        std::size_t iterations;
         std::vector<ExplorationStrategy> possibleExplorStrats;
         std::vector<BranchingStrategy> possibleBranchStrats;
         BenchmarkPerformanceMetrics metrics;
 
-        void displayBenchmarkResults(uint metricsIndex);
+        void displayBenchmarkResults();
 
     public:
-        Benchmark(uint numIterations = 10);
+        Benchmark(std::size_t numIterations = 10);
 
         void runBenchmark();
 };

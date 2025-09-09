@@ -6,7 +6,7 @@
 
 // PRIVATE METHODS
 
-void Benchmark::displayBenchmarkResults(uint metricsIndex) {
+void Benchmark::displayBenchmarkResults() {
     tabulate::Table results;
 
     // sort the metrics by ascending order of average execution time
@@ -17,7 +17,7 @@ void Benchmark::displayBenchmarkResults(uint metricsIndex) {
 
     results.add_row({"Exploration strategy", "Branching strategy", "Explored nodes", "Average execution time"});
 
-    for(int i = 0; i < metrics.things.size(); i++) {
+    for(std::size_t i = 0; i < metrics.things.size(); i++) {
         std::string time_str;
         if(std::get<0>(metrics.things[i]) > 1000) time_str = std::to_string(std::get<0>(metrics.things[i]) / 1000) + " s";
         else if(std::get<0>(metrics.things[i]) < 1) time_str = std::to_string(std::get<0>(metrics.things[i]) * 1000) + " \u03BCs";
@@ -34,7 +34,7 @@ void Benchmark::displayBenchmarkResults(uint metricsIndex) {
 
 // PUBLIC METHODS
 
-Benchmark::Benchmark(uint numIterations) {
+Benchmark::Benchmark(std::size_t numIterations) {
     iterations = numIterations;
     possibleExplorStrats = getPossibleExplorationStrategies();
     possibleBranchStrats = getPossibleBranchingStrategies();
@@ -46,15 +46,15 @@ void Benchmark::runBenchmark() {
     uint currentIndex = 0;
     uint deterministic_nodes;
 
-    for(int i = 0; i < possibleExplorStrats.size(); i++) {
+    for(std::size_t i = 0; i < possibleExplorStrats.size(); i++) {
         ExplorationStrategy currentExplorStrat = possibleExplorStrats[i];
-        for(int j = 0; j < possibleBranchStrats.size(); j++) {
+        for(std::size_t j = 0; j < possibleBranchStrats.size(); j++) {
             BranchingStrategy currentBranchStrat = possibleBranchStrats[j];
 
             avg_execution_time = 0;
             avg_explored_nodes = 0;
 
-            for(int k = 0; k < iterations; k++) {
+            for(std::size_t k = 0; k < iterations; k++) {
                 LP::LpProblem initialProblem = ModelFileReader::readModel("bench.lp");
                 BaBTree tree(initialProblem);
                 bool multithreading = false;
@@ -87,5 +87,5 @@ void Benchmark::runBenchmark() {
         }
     }
 
-    displayBenchmarkResults(0);
+    displayBenchmarkResults();
 }

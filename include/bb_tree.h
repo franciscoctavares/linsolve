@@ -41,10 +41,7 @@ class BaBTree {
          */
         Matrix solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat, bool multithreading);
 
-        /**
-         * @brief Displays the `optimalWholeSolution` to the IP model, along with a few performance metrics
-         */
-        void displayProblem(Matrix optimalWholeSolution);
+        void displayProblem();
 
         /**
          * @brief Deletes all tree nodes
