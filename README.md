@@ -1,5 +1,5 @@
 # linsolve
-Cli tool for solving linear programming models
+Command Line tool for solving linear programming models
 
 ## Note
 This repo was migrated from another account of mine in [Codeberg](https://codeberg.org/libertymaxi/linsolve)(now archived).
@@ -61,7 +61,7 @@ By default, this command will copy the binary to a directory which most systems 
     * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* Fixing bugs when using certain branching or exploration strategies
+* Rewriting the CLI  code
 
 ## Planned Features
 * More branching/exploration strategies

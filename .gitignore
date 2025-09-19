@@ -11,3 +11,7 @@ html/*
 # Extra stuff
 .vscode/*
 notes.txt
+
+# test files
+test.cpp
+test

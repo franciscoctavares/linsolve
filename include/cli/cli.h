@@ -3,34 +3,29 @@
 
 #include <string>
 #include <vector>
+#include <variant>
+
 #include "bb_utils.h"
 #include "bb_tree.h"
 #include "bb_node.h"
 
-typedef struct {
-    std::string fileName;
-    ExplorationStrategy explorationStrat;
-    BranchingStrategy branchingStrat;
-    bool multithreading;
-    bool displayResults;
-}Command;
+#include "cli/option.h"
+#include "cli/command.h"
+#include "cli/commands/benchmark.h"
+#include "cli/commands/default_command.h"
+
+using CommandTypes = std::variant<Commands::DefaultCommand>;
+
 
 class CLI {
+    public:
+        CLI(int argc, char** argv);
+        void run();
     private:
         std::vector<std::string> args;
-        Command command;
+        std::vector<CommandTypes> commands;
 
-        void validateCommand();
-
-        void executeCommand();
-
-        void benchmark();
-
-    public:
-        /**
-         * @brief Constructor, Takes in `argc`(number of arguments) and `argv`(arguments), and stores them in `args`, converting them to std::vector<std::string>
-         */
-        CLI(int argc, char** argv);
+        int parseCommand(); 
 };
 
 #endif
