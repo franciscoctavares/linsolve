@@ -1,28 +1,26 @@
-#include "cli/flag.h"
+#include "cli/option.h"
 #include "errors.h"
 
-#include <unordered_map>
-#include <vector>
-#include <format>
+template<typename T>
+Option<T>::Option(const std::pair<std::optional<std::string>, std::optional<std::string>> newFlags, bool argReq, bool argForceThing, bool exclusive) 
+    : flags(newFlags), argForce(argReq), argForceType(argForceThing), isExclusive(exclusive) {
 
-#include "cli/cli_utils.h"
-
-Flag::Flag(const std::optional<std::string> shortF, const std::optional<std::string> longF) : shortForm(shortF), longForm(longF) {
-    if(!shortForm.has_value() && !longForm.has_value())
+    if(!flags.first.has_value() && !flags.second.has_value())
         throw NoFlagsException("A flag must have a short form or a long form. You provided none");
-
-    if(shortForm.has_value()) {
-        if(shortForm.value().length() != 2)
+    
+    // short form flag
+    if(flags.first.has_value()) {
+        if(flags.first.value().length() != 2)
             throw FlagFormatException("Short form flags must have 2 characters only");
 
-        if(!shortForm.value().starts_with('-'))
+        if(!flags.first.value().starts_with('-'))
             throw FlagFormatException("Short form flags must start with \'-\'");
 
-        if(shortForm.value()[1] < 'a' || shortForm.value()[1] > 'z')
+        if(flags.first.value()[1] < 'a' || flags.first.value()[1] > 'z')
             throw FlagFormatException("Short form flags must have a lowercase letter as their second character");
     }
 
-    if(longForm.has_value()) {
+    if(flags.second.has_value()) {
         if(longForm.value().length() <= 4)
             throw FlagFormatException("Long form flags must start with \'--\' and have at least 2 letters after that");
 

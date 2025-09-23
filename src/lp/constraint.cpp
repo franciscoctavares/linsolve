@@ -10,10 +10,6 @@ Constraint::Constraint(std::vector<double>& newLhs, const std::string& newConstr
     rhs = newRhs;
 }
 
-bool Constraint::operator==(const Constraint& otherConstraint) const {
-    return lhs == otherConstraint.lhs && type == otherConstraint.type && rhs == otherConstraint.rhs;
-}
-
 void Constraint::removeFixedVariable(int varIndex, double varValue) {
     if(varIndex < 0 || static_cast<std::size_t>(varIndex) >= lhs.size()) {
         std::ostringstream errorMsg;

@@ -242,7 +242,7 @@ double Matrix::dotProduct(const Matrix& matrix) {
 
 }
 
-double Matrix::getElement(int row, int column) {
+double Matrix::getElement(int row, int column) const {
     if(row < 0 || std::size_t(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using getElement: row be between 0 and " << nRows - 1 << ", but the value provided was " << row;
@@ -351,7 +351,7 @@ Matrix Matrix::pointDivision(Matrix& matrix) {
     return Matrix(aux, nRows, nColumns);
 }
 
-Matrix Matrix::setRow(int row, const Matrix& newRow) {
+void Matrix::setRow(int row, const Matrix& newRow, double factor) {
     if(row < 0 || static_cast<std::size_t>(row) >= nRows) {
         std::ostringstream errorMsg;
         errorMsg << "Error using setRow: the row argument must be between 0 and " << nRows - 1 << ", but the value provided was " << row;
@@ -363,11 +363,13 @@ Matrix Matrix::setRow(int row, const Matrix& newRow) {
         throw std::invalid_argument(errorMsg.str());
     }
 
-    std::vector<double> aux = elements;
+    //std::vector<double> aux = elements;
     for(std::size_t j = 0; j < nColumns; j++) {
-        aux[row * nColumns + j] = newRow.elements[j];
+        //aux[row * nColumns + j] = newRow.elements[j];
+        //elements[row * nColumns + j] = newRow.elements[j];
+        elements[row * nColumns + j] = newRow.elements[row * nColumns + j] * factor;
     }
-    return Matrix(aux, nRows, nColumns);
+    //return Matrix(aux, nRows, nColumns);
 }
 
 void Matrix::setColumn(int column, Matrix& newColumn) {
@@ -378,7 +380,7 @@ void Matrix::setColumn(int column, Matrix& newColumn) {
     }
     else if(nRows != newColumn.nRows) {
         std::ostringstream errorMsg;
-        errorMsg << "Error using setRow: the matrix has " << nRows << " rows, but the new column matrix has " << newColumn.nRows << " rows";
+        errorMsg << "Error using setColumn: the matrix has " << nRows << " rows, but the new column matrix has " << newColumn.nRows << " rows";
         throw std::invalid_argument(errorMsg.str());
     }
 

@@ -44,7 +44,7 @@ void Benchmark::runBenchmark() {
     double avg_execution_time;
     double avg_explored_nodes;
     uint currentIndex = 0;
-    uint deterministic_nodes;
+    uint deterministic_nodes = 0;
 
     for(std::size_t i = 0; i < possibleExplorStrats.size(); i++) {
         ExplorationStrategy currentExplorStrat = possibleExplorStrats[i];

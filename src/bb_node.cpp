@@ -9,7 +9,7 @@
 #include <format>
 #include <cstddef>
 
-BaBNode::BaBNode(const LP::LpProblem& nodeProblem, uint newDepth) {
+BaBNode::BaBNode(const LP::LpProblem& nodeProblem, std::size_t newDepth) {
     problem = nodeProblem;
     leftChild = nullptr;
     rightChild = nullptr;
@@ -53,40 +53,6 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
         branchVarInfo = std::make_pair(contVarsIndexes[num], currentSolution.getElement(0, contVarsIndexes[num]));
     }
     else if(branchStrat == BranchingStrategy::BEST_COEFFICIENT) {
-        /*
-        std::vector<uint> contVarsIndexes;
-        
-        for(uint i = 0; i < currentSolution.getNColumns(); i++) {
-            if(!LP::isNumberAnInteger(currentSolution.getElement(0, i))) contVarsIndexes.push_back(i);
-        }
-        Matrix objFun = problem.getObjectiveFunction();
-
-        std::vector<double> contVarsCoeffs;
-        for(uint i = 0; i < contVarsIndexes.size(); i++) {
-            contVarsCoeffs.push_back(objFun.getElement(0, contVarsIndexes[i]));
-        }
-
-
-        if(problem.getType() == LP::MAX) {
-            size_t max_index;
-            auto max_it = std::max_element(contVarsCoeffs.begin(), contVarsCoeffs.end());
-            if (max_it != contVarsCoeffs.end()) {
-                max_index = std::distance(contVarsCoeffs.begin(), max_it);
-            }
-
-            //std::cout << std::format(", and max index is {}", contVarsIndexes[max_index]) << std::endl;
-            branchVarInfo = std::make_pair(contVarsIndexes[max_index], currentSolution.getElement(0, contVarsIndexes[max_index]));
-        }
-        else {
-            size_t min_index;
-            auto min_it = std::min_element(contVarsCoeffs.begin(), contVarsCoeffs.end());
-            if (min_it != contVarsCoeffs.end()) {
-                min_index = std::distance(contVarsCoeffs.begin(), min_it);
-            }
-
-            branchVarInfo = std::make_pair(contVarsIndexes[min_index], currentSolution.getElement(0, contVarsIndexes[min_index]));
-        }
-        */
 
         Matrix objFun = problem.getObjectiveFunction();
         
@@ -170,28 +136,14 @@ void BaBNode::deleteSubNodes() {
 }
 
 double BaBNode::getObjectiveFunctionValue() {
-    //problem.getOptimalSolution().displayMatrix();
-    //std::cout << std::endl;
-    //problem.getObjectiveFunction().displayMatrix();
-    //std::cout << std::endl;
-
     return problem.getOptimalSolution().dotProduct(problem.getObjectiveFunction());
 }
 
 bool BaBNode::isBetter(BaBNode* otherNode) {
-    LP::ProblemType probType = problem.getType();
-
-    //problem.getOptimalSolution().displayMatrix();
-    //std::cout << std::endl << std::endl;
-    
-    //otherNode->getProblem().getOptimalSolution().displayMatrix();
-    //std::cout << std::endl << std::endl;
-
     if(otherNode == NULL) return false;
 
-    if(probType == LP::MAX) {
+    if(problem.getType() == LP::MAX) {
         return getObjectiveFunctionValue() > otherNode->getObjectiveFunctionValue();
     }
     else return getObjectiveFunctionValue() < otherNode->getObjectiveFunctionValue();
-
 }

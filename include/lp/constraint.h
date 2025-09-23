@@ -16,13 +16,13 @@ class Constraint {
 
         Constraint(std::vector<double>& newLhs, const std::string& newConstraintType, double newRhs);
 
-        std::vector<double>& getLhs() { return lhs; }
+        const std::vector<double>& getLhs() const { return lhs; }
 
-        ConstraintType getType() { return type; }
+        ConstraintType getType() const { return type; }
 
-        double getRhs() { return rhs; }
+        double getRhs() const { return rhs; }
 
-        bool operator==(const Constraint& otherConstraint) const;
+        bool operator==(const Constraint& otherConstraint) const { return lhs == otherConstraint.lhs && type == otherConstraint.type && rhs == otherConstraint.rhs; }
 
         /**
          * @brief Removes a variable(whose index is `varIndex`) that has been set to a specific value(`varValue`)

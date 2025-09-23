@@ -24,7 +24,7 @@ void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, Simplif
         // Check for constraints of the form xi = k, where i = 1,...,n and k is a real number
         if(problemToSimplify.getConstraints()[currentBasisConstraint_i].getType() == EQUAL) {
             helper.constraintsToRemove.push_back(currentBasisConstraint_i);
-            helper.fixedVariables.push_back(std::make_pair(basisConstraintsInfo[currentBasisConstraint_i].second, problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs()));
+            helper.fixedVariables.emplace_back(basisConstraintsInfo[currentBasisConstraint_i].second, problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs());
         }
 
         // checks for any constraint of the types xi <= k and xi >= k   

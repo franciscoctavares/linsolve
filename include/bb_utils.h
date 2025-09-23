@@ -21,12 +21,12 @@ enum class ExplorationStrategy {
     RANDOM_NODE,
 };
 
-typedef struct {
+struct PerformanceMetrics {
     uint explored_nodes;
     double execution_time;
     Matrix optimalWholeSolution;
     uint optimalSolutionDepth;
-}PerformanceMetrics;
+};
 
 std::vector<ExplorationStrategy> getPossibleExplorationStrategies();
 std::vector<BranchingStrategy> getPossibleBranchingStrategies();

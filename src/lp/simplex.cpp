@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cmath>
 #include <format>
+#include <cstddef>
 
 namespace LP {
     
@@ -44,7 +45,7 @@ Matrix SimplexSolver::getBasisIndexes(Matrix& extraCj) {
     std::vector<std::pair<int, int>> restrictionsIndices(problem.getConstraints().size(), {-1, -1});
     std::vector<ConstraintType> constraintsTypes;
 
-    for(Constraint& currentConstraint : problem.getConstraints()) {
+    for(const Constraint& currentConstraint : problem.getConstraints()) {
         constraintsTypes.push_back(currentConstraint.getType());
     }
 
@@ -73,8 +74,11 @@ Matrix SimplexSolver::getBasisIndexes(Matrix& extraCj) {
 
     std::vector<unsigned> artificialRestrictions;
     for(std::size_t i = 0; i < constraintsTypes.size(); i++) {
+        /*
         if(restrictionsIndices[i].second == -2) continue;
         else if(restrictionsIndices[i].second == -1) artificialRestrictions.push_back(i);
+        */
+        if(restrictionsIndices[i].second == -1) artificialRestrictions.push_back(i);
     }
 
     for(std::size_t i = n_slack_surplus_variables; i < totalExtraVariables; i++) {
@@ -92,8 +96,11 @@ Matrix SimplexSolver::getBasisIndexes(Matrix& extraCj) {
     std::vector<double> basisIndices;
     for(std::size_t i = 0; i < constraintsTypes.size(); i++) {
         if(constraintsTypes[i] == LESS_THAN_OR_EQUAL) basisIndices.push_back(restrictionsIndices[i].first);
+        else basisIndices.push_back(restrictionsIndices[i].second);
+        /*
         else if(constraintsTypes[i] == GREATER_THAN_OR_EQUAL) basisIndices.push_back(restrictionsIndices[i].second);
         else if(constraintsTypes[i] == EQUAL) basisIndices.push_back(restrictionsIndices[i].second);
+        */
     }
     
     return Matrix(basisIndices, constraintsTypes.size(), 1);
@@ -141,15 +148,14 @@ bool SimplexSolver::isConstraintSatisfied(Matrix potentialSolution, int constrai
 
 bool SimplexSolver::isSolutionAdmissible(Matrix potentialSolution) {
     for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
-        if(!isConstraintSatisfied(potentialSolution, i)) {
-            //std::cout << "Constraint " << i << " not satisfied" << std::endl;
+        if(!isConstraintSatisfied(potentialSolution, i))
             return false;
-        }
     }
 
     // non negativity
     for(std::size_t i = 0; i < potentialSolution.getNColumns(); i++) {
-        if(potentialSolution.getElement(0, i) < 0) return false;
+        if(potentialSolution.getElement(0, i) < 0)
+            return false;
     }
 
     return true;
@@ -160,7 +166,7 @@ Matrix SimplexSolver::extraVariablesMatrix() {
     unsigned slack_surplus_variables = 0;
     unsigned artificial_variables = 0;
 
-    std::vector<std::vector<double>> pairs;
+    std::vector<std::pair<std::size_t, double>> pairs;
 
     for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
         if(problem.getConstraints()[i].getType() == LESS_THAN_OR_EQUAL) {
@@ -180,28 +186,31 @@ Matrix SimplexSolver::extraVariablesMatrix() {
 
     for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
         if(problem.getConstraints()[i].getType() == LESS_THAN_OR_EQUAL) {
-            pairs.push_back({double(i), 1.0});
+            pairs.emplace_back(i, 1.0);
         }
         else if(problem.getConstraints()[i].getType() == EQUAL) {
             continue;
         }
         else if(problem.getConstraints()[i].getType() == GREATER_THAN_OR_EQUAL) {
-            pairs.push_back({double(i), -1.0});
+            pairs.emplace_back(i, -1.0);
         }
     }
 
     for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
         if(problem.getConstraints()[i].getType() == EQUAL || problem.getConstraints()[i].getType() == GREATER_THAN_OR_EQUAL) {
-            //pairs.push_back({double(slack_surplus_variables - 1 + i), 1.0});
-            pairs.push_back({double(i), 1.0});
+            pairs.emplace_back(static_cast<double>(i), 1.0);
         }
         else continue;
+        /*
+        if(problem.getConstraints()[i].getType() != LESS_THAN_OR_EQUAL)
+            pairs.emplace_back(i, 1.0);
+        */
     }
 
     Matrix aux = zeros(problem.getConstraints().size(), nVariables);
 
     for(std::size_t i = 0; i < pairs.size(); i++) {
-        Matrix currentBasisVector = basisVector(problem.getConstraints().size(), pairs[i][0]) * pairs[i][1];
+        Matrix currentBasisVector = basisVector(problem.getConstraints().size(), pairs[i].first) * pairs[i].second;
         aux.setColumn(i, currentBasisVector);
     }
 
@@ -220,17 +229,13 @@ std::vector<Matrix> SimplexSolver::initialSimplexTableau() {
     if(problem.getType() == MIN) cj *= -1;
 
     std::vector<double> aux;
-    /*
-    for(int i = 0; i < problem.getConstraints().size(); i++) {
-        if(problem.getConstraints()[i].getType() != EQUAL) aux.push_back(0.0);
-    }
-    */
-    for(Constraint& currentConstraint : problem.getConstraints()) {
+
+    for(const Constraint& currentConstraint : problem.getConstraints()) {
         if(currentConstraint.getType() != EQUAL) aux.push_back(0.0);
     }
 
     std::vector<double> basisCoeffs;
-    for(Constraint& currentConstraint : problem.getConstraints()) {        
+    for(const Constraint& currentConstraint : problem.getConstraints()) {        
         if(currentConstraint.getType() == LESS_THAN_OR_EQUAL) {
             basisCoeffs.push_back(0.0);
         }
@@ -244,20 +249,6 @@ std::vector<Matrix> SimplexSolver::initialSimplexTableau() {
     Matrix basisIndicesAux = getBasisIndexes(extraCj);
     cj.stackHorizontal(extraCj);
     Matrix cb(basisCoeffs, basisCoeffs.size(), 1);
-
-    /*
-    simplexTableau.displayMatrix();
-    std::cout << std::endl << std::endl;
-
-    cb.displayMatrix();
-    std::cout << std::endl << std::endl;
-
-    cj.displayMatrix();
-    std::cout << std::endl << std::endl;
-
-    b.displayMatrix();
-    std::cout << std::endl << std::endl;
-    */
 
     return {simplexTableau, b, cj, basisIndicesAux, cb};
 }
@@ -307,7 +298,7 @@ std::vector<std::pair<int, int>> SimplexSolver::getConstraintsIndexes(Matrix ext
     return constraintsIndexes;
 }
 
-std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
+void SimplexSolver::solveSimplex() {
     std::pair<uint, uint> pivots = std::make_pair(0, 0);
 
     std::vector<Matrix> things = initialSimplexTableau();
@@ -318,13 +309,10 @@ std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
     Matrix& cb = things[4];
 
     Matrix zj = zeros(1, simplexTableau.getNColumns());
-    //Matrix cj_minus_zj = zeros(1, simplexTableau.getNColumns());
 
     unsigned n_surplus_slack_variables = 0;
-    for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
-        ConstraintType currentConstraintType = problem.getConstraints()[i].getType();
-
-        if(currentConstraintType == LESS_THAN_OR_EQUAL || currentConstraintType == GREATER_THAN_OR_EQUAL)
+    for(const Constraint& currentConstraint : problem.getConstraints()) {
+        if(currentConstraint.getType() != EQUAL)
             n_surplus_slack_variables++;
     }
 
@@ -339,11 +327,6 @@ std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
     Matrix ratios = zeros(problem.getConstraints().size(), 1);
     Matrix pivotColumn;
     while(!isSimplexDone(cj_minus_zj)) {
-        //simplexTableau.displayMatrix();
-        //std::cout << std::endl << std::endl;
-        //cj_minus_zj.displayMatrix();
-        //std::cout << std::endl;
-        //std::cout << "So far there have been " << iterations << " iterations of the simplex method" << std::endl;
 
         if(iterations > 1000) {
             std::cout << "I seem to be getting stuck here..." << std::endl;
@@ -352,28 +335,19 @@ std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
             ratios.displayMatrix();
             std::cout << std::endl;
         }
-
-        //pivots.second = cj_minus_zj.maxValueIndex();
+        
+        // compute pivot column index
         pivots.second = computePivotColumn(cj_minus_zj);
-        //std::cout << "The pivot column is " << pivots.second << std::endl;
-        ratios = zeros(problem.getConstraints().size(), 1);
-
-        //std::cout << std::format("Pivot column = {}", pivots.second) << std::endl;
         pivotColumn = simplexTableau.getColumn(pivots.second);
-        //ratios = b.pointDivision(pivotColumn);
 
-        // computes the pivot row index
+        // compute pivot row index
         uint pivotRow = getPivotRow(pivotColumn, b);
-        //std::cout << "The pivot row is " << pivotRow << std::endl;
         
         // unbounded problem
         if(static_cast<int>(pivotRow) == -1) {
-            //solutionType = UNBOUNDED;
             problem.setSolutionType(UNBOUNDED);
-            //optimalSolution = Matrix({INFINITY}, 1, 1);´
             problem.setOptimalSolution(Matrix({INFINITY}, 1, 1));
-            //std::cout << "Just finished solving a problem(Unbounded)" << std::endl;
-            return std::make_pair(Matrix({INFINITY}, 1, 1), UNBOUNDED);
+            return;
         }
 
         pivots.first = pivotRow;
@@ -404,11 +378,13 @@ std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
         cb.setElement(oldBasis, 0, cj.getElement(0, newBasis));
 
         //Matrix newRow = Matrix(simplexTableau.getRow(oldBasis), 1, simplexTableau.columns()) * (1 / simplexTableau.getElement(oldBasis, newBasis));
-        Matrix newRow = simplexTableau.getRow(oldBasis) * (1 / simplexTableau.getElement(oldBasis, newBasis));
-        b.setElement(oldBasis, 0, b.getElement(oldBasis, 0) / simplexTableau.getElement(oldBasis, newBasis));
+        double pivotElement = simplexTableau.getElement(oldBasis, newBasis);
+        //Matrix newRow = simplexTableau.getRow(oldBasis) * (1 / pivotElement);
+        b.setElement(oldBasis, 0, b.getElement(oldBasis, 0) / pivotElement);
 
-        simplexTableau = simplexTableau.setRow(oldBasis, newRow);
+        simplexTableau.setRow(oldBasis, simplexTableau, 1 / pivotElement);
 
+        // perform row operations
         for(std::size_t i = 0; i < simplexTableau.getNRows(); i++) {
             if(i == oldBasis) continue;
             else {
@@ -424,27 +400,10 @@ std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
             zj.setElement(0, i, innerProduct);
         }
 
-
-        //cj.displayMatrix();
-        //std::cout << std::endl;
-        //simplexTableau.displayMatrix();
-        //std::cout << std::endl << std::endl;
-
-        //cb.displayMatrix();
-        //std::cout << std::endl << std::endl;
-
-        
-        //zj.displayMatrix();
-        //std::cout << std::endl;
-
         cj_minus_zj = cj - zj;
 
         iterations++;
-
     }
-
-    //std::cout << "Finished all simplex method iterations..." << std::endl;
-    //std::cout << "Final solution: " << cj.getNColumns() << std::endl << std::endl;
 
     Matrix solution = zeros(1, problem.getObjectiveFunction().getNColumns());
 
@@ -452,26 +411,20 @@ std::pair<Matrix, SolutionType> SimplexSolver::solveSimplex() {
     double currentBasisIndex;
     for(std::size_t k = 0; k < basisIndices.getNRows(); k++) {
         currentBasisIndex = basisIndices.getElement(k, 0);
-        if(currentBasisIndex < problem.getObjectiveFunction().getNColumns()) solution.setElement(0, currentBasisIndex, b.getElement(k, 0));
+        if(currentBasisIndex < problem.getObjectiveFunction().getNColumns())
+            solution.setElement(0, currentBasisIndex, b.getElement(k, 0));
         else if(currentBasisIndex >= problem.getObjectiveFunction().getNColumns() + n_surplus_slack_variables && b.getElement(k, 0) > 0) {
-            //solutionType = INFEASIBLE;
             problem.setSolutionType(INFEASIBLE);
-            solution = Matrix({0}, 1, 1);
-            //std::cout << "Just finished solving a problem(Infeasible)" << std::endl;
-            //optimalSolution = solution;
+            //solution = Matrix({0}, 1, 1);
+
             problem.setOptimalSolution(Matrix({0}, 1, 1));
             isOptimalSolutionWhole();
-            return std::make_pair(Matrix({0}, 1, 1), INFEASIBLE);
+            return;
         }
     }
 
-
-    //optimalSolution = solution;
     problem.setOptimalSolution(solution);
     isOptimalSolutionWhole();
-    //std::cout << "Just finished solving a problem(Continuous or Integer)" << std::endl;
-    //return solution;
-    return std::make_pair(problem.getOptimalSolution(), problem.getSolutionType());
 }
 
 void SimplexSolver::isOptimalSolutionWhole() {
@@ -495,7 +448,7 @@ void SimplexSolver::isOptimalSolutionWhole() {
     problem.setSolutionType(WHOLE_SOLUTION);
 }
 
-void SimplexSolver::computeOriginalProblemSolution(std::pair<Matrix, SolutionType>& simplifiedResult, SimplifierHelper& helper) {
+void SimplexSolver::computeOriginalProblemSolution(std::pair<const Matrix&, SolutionType>& simplifiedResult, SimplifierHelper& helper) {
     if(simplifiedResult.second == INFEASIBLE) {
         problem.setSolutionType(INFEASIBLE);
         problem.setOptimalSolution(simplifiedResult.first);
@@ -533,9 +486,9 @@ void SimplexSolver::computeOriginalProblemSolution(std::pair<Matrix, SolutionTyp
     }
 }
 
-uint SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
-    std::vector<std::pair<size_t, double>> validIndexes;
-    std::vector<size_t> zeroIndexes;
+std::size_t SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
+    std::vector<std::pair<std::size_t, double>> validIndexes;
+    std::vector<std::size_t> zeroIndexes;
 
     for(size_t i = 0; i < cj_minus_zj.getNColumns(); i++) {
         if(cj_minus_zj.getElement(0, i) == 0) {
@@ -548,6 +501,7 @@ uint SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
     }
 
     //std::cout << std::format("valid({}), zeros({})", validIndexes.size(), zeroIndexes.size()) << std::endl;
+    /*
     for(size_t i = 0; i < validIndexes.size(); i++) {
         std::cout << validIndexes[i].second << " ";
     }
@@ -556,7 +510,8 @@ uint SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
         std::cout << cj_minus_zj.getElement(0, zeroIndexes[i]) << " ";
     }
     std::cout << std::endl;
-
+    */
+    /*
     if(zeroIndexes.size() > 0 && validIndexes.size() == zeroIndexes.size()) {
         //std::cout << "Bland's rule..." << std::endl;
         return validIndexes[0].first;
@@ -565,22 +520,18 @@ uint SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
         //std::cout << "Normal pivoting..." << std::endl;
         return cj_minus_zj.maxValueIndex();
     }
+    */
+    return cj_minus_zj.maxValueIndex();
 }
 
 // PUBLIC METHODS
 
-SimplexSolver::SimplexSolver(LpProblem problemToSolve) {
-    problem = problemToSolve;
-}
-
 std::pair<Matrix, SolutionType> SimplexSolver::runSolver() {
-
-
     SimplifierHelper helper = LPSimplifier::computeSimplifierHelper(problem);
 
     if(helper.isHelperEmpty()) {
-        std::pair<Matrix, SolutionType> results = solveSimplex();
-        return results;
+        solveSimplex();
+        return std::make_pair(problem.getOptimalSolution(), problem.getSolutionType());
     }
     else {
         LpProblem simplifiedProblem(problem);
@@ -588,16 +539,14 @@ std::pair<Matrix, SolutionType> SimplexSolver::runSolver() {
         LPSimplifier::simplifyProblem(simplifiedProblem, helper);
 
         SimplexSolver simplifiedSolver(simplifiedProblem);
-        std::pair<Matrix, SolutionType> simplifiedResult = simplifiedSolver.solveSimplex();
+        simplifiedSolver.solveSimplex();
+
+        std::pair<const Matrix&, SolutionType> simplifiedResult = {simplifiedProblem.getOptimalSolution(), simplifiedProblem.getSolutionType()};
 
         computeOriginalProblemSolution(simplifiedResult, helper);
 
         return std::make_pair(problem.getOptimalSolution(), problem.getSolutionType());
     }
-
-    //std::pair<Matrix, SolutionType> optimalSolution = solveSimplex();
-
-    //return std::make_pair(optimalSolution.first, optimalSolution.second);
 }
 
 }

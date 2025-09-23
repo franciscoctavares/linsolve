@@ -13,7 +13,7 @@ class Flag {
        const std::optional<std::string>& getLongForm() const { return longForm; }
 
        /**
-        * @brief Returns true if only 1 of the flag versions(`shortForm` or `longform`) is present in `args`
+        * @brief Returns true if only if flag(`shortForm` or `longForm`) is found in `args`
         * 
         * @throw drgdrg
         */

@@ -14,59 +14,6 @@
 
 namespace LP {
 
-void LpProblem::simplifiedProblemSolution(SimplifierHelper& helper,  LpProblem& simplifiedProblem) {
-
-    Matrix unboundedSol = Matrix({INFINITY}, 1, 1);
-    Matrix infeasibleSol = Matrix({0}, 1, 1);
-
-    if(simplifiedProblem.getOptimalSolution() == infeasibleSol) {
-        solutionType = INFEASIBLE;
-        optimalSolution = infeasibleSol;
-        std::cout << "Both problems are infeasible" << std::endl;
-        return;
-    }
-    else if(simplifiedProblem.getOptimalSolution() == unboundedSol) {
-        solutionType = UNBOUNDED;
-        optimalSolution = unboundedSol;
-        std::cout << "Both problems are Unbounded" << std::endl;
-        return;
-    }
-
-    if(helper.fixedVariables.size() == 0) optimalSolution = simplifiedProblem.getOptimalSolution();
-    else {
-        //std::cout << std::format("Some variables were fixed...({},{})", simplifiedProblem.getOptimalSolution().getNColumns(), helper.fixedVariables.size()) << std::endl;
-        Matrix actualSolution = zeros(1, simplifiedProblem.getOptimalSolution().getNColumns() + helper.fixedVariables.size());
-
-        for(const std::pair<uint, uint>& pairsOfVars : helper.pairsOfVars) {
-            actualSolution.setElement(0, pairsOfVars.second, simplifiedProblem.getOptimalSolution().getElement(0, pairsOfVars.first));
-        }
-
-        for(const std::pair<uint, double>& fixedVars : helper.fixedVariables) {
-            actualSolution.setElement(0, fixedVars.first, fixedVars.second);
-        }
-
-        optimalSolution = actualSolution;
-    }
-
-    if(simplifiedProblem.getSolutionType() == CONTINUOUS_SOLUTION) {
-        solutionType = CONTINUOUS_SOLUTION;
-        //std::cout << "Original problem is Continuous" << std::endl;
-    }
-    else if(simplifiedProblem.getSolutionType() == WHOLE_SOLUTION && helper.fixedVariables.size() != 0) {
-        solutionType = WHOLE_SOLUTION;
-        //std::cout << "Original problem is Whole" << std::endl;
-    }
-
-}
-
-bool LpProblem::isOptimalSolutionWhole() {
-    for(std::size_t i = 0; i < optimalSolution.getNColumns(); i++) {
-        if(!isNumberAnInteger(optimalSolution.getElement(0, i)))
-            return false;
-    }
-    return true;
-}
-
 // PUBLIC METHODS
 
 LpProblem::LpProblem(ProblemType modelType, std::vector<double> newObjectiveFunction, std::vector<Constraint> newConstraints) {

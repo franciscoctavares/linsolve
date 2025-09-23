@@ -6,27 +6,16 @@
 
 #include <utility>
 #include <vector>
-#include <sys/types.h>
 
 namespace LP {
 
-struct SimplexMatrices {
-    Matrix tableau;
-    Matrix b;
-    Matrix cj;
-    Matrix basisIndices;
-    Matrix cb;
-    Matrix zj;
-    Matrix cj_minus_zj;
-
-    // extra stuff
-    std::pair<uint, uint> pivots;
-};
-
 class SimplexSolver {
+    public:
+        SimplexSolver(LpProblem& problemToSolve) : problem(problemToSolve) { ; }
+
+        std::pair<Matrix, SolutionType> runSolver();
     private:
-        LpProblem problem;
-        SimplexMatrices simplexMatrices;
+        LpProblem& problem;
 
         /**
          * @brief Checks the cj - zj(passed as an argument) row see if any of the elements is positive, to see if more simplex iterations are necessary
@@ -98,21 +87,13 @@ class SimplexSolver {
          */
         std::vector<std::pair<int, int>> getConstraintsIndexes(Matrix extraCj);
 
-        /**
-         * @brief Solves the LP model using the simplex method
-         */
-        std::pair<Matrix, SolutionType> solveSimplex();
+        void solveSimplex();
 
         void isOptimalSolutionWhole();
 
-        void computeOriginalProblemSolution(std::pair<Matrix, SolutionType>& simplifiedResult, SimplifierHelper& helper);
+        void computeOriginalProblemSolution(std::pair<const Matrix&, SolutionType>& simplifiedResult, SimplifierHelper& helper);
 
-        uint computePivotColumn(Matrix& cj_minus_zj);
-
-    public:
-        SimplexSolver(LpProblem problemToSolve);
-
-        std::pair<Matrix, SolutionType> runSolver();
+        std::size_t computePivotColumn(Matrix& cj_minus_zj);
 };
 
 bool isNumberCloseToInteger(double number, int integerToCheck, double epsilon = 1e-10);

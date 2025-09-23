@@ -9,13 +9,13 @@
 #include <string>
 #include <tuple>
 
-typedef struct {
+struct BenchmarkPerformanceMetrics {
     std::vector<double> avg_execution_times;
     std::vector<std::pair<ExplorationStrategy, BranchingStrategy>> strats;
     std::vector<uint> explored_nodes;
 
     std::vector<std::tuple<double, std::pair<ExplorationStrategy, BranchingStrategy>, uint>> things;
-}BenchmarkPerformanceMetrics;
+};
 
 
 class Benchmark {

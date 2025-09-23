@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <cmath>
+#include <format>
 
 // private methods
 
@@ -169,6 +170,7 @@ LP::LpProblem ModelFileReader::readModel(std::string fileName) {
     LP::ProblemType type;
     if(objectiveFunctionAux.first == "max") type = LP::MAX;
     else if(objectiveFunctionAux.first == "min") type = LP::MIN;
+    else throw std::invalid_argument(std::format("Error reading a model from the file {}: problem type must be either max or min, but the type read was {}", fileName, objectiveFunctionAux.first));
 
     std::vector<double> objectiveFunction = objectiveFunctionAux.second;
     std::vector<Constraint> constraints;

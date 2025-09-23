@@ -22,25 +22,6 @@ class LpProblem {
         std::vector<Constraint> constraints;
         Matrix optimalSolution;
         SolutionType solutionType;
-
-        /**
-         * @brief Checks if the LP problem can be simplified, and stores information about which constraints to remove 
-         *        and variables to fix in the `helper` variable passed as an argument
-         */
-        bool canProblemBeSimplified(SimplifierHelper* helper);
-
-        /**
-         * @brief Uses the information stored in the `helper` variable argument to simplify the problem
-         */
-        bool simplifyProblem(SimplifierHelper* helper);
-
-        /**
-         * @brief Uses the information stored in the `helper` variable argument and the simplified problem solution(`simplifiedSolution`)
-         *        to obtain the initial problem's solution
-         */
-        void simplifiedProblemSolution(SimplifierHelper& helper, LpProblem& simplifiedSolution);
-
-        bool isOptimalSolutionWhole();
         
     public:
         LpProblem(void) = default;
@@ -81,32 +62,21 @@ class LpProblem {
          */
         void removeConstraint(int constraintIndex);
 
-        /**
-         * @brief Returns `optimalSolution`
-         */
+        const Matrix& getObjectiveFunction() const { return objectiveFunction; }
+
         Matrix& getOptimalSolution() { return optimalSolution; }
 
-        /**
-         * @brief Returns the LP model type(MAX or MIN)
-         */
-        ProblemType getType() { return type; }
+        const std::vector<Constraint>& getConstraints() const { return constraints; }
+        
+        ProblemType getType() const { return type; }
 
-        /**
-         * @brief Returns `objectiveFunction`
-         */
-        Matrix& getObjectiveFunction() { return objectiveFunction; }
-
-        /**
-         * @brief Solves the LP model
-         */
         void solveProblem(SolvingMethod method);
 
-        std::vector<Constraint>& getConstraints() { return constraints; }
+        SolutionType getSolutionType() const { return solutionType; }
 
-        SolutionType getSolutionType() { return solutionType; }
         void setSolutionType(SolutionType newSolutionType) { solutionType = newSolutionType; }
         
-        void setOptimalSolution(Matrix newOptimalSolution) { optimalSolution = newOptimalSolution; }
+        void setOptimalSolution(const Matrix& newOptimalSolution) { optimalSolution = newOptimalSolution; }
 
         /**
          * @brief Checks if `potentialSolution` respects the constraint whose index is `constraintIndex`

@@ -8,6 +8,7 @@
 #include <variant>
 #include <cstddef>
 
+// to represent types of possible arguments
 using MyVariant = std::variant<bool, int, std::string>;
 
 class Command {

@@ -40,15 +40,9 @@ class Matrix {
          */
         Matrix& operator=(Matrix&& otherMatrix) noexcept;
 
-        /**
-         * @brief Returns the number of rows of the matrix
-         */
-        std::size_t getNRows() { return nRows; }
+        const std::size_t& getNRows() const { return nRows; }
 
-        /**
-         * @brief Returns the number of columns of the matrix
-         */
-        std::size_t getNColumns() { return nColumns; }
+        const std::size_t& getNColumns() const { return nColumns; }
 
         /**
          * @brief Retrieves the elements of the matrix
@@ -138,7 +132,7 @@ class Matrix {
          * @throw std::invalid_argument - if `row` < 0 or `row` >= `nRows`
          * @throw std::invalid_argument - if `column` < 0 or `column` >= `nColumns`
          */
-        double getElement(int row, int column);
+        double getElement(int row, int column) const;
 
         /**
          * @brief Sets the value of a specific element from the matrix, given its coordinates and the value
@@ -195,12 +189,12 @@ class Matrix {
         Matrix pointDivision(Matrix& matrix);
 
         /**
-         * @brief Replaces the specified row of the matrix with a new row matrix and returns the resulting matrix
+         * @brief Replaces the specified row of the matrix with a new row matrix
          * 
          * @throw std::invalid_argument - if `row` < 0 or `row` >= `nRows`
          * @throw std::invalid_argument - if `nColumns` != `newRow.nColumns`
          */
-        Matrix setRow(int row, const Matrix& newRow);
+        void setRow(int row, const Matrix& newRow, double factor);
 
         /**
          * @brief Replaces the specified column of the matrix with a new column matrix and returns the resulting matrix

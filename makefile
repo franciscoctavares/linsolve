@@ -9,13 +9,14 @@ CXX := g++
 OPTIM_LEVEL := 0
 CPP_STANDARD := 20
 #WARNINGS := -Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wold-style-cast -Wnull-dereference -Wdouble-promotion -Wuseless-cast
-CXXFLAGS := -Wall -Wextra -Werror -I$(INCLUDE_DIR) -O$(OPTIM_LEVEL) -std=c++$(CPP_STANDARD)
+CXXFLAGS := -Wall -Wextra -Werror -I$(INCLUDE_DIR) -O$(OPTIM_LEVEL) -std=c++$(CPP_STANDARD) $(EXTRA_FLAGS)
+EXTRA_FLAGS := -pthread
 TARGET := $(BIN_DIR)/main
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $@
+	$(CXX) $(OBJ) $(EXTRA_FLAGS) -o $@
 
 # Pattern rule: build/foo.o from any foo.cpp
 $(BUILD_DIR)/%.o: 
@@ -24,9 +25,11 @@ $(BUILD_DIR)/%.o:
 
 build: clean $(TARGET)
 
-test:
-	clear
-	@./bin/main model BEST_VALUE BEST_COEFFICIENT --show
+test: test_clean
+	g++ test.cpp -o test
+
+test_clean:
+	rm -f test test.o flag.o
 
 bench:
 	clear

@@ -4,6 +4,8 @@
 #include "lp/lp.h"
 #include "bb_utils.h"
 
+#include <cstddef>
+
 enum NodeStatus {
     NOT_EVALUATED,
     EVALUATED,
@@ -16,14 +18,14 @@ class BaBNode {
         BaBNode* leftChild;
         BaBNode* rightChild;
         NodeStatus status;
-        uint depth;
+        std::size_t depth;
     public:
         BaBNode(void) = default;
 
         /**
          * @brief Standard constructor
          */
-        BaBNode(const LP::LpProblem& nodeProblem, uint newDepth);
+        BaBNode(const LP::LpProblem& nodeProblem, std::size_t newDepth);
 
         /**
          * @brief Copy constructor
@@ -55,9 +57,6 @@ class BaBNode {
          */
         Matrix solveNode();
 
-        /**
-         * @brief Returns a reference to the node's LP problem
-         */
         LP::LpProblem& getProblem() { return problem; }
 
         /**
@@ -98,10 +97,7 @@ class BaBNode {
          */
         bool isBetter(BaBNode* node);
 
-        /**
-         * @brief Return the node's `depth`
-         */
-        uint getDepth() { return depth; }
+        std::size_t getDepth() { return depth; }
 
         bool doesNodeHaveASolution() { return problem.getSolutionType() == LP::CONTINUOUS_SOLUTION || problem.getSolutionType() == LP::WHOLE_SOLUTION; }
 

@@ -14,12 +14,16 @@ const std::string sugestion = std::format("{}Sugestion{}: run \'linsolve --help\
 //      BaseCLIException
 //          ParsingException
 //              UnknownCommandException
+//              UnknownOptionException
 //              NoArgsException
 //              MultipleArgsException
+//              ExclusiveOptionException
 //          OptionException
 //              FlagException
+//                  NotAFlagException
 //                  NoFlagsException
 //                  FlagFormatException
+//                  BothFlagsException
 
 class BaseCLIException : public std::logic_error {
     public:
@@ -29,9 +33,6 @@ class BaseCLIException : public std::logic_error {
 class ParsingException : public BaseCLIException {
     public:
         explicit ParsingException(const std::string& msg) : BaseCLIException(msg) {}
-    protected:
-        //const std::string error_thing = std::format("{}Error{}: ", RED, RESET);
-        //const std::string sugestion = std::format("{}Sugestion{}: run \'linsolve --help\' to get more information.", MAGENTA, RESET);
 };
 
 class UnknownCommandException : public ParsingException {
@@ -63,6 +64,13 @@ class MultipleArgsException : public ParsingException {
         explicit MultipleArgsException(const std::string& msg) : ParsingException(msg) {}
 };
 
+class ExclusiveOptionException : public ParsingException {
+    public:
+        explicit ExclusiveOptionException(const std::string& repeated_option) : ParsingException(
+            std::format("{}Option {} must be exclusive.\n\n{}", error_thing, repeated_option, sugestion)
+        ) {}
+};
+
 class OptionException : public BaseCLIException {
     public:
         explicit OptionException(const std::string& msg) : BaseCLIException(msg) {}
@@ -71,6 +79,13 @@ class OptionException : public BaseCLIException {
 class FlagException : public OptionException {
     public:
         explicit FlagException(const std::string& msg) : OptionException(msg) {}
+};
+
+class NotAFlagException : public FlagException {
+    public:
+        explicit NotAFlagException(const std::string& command, const std::string& supposed_flag) : FlagException(
+            std::format("{}{} is not a flag.\n\n{}.", error_thing, supposed_flag, sugestion)
+        ) {}
 };
 
 class NoFlagsException : public FlagException {
@@ -85,9 +100,16 @@ class FlagFormatException : public FlagException {
 
 class SameFlagsException : public FlagException {
     public:
-        explicit SameFlagsException(const std::string& msg) : FlagException(msg) {}
+        explicit SameFlagsException() : FlagException(
+            std::format("{}using repeated flags is not allowed.\n\n{}", error_thing, sugestion)
+        ) {}
 };
 
-
+class BothFlagsException : public FlagException {
+    public:
+        explicit BothFlagsException() : FlagException(
+            std::format("{}using both flag versions('-' and '--') is not allowed.\n\n", error_thing, sugestion)
+        ) {}
+};
 
 #endif
