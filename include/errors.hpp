@@ -1,5 +1,4 @@
-#ifndef ERRORS_H
-#define ERRORS_H
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -111,5 +110,3 @@ class BothFlagsException : public FlagException {
             std::format("{}using both flag versions('-' and '--') is not allowed.\n\n", error_thing, sugestion)
         ) {}
 };
-
-#endif

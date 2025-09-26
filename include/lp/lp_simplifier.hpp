@@ -1,5 +1,4 @@
-#ifndef LP_SIMPLIFIER_H
-#define LP_SIMPLIFIER_H
+#pragma once
 
 #include "lp/lp_utils.hpp"
 #include "lp/lp.hpp"
@@ -25,5 +24,3 @@ class LPSimplifier {
 };
 
 }
-
-#endif

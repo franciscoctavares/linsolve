@@ -1,5 +1,4 @@
-#ifndef CLI_UTILS_H
-#define CLI_UTILS_H
+#pragma once
 
 #include <string>
 #include <variant>
@@ -37,5 +36,3 @@ T convertFromString(const std::string& str) {
         throw WrongArgTypeException("Argument is of the wrong type");
 }
 */
-
-#endif

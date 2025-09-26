@@ -1,5 +1,4 @@
-#ifndef DEFAULT_COMMAND_H
-#define DEFAULT_COMMAND_H
+#pragma once
 
 #include "cli/command.hpp"
 
@@ -21,5 +20,3 @@ class DefaultCommand : public Command {
 };
 
 }
-
-#endif

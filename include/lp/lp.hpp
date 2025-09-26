@@ -1,5 +1,4 @@
-#ifndef LP_H
-#define LP_H
+#pragma once
 
 #include "matrix.hpp"
 #include "constraint.hpp"
@@ -101,5 +100,3 @@ class LpProblem {
 };
 
 }
-
-#endif

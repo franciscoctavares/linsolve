@@ -1,5 +1,4 @@
-#ifndef BB_UTILS_H
-#define BB_UTILS_H
+#pragma once
 
 #include "matrix.hpp"
 #include <sys/types.h>
@@ -33,5 +32,3 @@ std::vector<BranchingStrategy> getPossibleBranchingStrategies();
 
 std::string convertExplorStratToString(ExplorationStrategy strat);
 std::string convertBranchStratToString(BranchingStrategy strat);
-
-#endif

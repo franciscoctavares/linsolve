@@ -1,5 +1,4 @@
-#ifndef BB_NODE_H
-#define BB_NODE_H
+#pragma once
 
 #include "lp/lp.hpp"
 #include "bb_utils.hpp"
@@ -103,5 +102,3 @@ class BaBNode {
 
         bool isNodeValid() { return problem.isSolutionAdmissible(problem.getOptimalSolution()); }
 };
-
-#endif

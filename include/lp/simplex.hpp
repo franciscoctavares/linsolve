@@ -1,5 +1,4 @@
-#ifndef SIMPLEX_H
-#define SIMPLEX_H
+#pragma once
 
 #include "lp/lp.hpp"
 #include "matrix.hpp"
@@ -99,5 +98,3 @@ class SimplexSolver {
 bool isNumberCloseToInteger(double number, int integerToCheck, double epsilon = 1e-10);
 
 }
-
-#endif

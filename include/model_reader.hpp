@@ -1,5 +1,4 @@
-#ifndef FILE_H
-#define FILE_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -32,5 +31,3 @@ class ModelFileReader {
          */
         static LP::LpProblem readModel(std::string fileName);
 };
-
-#endif

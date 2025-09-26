@@ -1,5 +1,4 @@
-#ifndef COMMAND_H
-#define COMMAND_H
+#pragma once
 
 #include "cli/option.hpp"
 
@@ -24,5 +23,3 @@ class Command {
         const std::string name;
         const std::string helpMessage;
 };
-
-#endif

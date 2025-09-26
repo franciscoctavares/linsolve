@@ -1,5 +1,4 @@
-#ifndef CLI_H
-#define CLI_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -27,5 +26,3 @@ class CLI {
 
         int parseCommand(); 
 };
-
-#endif

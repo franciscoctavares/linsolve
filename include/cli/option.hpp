@@ -1,5 +1,4 @@
-#ifndef OPTION_H
-#define OPTION_H
+#pragma once
 
 #include <string>
 #include <optional>
@@ -32,5 +31,3 @@ class Option {
 
 
 };
-
-#endif

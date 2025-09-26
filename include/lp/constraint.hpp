@@ -1,5 +1,4 @@
-#ifndef CONSTRAINT_H
-#define CONSTRAINT_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -36,5 +35,3 @@ class Constraint {
         ConstraintType type;
         double rhs;
 };
-
-#endif

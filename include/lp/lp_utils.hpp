@@ -1,5 +1,4 @@
-#ifndef LP_UTILS_H
-#define LP_UTILS_H
+#pragma once
 
 #include <sys/types.h>
 #include <vector>
@@ -42,5 +41,3 @@ enum SolutionType {
 bool isNumberAnInteger(double number, double epsilon = 1e-10);
 
 }
-
-#endif
