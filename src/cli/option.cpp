@@ -1,9 +1,10 @@
-#include "cli/option.h"
-#include "errors.h"
+#include "cli/option.hpp"
+#include "errors.hpp"
+#include "cli/cli_utils.hpp"
 
-template<typename T>
-Option<T>::Option(const std::pair<std::optional<std::string>, std::optional<std::string>> newFlags, bool argReq, bool argForceThing, bool exclusive) 
-    : flags(newFlags), argForce(argReq), argForceType(argForceThing), isExclusive(exclusive) {
+template<>
+Option<MyVariant>::Option(const std::pair<std::optional<std::string>, std::optional<std::string>> newFlags, bool argReq, bool argForce, bool exclusive) 
+    : flags(newFlags), argForce(argReq), argForceType(argForce), isExclusive(exclusive) {
 
     if(!flags.first.has_value() && !flags.second.has_value())
         throw NoFlagsException("A flag must have a short form or a long form. You provided none");
@@ -13,7 +14,7 @@ Option<T>::Option(const std::pair<std::optional<std::string>, std::optional<std:
         if(flags.first.value().length() != 2)
             throw FlagFormatException("Short form flags must have 2 characters only");
 
-        if(!flags.first.value().starts_with('-'))
+        if(!flags.first.value().starts_with("-"))
             throw FlagFormatException("Short form flags must start with \'-\'");
 
         if(flags.first.value()[1] < 'a' || flags.first.value()[1] > 'z')
@@ -21,14 +22,14 @@ Option<T>::Option(const std::pair<std::optional<std::string>, std::optional<std:
     }
 
     if(flags.second.has_value()) {
-        if(longForm.value().length() <= 4)
+        if(flags.second.value().length() <= 4)
             throw FlagFormatException("Long form flags must start with \'--\' and have at least 2 letters after that");
 
-        if(!longForm.value().starts_with('--'))
+        if(!flags.second.value().starts_with("--"))
             throw FlagFormatException("Long form flags must start with \'--\'");
 
-        for(std::size_t i = 2; i < longForm.value().length(); i++) {
-            if(longForm.value()[i] < 'a' || longForm.value()[i] > 'z')
+        for(std::size_t i = 2; i < flags.second.value().length(); i++) {
+            if(flags.second.value()[i] < 'a' || flags.second.value()[i] > 'z')
                 throw FlagFormatException("Long form flags must have all lowercase letters after the starting \'--\'");
         }
     }

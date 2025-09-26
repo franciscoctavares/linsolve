@@ -1,5 +1,5 @@
-#include "bb_node.h"
-#include "lp/lp_utils.h"
+#include "bb_node.hpp"
+#include "lp/lp_utils.hpp"
 
 #include <cmath>
 #include <iostream>

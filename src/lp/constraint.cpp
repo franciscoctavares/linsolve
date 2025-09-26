@@ -1,4 +1,4 @@
-#include "lp/constraint.h"
+#include "lp/constraint.hpp"
 #include <sstream>
 
 Constraint::Constraint(std::vector<double>& newLhs, const std::string& newConstraintType, double newRhs) {

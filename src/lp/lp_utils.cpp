@@ -1,4 +1,4 @@
-#include "lp/lp_utils.h"
+#include "lp/lp_utils.hpp"
 
 #include <cmath>
 #include <iostream>

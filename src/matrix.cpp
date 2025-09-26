@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "matrix.hpp"
 #include "tabulate.hpp"
 
 #include <cmath>

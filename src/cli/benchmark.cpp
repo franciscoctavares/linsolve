@@ -1,8 +1,8 @@
-#include "cli/benchmark.h"
+#include "cli/benchmark.hpp"
 #include "tabulate.hpp"
-#include "lp/lp.h"
-#include "model_reader.h"
-#include "bb_tree.h"
+#include "lp/lp.hpp"
+#include "model_reader.hpp"
+#include "ip/bb_tree.hpp"
 
 // PRIVATE METHODS
 

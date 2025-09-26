@@ -1,14 +1,13 @@
 SRC := $(shell find src -name "*.cpp")
 OBJ := $(patsubst %.cpp,build/%.o,$(notdir $(SRC)))
 
-INCLUDE_DIR := include
+INCLUDE_DIR := src
 BUILD_DIR := build
 BIN_DIR := bin
 
 CXX := g++
 OPTIM_LEVEL := 0
 CPP_STANDARD := 20
-#WARNINGS := -Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wold-style-cast -Wnull-dereference -Wdouble-promotion -Wuseless-cast
 CXXFLAGS := -Wall -Wextra -Werror -I$(INCLUDE_DIR) -O$(OPTIM_LEVEL) -std=c++$(CPP_STANDARD) $(EXTRA_FLAGS)
 EXTRA_FLAGS := -pthread
 TARGET := $(BIN_DIR)/main

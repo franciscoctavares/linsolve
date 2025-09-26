@@ -1,6 +1,6 @@
-#include "lp/simplex.h"
-#include "lp/lp_simplifier.h"
-#include "lp/lp_utils.h"
+#include "lp/simplex.hpp"
+#include "lp/lp_simplifier.hpp"
+#include "lp/lp_utils.hpp"
 
 #include <sstream>
 #include <iostream>

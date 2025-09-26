@@ -1,15 +1,16 @@
-#include "cli/commands/default_command.h"
+#include "cli/commands/default_command.hpp"
 #include <iostream>
 #include <utility>
 
-#include "errors.h"
+#include "errors.hpp"
 #include <format>
-#include "cli/cli_utils.h"
+#include "cli/cli_utils.hpp"
+#include "cli/option.hpp"
 
 namespace Commands {
 
 DefaultCommand::DefaultCommand(const std::string& newHelpMessage) : Command("", newHelpMessage) {
-    Option<MyVariant> helpOption({"-h", "--help"}, true, false, true);
+    Option<MyVariant> helpOption(std::make_pair("-h", "--help"), true, false, true);
     options.emplace_back(helpOption);
     settings.help = true;
 }
@@ -25,27 +26,29 @@ void DefaultCommand::parseOptions(std::vector<std::string>& args) {
         
     }
     */
-    bool flagDetected;
+    //bool flagDetected;
 
     for(std::size_t i = 2; i < args.size(); i++) {
-        flagDetected = false;
+        //flagDetected = false;
         for(std::size_t j = 0; j < options.size(); j++) {
             if(args[i] == options[j].getFlags().first || args[i] == options[j].getFlags().second) {
                 if(options[j].getIsUsed())
                     throw SameFlagsException();
 
-                flagDetected = true;
+                //flagDetected = true;
                 options[j].setIsUsed(true);
 
                 if(options[j].getIsExclusive() && i < args.size() - 1)
-                    throw ExclusiveOptionException(std::format("{}/{}", options[j].getFlags().first, options[j].getFlags().second));
+                    throw ExclusiveOptionException(std::format("{}/{}", options[j].getFlags().first.value(), options[j].getFlags().second.value()));
 
                 if(options[j].getArgForce()) {
                     if(options[j].getArgForceType()) {
-                        if(i == args.size() - 1) throw
+                        if(i == args.size() - 1) throw NoArgsException("An argument is required, none were provided.");
+
+                        options[j].setArg();
                     }
                     else {
-
+                        std::cout << "No argument is supposed to be here\n";
                     }
                 }
             }
@@ -54,7 +57,7 @@ void DefaultCommand::parseOptions(std::vector<std::string>& args) {
 }
 
 void DefaultCommand::runCommand() {
-    if(settings.help) {
+    if(options[0].getIsUsed()) {
         displayHelpMessage();
     }
     //else throw NoArgsException(std::format("{}Error{}: using repeated flags is not allowed.\n\n{}Sugestion{}: Run \'linsolve --help\' to get more information.", RED, RESET, CYAN, RESET));
@@ -73,10 +76,10 @@ void DefaultCommand::displayHelpMessage() {
     std::cout << "\nOptions:\n";
     for(Option<MyVariant>& currentOption : options) {
         std::cout << "  ";
-        if(currentOption.flag.getShortForm().has_value())
-            std::cout << currentOption.flag.getShortForm().value();
-        if(currentOption.flag.getLongForm().has_value())
-            std::cout << ", " <<  currentOption.flag.getLongForm().value();
+        if(currentOption.getFlags().first.has_value())
+            std::cout << currentOption.getFlags().first.value();
+        if(currentOption.getFlags().second.has_value())
+            std::cout << ", " <<  currentOption.getFlags().second.value();
 
         std::cout << "\n";
     }

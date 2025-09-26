@@ -1,12 +1,11 @@
-#include "cli/cli.h"
-#include "cli/cli_utils.h"
+#include "cli/cli.hpp"
+#include "cli/cli_utils.hpp"
 
 #include <filesystem>
 #include <iostream>
 #include <algorithm>
 #include <format>
-#include "cli/benchmark.h"
-#include "errors.h"
+#include "errors.hpp"
 
 // PRIVATE METHODS
 

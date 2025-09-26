@@ -1,4 +1,4 @@
-#include "bb_tree.h"
+#include "bb_tree.hpp"
 
 #include <iostream>
 #include <cmath>

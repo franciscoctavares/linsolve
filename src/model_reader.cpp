@@ -1,4 +1,4 @@
-#include "../include/model_reader.h"
+#include "model_reader.hpp"
 
 #include <iostream>
 #include <fstream>

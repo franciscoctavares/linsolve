@@ -1,4 +1,4 @@
-#include "lp/lp_simplifier.h"
+#include "lp/lp_simplifier.hpp"
 
 #include <algorithm>
 #include <iostream>
