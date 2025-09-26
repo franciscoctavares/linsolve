@@ -1,5 +1,4 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#pragma once
 
 #include <vector>
 #include <cstddef>
@@ -265,5 +264,3 @@ Matrix zeros(int rows, int columns);
 Matrix basisVector(int size, int index);
 
 int isBasisVector(const std::vector<double>& vector);
-
-#endif

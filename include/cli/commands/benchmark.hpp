@@ -1,7 +1,7 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
 
-#include "cli/command.h"
+#include "cli/command.hpp"
 #include <string>
 #include <cstddef>
 

@@ -1,8 +1,8 @@
 #ifndef LP_H
 #define LP_H
 
-#include "matrix.h"
-#include "constraint.h"
+#include "matrix.hpp"
+#include "constraint.hpp"
 
 #include <vector>
 #include <string>
@@ -10,8 +10,8 @@
 
 #include <limits>
 
-#include "lp/lp_utils.h"
-#include "lp/lp.h"
+#include "lp/lp_utils.hpp"
+#include "lp/lp.hpp"
 
 namespace LP {
 

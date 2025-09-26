@@ -1,7 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "cli/option.h"
+#include "cli/option.hpp"
 
 #include <string>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <cstddef>
 
 // to represent types of possible arguments
-using MyVariant = std::variant<bool, int, std::string>;
+#include "cli/cli_utils.hpp"
 
 class Command {
     public:

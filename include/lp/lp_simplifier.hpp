@@ -1,8 +1,8 @@
 #ifndef LP_SIMPLIFIER_H
 #define LP_SIMPLIFIER_H
 
-#include "lp/lp_utils.h"
-#include "lp/lp.h"
+#include "lp/lp_utils.hpp"
+#include "lp/lp.hpp"
 
 namespace LP {
 

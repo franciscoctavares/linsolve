@@ -1,8 +1,8 @@
 #ifndef BB_TREE_H
 #define BB_TREE_H
 
-#include "bb_node.h"
-#include "bb_utils.h"
+#include "bb_node.hpp"
+#include "bb_utils.hpp"
 
 class BaBTree {
     private:

@@ -2,6 +2,7 @@
 #define CLI_UTILS_H
 
 #include <string>
+#include <variant>
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
@@ -13,6 +14,8 @@
 #define WHITE   "\033[37m"
 
 bool isFlag(const std::string& str);
+
+using MyVariant = std::variant<bool, int, std::string>;
 
 /*
 template<typename T>

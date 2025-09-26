@@ -5,7 +5,7 @@
 #include <string>
 #include <format>
 
-#include "cli/cli_utils.h"
+#include "cli/cli_utils.hpp"
 
 const std::string error_thing = std::format("{}Error{}: ", RED, RESET);
 const std::string sugestion = std::format("{}Sugestion{}: run \'linsolve --help\' to get more information.", MAGENTA, RESET);
@@ -83,7 +83,7 @@ class FlagException : public OptionException {
 
 class NotAFlagException : public FlagException {
     public:
-        explicit NotAFlagException(const std::string& command, const std::string& supposed_flag) : FlagException(
+        explicit NotAFlagException(const std::string& supposed_flag) : FlagException(
             std::format("{}{} is not a flag.\n\n{}.", error_thing, supposed_flag, sugestion)
         ) {}
 };

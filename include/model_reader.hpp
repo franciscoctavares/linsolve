@@ -5,7 +5,7 @@
 #include <string>
 #include <tuple>
 #include <utility>
-#include "lp/lp.h"
+#include "lp/lp.hpp"
 
 
 class ModelFileReader {

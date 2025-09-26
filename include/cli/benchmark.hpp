@@ -1,10 +1,9 @@
-#ifndef BENCHMARK_H
-#define BENCHMARK_H
+#pragma once
 
 #include <vector>
 #include <cstddef>
 
-#include "bb_utils.h"
+#include "bb_utils.hpp"
 
 #include <string>
 #include <tuple>
@@ -32,5 +31,3 @@ class Benchmark {
 
         void runBenchmark();
 };
-
-#endif

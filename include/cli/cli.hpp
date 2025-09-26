@@ -5,14 +5,14 @@
 #include <vector>
 #include <variant>
 
-#include "bb_utils.h"
-#include "bb_tree.h"
-#include "bb_node.h"
+#include "bb_utils.hpp"
+#include "bb_tree.hpp"
+#include "bb_node.hpp"
 
-#include "cli/option.h"
-#include "cli/command.h"
-#include "cli/commands/benchmark.h"
-#include "cli/commands/default_command.h"
+#include "cli/option.hpp"
+#include "cli/command.hpp"
+#include "cli/commands/benchmark.hpp"
+#include "cli/commands/default_command.hpp"
 
 using CommandTypes = std::variant<Commands::DefaultCommand>;
 

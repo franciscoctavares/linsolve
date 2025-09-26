@@ -1,8 +1,8 @@
 #ifndef BB_NODE_H
 #define BB_NODE_H
 
-#include "lp/lp.h"
-#include "bb_utils.h"
+#include "lp/lp.hpp"
+#include "bb_utils.hpp"
 
 #include <cstddef>
 

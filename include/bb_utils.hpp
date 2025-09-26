@@ -1,7 +1,7 @@
 #ifndef BB_UTILS_H
 #define BB_UTILS_H
 
-#include "matrix.h"
+#include "matrix.hpp"
 #include <sys/types.h>
 #include <vector>
 #include <string>

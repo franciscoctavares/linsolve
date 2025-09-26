@@ -1,8 +1,8 @@
 #ifndef SIMPLEX_H
 #define SIMPLEX_H
 
-#include "lp/lp.h"
-#include "matrix.h"
+#include "lp/lp.hpp"
+#include "matrix.hpp"
 
 #include <utility>
 #include <vector>

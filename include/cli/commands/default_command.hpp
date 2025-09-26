@@ -1,7 +1,7 @@
 #ifndef DEFAULT_COMMAND_H
 #define DEFAULT_COMMAND_H
 
-#include "cli/command.h"
+#include "cli/command.hpp"
 
 namespace Commands {
 
