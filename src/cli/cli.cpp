@@ -15,9 +15,7 @@ int CLI::parseCommand() {
     
     int typedCommandIndex = -1;
     for(std::size_t i = 0; i < commands.size(); i++) {
-        if(args[1] == std::visit([](auto&& arg) {
-            return arg.getName();
-        }, commands[i])) {
+        if(args[1] == commands[i]->getName()) {
             if(typedCommandIndex != -1)
                 throw MultipleArgsException(std::format("{}Error{}: Multiple commands typed.\n\nRun \'linsolve --help\' to get more information.", RED, RESET));
             else
@@ -32,20 +30,23 @@ void CLI::run() {
     try {
         int typedCommandIndex = parseCommand();
 
-        
-        //if(typedCommandIndex == -2)
-        //    throw UnknownCommandException(args[1]);
         if(typedCommandIndex == -1 && !isFlag(args[1])) throw UnknownCommandException(args[1]);
         else typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
 
-
+        /*
         std::visit([this](auto&& arg) {
             arg.parseOptions(this->args);
         }, commands[typedCommandIndex]);
+        */
 
+        commands[typedCommandIndex]->parseOptions(args);
+        commands[typedCommandIndex]->runCommand();
+
+        /*
         std::visit([](auto&& arg) {
             arg.runCommand();
         }, commands[typedCommandIndex]);
+        */
     }
     catch(const std::exception& e) {
         std::cerr << e.what() << '\n';
@@ -72,5 +73,9 @@ Commands:
 
 Run 'linsolve COMMAND --help' for more information on a command.)";
 
-    commands.push_back(Commands::DefaultCommand(helpMessage));
+    Commands::DefaultCommand def(helpMessage);
+
+    commands.push_back(std::make_unique<Commands::DefaultCommand>(helpMessage));
+
+    //commands.push_back(Commands::DefaultCommand(helpMessage));
 }

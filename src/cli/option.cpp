@@ -33,4 +33,6 @@ Option<MyVariant>::Option(const std::pair<std::optional<std::string>, std::optio
                 throw FlagFormatException("Long form flags must have all lowercase letters after the starting \'--\'");
         }
     }
+
+    isUsed = false;
 }

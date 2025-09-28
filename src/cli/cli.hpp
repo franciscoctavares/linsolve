@@ -8,7 +8,7 @@
 #include "cli/command.hpp"
 #include "cli/commands/default_command.hpp"
 
-using CommandTypes = std::variant<Commands::DefaultCommand>;
+#include <memory>
 
 
 class CLI {
@@ -17,7 +17,7 @@ class CLI {
         void run();
     private:
         std::vector<std::string> args;
-        std::vector<CommandTypes> commands;
+        std::vector<std::unique_ptr<Command>> commands;
 
         int parseCommand(); 
 };
