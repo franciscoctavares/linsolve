@@ -12,6 +12,8 @@ CXXFLAGS := -Wall -Wextra -Werror -I$(INCLUDE_DIR) -O$(OPTIM_LEVEL) -std=c++$(CP
 EXTRA_FLAGS := -pthread
 TARGET := $(BIN_DIR)/main
 
+INSTALL_PATH := /usr/bin
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
@@ -33,6 +35,9 @@ test_clean:
 bench:
 	clear
 	@./bin/main --benchmark
+
+install:
+	@sudo cp ./bin/main $(INSTALL_PATH)/linsolve
 
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
