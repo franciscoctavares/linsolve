@@ -7,7 +7,7 @@
 #include "cli/cli_utils.hpp"
 
 const std::string error_thing = std::format("{}Error{}: ", RED, RESET);
-const std::string sugestion = std::format("{}Sugestion{}: run \'linsolve --help\' to get more information.", MAGENTA, RESET);
+const std::string sugestion = std::format("{}Sugestion{}: run \'linsolve --help\' to get more information.", MAGENTA_ANSI, RESET);
 
 //  std::logic_error
 //      BaseCLIException
@@ -17,6 +17,8 @@ const std::string sugestion = std::format("{}Sugestion{}: run \'linsolve --help\
 //              NoArgsException
 //              MultipleArgsException
 //              ExclusiveOptionException
+//              InvalidOptionException
+//              ArgumentCastingException
 //          OptionException
 //              FlagException
 //                  NotAFlagException
@@ -67,6 +69,13 @@ class ExclusiveOptionException : public ParsingException {
     public:
         explicit ExclusiveOptionException(const std::string& repeated_option) : ParsingException(
             std::format("{}Option {} must be exclusive.\n\n{}", error_thing, repeated_option, sugestion)
+        ) {}
+};
+
+class InvalidOptionException : public ParsingException {
+    public:
+        explicit InvalidOptionException(const std::string& invalid_option) : ParsingException(
+            std::format("{}The option {} is not valid for this command.\n\n{}", error_thing, invalid_option, sugestion)
         ) {}
 };
 

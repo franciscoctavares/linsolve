@@ -7,11 +7,14 @@
 #include <format>
 #include "errors.hpp"
 
+#include "cli/commands/default_command.hpp"
+#include "cli/commands/solve.hpp"
+
 // PRIVATE METHODS
 
 int CLI::parseCommand() {
     if(args.size() == 1)
-        throw NoArgsException(std::format("{}Error{}: No commands, no options and no arguments were specified.\n\n{}Sugestion{}:Run \'linsolve --help\' to get more information.", RED, RESET, MAGENTA, RESET));
+        throw NoArgsException(std::format("{}Error{}: No commands, no options and no arguments were specified.\n\n{}Sugestion{}: Run \'linsolve --help\' to get more information.", RED, RESET, MAGENTA_ANSI, RESET));
     
     int typedCommandIndex = -1;
     for(std::size_t i = 0; i < commands.size(); i++) {
@@ -31,22 +34,12 @@ void CLI::run() {
         int typedCommandIndex = parseCommand();
 
         if(typedCommandIndex == -1 && !isFlag(args[1])) throw UnknownCommandException(args[1]);
-        else typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
+        else if(typedCommandIndex == -1 && isFlag(args[1])) typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
+        //else typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
 
-        /*
-        std::visit([this](auto&& arg) {
-            arg.parseOptions(this->args);
-        }, commands[typedCommandIndex]);
-        */
-
+        //std::cout << "Typed command is " << typedCommandIndex << " " << commands[typedCommandIndex]->getName() << std::endl;
         commands[typedCommandIndex]->parseOptions(args);
         commands[typedCommandIndex]->runCommand();
-
-        /*
-        std::visit([](auto&& arg) {
-            arg.runCommand();
-        }, commands[typedCommandIndex]);
-        */
     }
     catch(const std::exception& e) {
         std::cerr << e.what() << '\n';
@@ -74,8 +67,10 @@ Commands:
 Run 'linsolve COMMAND --help' for more information on a command.)";
 
     Commands::DefaultCommand def(helpMessage);
-
     commands.push_back(std::make_unique<Commands::DefaultCommand>(helpMessage));
+
+    Commands::Solve solve("wdgwigdiugwuidiwb");
+    commands.push_back(std::make_unique<Commands::Solve>("solve command help message"));
 
     //commands.push_back(Commands::DefaultCommand(helpMessage));
 }

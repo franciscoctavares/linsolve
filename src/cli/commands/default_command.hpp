@@ -12,6 +12,7 @@ struct DefaultSettings {
 class DefaultCommand : public Command {
     public:
         DefaultCommand(const std::string& newHelpMessage);
+
         void parseOptions(std::vector<std::string>& args) override;
         void runCommand() override;
         void displayHelpMessage() override;

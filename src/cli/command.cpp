@@ -1,25 +1,13 @@
-#include "cli/commands/default_command.hpp"
-#include <iostream>
-#include <utility>
-
+#include "cli/command.hpp"
 #include "errors.hpp"
+#include <iostream>
 #include <format>
-#include "cli/cli_utils.hpp"
-#include "cli/option.hpp"
 
-namespace Commands {
-
-DefaultCommand::DefaultCommand(const std::string& newHelpMessage) : Command("", newHelpMessage) {
-    Option helpOption({"-h", "--help"}, true, false, true, "Displays information about a command");
-    options.emplace_back(helpOption);
-    settings.help = false;
-}
-
-void DefaultCommand::parseOptions(std::vector<std::string>& args) {
+void Command::parseOptions(std::vector<std::string>& args) {
     bool isAnythingUsed = false;
     bool isThisOptionValid = false;
 
-    for(std::size_t i = 1; i < args.size(); i++) {
+    for(std::size_t i = 2; i < args.size(); i++) {
         isThisOptionValid = false;
         for(std::size_t j = 0; j < options.size(); j++) {
             if(args[i] == options[j].getFlags().first || args[i] == options[j].getFlags().second) {
@@ -41,7 +29,9 @@ void DefaultCommand::parseOptions(std::vector<std::string>& args) {
                     if(options[j].getArgForceType()) {
                         if(i == args.size() - 1) throw NoArgsException("An argument is required, yet none were provided.");
 
-                        options[j].setArg();
+                        options[j].setArg(args[i + 1]);
+                        //std::cout << "stored argument\n";
+                        i++;
                     }
                     else {
                         if(i < args.size() - 1) throw NoArgsException("There aren't supposed to be any arguments, but some were provided");
@@ -58,36 +48,31 @@ void DefaultCommand::parseOptions(std::vector<std::string>& args) {
     if(!isAnythingUsed) throw NoArgsException(std::format("{}Error{}: No options nor arguments were passed to this command.\n\n{}Sugestion{}:Run \'linsolve --help\' to get more information.", RED, RESET, MAGENTA, RESET));
 }
 
-void DefaultCommand::runCommand() {
-    if(options[0].getIsUsed()) {
-        displayHelpMessage();
-    }
-}
+void Command::displayHelpMessage() {
+    std::cout << std::format("Usage: linsolve {} [OPTIONS] [ARGS]...\n\n", name);
 
-void DefaultCommand::displayHelpMessage() {
+    std::cout << "A command line tool for solving Linear and Integer Programming problems.\n\n";
 
-    std::cout << "Usage: linsolve [OPTIONS] COMMAND [ARGS]...\n\n";
-
-    std::cout << "A CLI tool for solving Linear and Integer Programming problems.\n\n";
-
+    /*
     std::cout << "Commands:\n";
     std::cout << "  solve\t\tSolve a Linear or Integer Programming problem\n";
     std::cout << "  benchmark\tBenchmark the speed and efficiency of different settings\n";
+    */
 
     std::cout << "\nOptions:\n";
     for(Option& currentOption : options) {
         std::cout << "  ";
         if(currentOption.getFlags().first.has_value())
             std::cout << currentOption.getFlags().first.value();
-        if(currentOption.getFlags().second.has_value())
-            std::cout << ", " <<  currentOption.getFlags().second.value();
+        if(currentOption.getFlags().second.has_value()) {
+            if(currentOption.getFlags().first.has_value()) std::cout << ", ";
+            std::cout << currentOption.getFlags().second.value();
+        }
 
         std::cout << "\t" << currentOption.getDescription() << "\n";
 
         //std::cout << "\n";
     }
 
-    std::cout << "\nRun 'linsolve COMMAND --help' for more information on a specific command.\n";
-}
-
+    //std::cout << std::format("\nRun 'linsolve {} --help' for more information on a specific command.\n", name);
 }

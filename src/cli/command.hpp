@@ -7,7 +7,6 @@
 #include <variant>
 #include <cstddef>
 
-// to represent types of possible arguments
 #include "cli/cli_utils.hpp"
 
 class Command {
@@ -15,11 +14,12 @@ class Command {
         Command(const std::string& commandName, const std::string& newHelpMessage) : name(commandName), helpMessage(newHelpMessage) {}
         const std::string& getName() const { return name; }
 
-        virtual void parseOptions(std::vector<std::string>& args) = 0;
+        virtual void parseOptions(std::vector<std::string>& args);
         virtual void runCommand() = 0;
-        virtual void displayHelpMessage() = 0;
+        //virtual void displayHelpMessage() = 0;
+        virtual void displayHelpMessage();
     protected:
-        std::vector<Option<MyVariant>> options;
+        std::vector<Option> options;
         const std::string name;
         const std::string helpMessage;
 };

@@ -2,14 +2,8 @@
 
 #include <string>
 #include <vector>
-#include <variant>
-
-#include "cli/option.hpp"
-#include "cli/command.hpp"
-#include "cli/commands/default_command.hpp"
-
 #include <memory>
-
+#include "cli/command.hpp"
 
 class CLI {
     public:
@@ -19,5 +13,5 @@ class CLI {
         std::vector<std::string> args;
         std::vector<std::unique_ptr<Command>> commands;
 
-        int parseCommand(); 
+        int parseCommand();
 };

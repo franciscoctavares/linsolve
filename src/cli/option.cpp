@@ -2,9 +2,8 @@
 #include "errors.hpp"
 #include "cli/cli_utils.hpp"
 
-template<>
-Option<MyVariant>::Option(const std::pair<std::optional<std::string>, std::optional<std::string>> newFlags, bool argReq, bool argForce, bool exclusive) 
-    : flags(newFlags), argForce(argReq), argForceType(argForce), isExclusive(exclusive) {
+Option::Option(const std::pair<std::optional<std::string>, std::optional<std::string>> newFlags, bool argReq, bool argForce, bool exclusive, const std::string& optionDescription) 
+    : flags(newFlags), description(optionDescription), argForce(argReq), argForceType(argForce), isExclusive(exclusive), isUsed(false) {
 
     if(!flags.first.has_value() && !flags.second.has_value())
         throw NoFlagsException("A flag must have a short form or a long form. You provided none");
@@ -34,5 +33,5 @@ Option<MyVariant>::Option(const std::pair<std::optional<std::string>, std::optio
         }
     }
 
-    isUsed = false;
+    //isUsed = false;
 }
