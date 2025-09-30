@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include <vector>
 #include <string>
-#include <map>
 #include <stdexcept>
 
 enum class BranchingStrategy {
@@ -28,14 +27,6 @@ struct PerformanceMetrics {
     uint optimalSolutionDepth;
 };
 
-std::vector<ExplorationStrategy> getPossibleExplorationStrategies();
-std::vector<BranchingStrategy> getPossibleBranchingStrategies();
-
-std::string convertExplorStratToString(ExplorationStrategy strat);
-ExplorationStrategy convertStringToExplorStrat(const std::string& stratString);
-
-std::string convertBranchStratToString(BranchingStrategy strat);
-
 template<typename T>
 class StratMap {
     public:
@@ -57,6 +48,14 @@ class StratMap {
             }
 
             throw std::invalid_argument("Value not found");
+        }
+
+        std::vector<T> getAllStrats() {
+            std::vector<T> resultMap;
+            for(const std::pair<std::string, T>& currentPair : map) {
+                resultMap.push_back(currentPair.second);
+            }
+            return resultMap;
         }
     private:
         std::vector<std::pair<std::string, T>> map;
