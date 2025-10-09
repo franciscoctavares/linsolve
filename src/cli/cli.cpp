@@ -53,24 +53,6 @@ CLI::CLI(int argc, char** argv) {
         args.emplace_back(std::string(argv[i]));
     }
 
-    const std::string helpMessage = R"(Usage: linsolve [OPTIONS] COMMAND [ARGS]...
-
-A CLI tool for solving Linear and Integer Programming problems.
-
-Options:
-  -h, --help        Show this message and exit
-
-Commands:
-  solve         Solve a Linear or Integer Programming problem
-  benchmark     Benchmark the speed and efficiency of different settings
-
-Run 'linsolve COMMAND --help' for more information on a command.)";
-
-    Commands::DefaultCommand def(helpMessage);
-    commands.push_back(std::make_unique<Commands::DefaultCommand>(helpMessage));
-
-    Commands::Solve solve("wdgwigdiugwuidiwb");
-    commands.push_back(std::make_unique<Commands::Solve>("solve command help message"));
-
-    //commands.push_back(Commands::DefaultCommand(helpMessage));
+    commands.push_back(std::make_unique<Commands::DefaultCommand>("A command line tool to solve Linear and Integer programming problems"));
+    commands.push_back(std::make_unique<Commands::Solve>("Solve a Linear or Integer programming problem"));
 }

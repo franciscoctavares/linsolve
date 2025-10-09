@@ -9,12 +9,6 @@
 
 namespace Commands {
 
-DefaultCommand::DefaultCommand(const std::string& newHelpMessage) : Command("", newHelpMessage) {
-    Option helpOption({"-h", "--help"}, true, false, true, "Displays information about a command");
-    options.emplace_back(helpOption);
-    settings.help = false;
-}
-
 void DefaultCommand::parseOptions(std::vector<std::string>& args) {
     bool isAnythingUsed = false;
     bool isThisOptionValid = false;
@@ -68,7 +62,8 @@ void DefaultCommand::displayHelpMessage() {
 
     std::cout << "Usage: linsolve [OPTIONS] COMMAND [ARGS]...\n\n";
 
-    std::cout << "A CLI tool for solving Linear and Integer Programming problems.\n\n";
+    //std::cout << "A CLI tool for solving Linear and Integer Programming problems.\n\n";
+    std::cout << std::format("{}\n\n", description);
 
     std::cout << "Commands:\n";
     std::cout << "  solve\t\tSolve a Linear or Integer Programming problem\n";
@@ -83,8 +78,6 @@ void DefaultCommand::displayHelpMessage() {
             std::cout << ", " <<  currentOption.getFlags().second.value();
 
         std::cout << "\t" << currentOption.getDescription() << "\n";
-
-        //std::cout << "\n";
     }
 
     std::cout << "\nRun 'linsolve COMMAND --help' for more information on a specific command.\n";

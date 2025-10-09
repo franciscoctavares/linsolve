@@ -32,17 +32,16 @@ void Solve::prepareSettings() {
 
     if(!settings.help) {
         settings.fileName = options[1].getArg().value() + ".lp";
-        settings.explorStrat = explorMap[options[3].getArg().value()];
-        settings.branchStrat = branchMap[options[4].getArg().value()];
-        settings.multithreading = options[2].getIsUsed();
-        settings.showResults = options[5].getIsUsed();
-    }
 
-    //settings.fileName = static_cast<std::string>(options[1].getArg().value()) + ".lp";
+        settings.explorStrat = options[3].getArg().has_value() ? explorMap[options[3].getArg().value()] : explorMap["BEST_VALUE"];
+        settings.branchStrat = options[4].getArg().has_value() ? branchMap[options[4].getArg().value()] : branchMap["BEST_COEFFICIENT"];
+        
+        settings.multithreading = options[2].getIsUsed();
+        settings.showResults = options[5].getIsUsed() ? true : true;
+    }
 }
 
 void Solve::runCommand() {
-    //std::cout << "Executing solve command...\n";
     prepareSettings();
     if(settings.help) {
         displayHelpMessage();
