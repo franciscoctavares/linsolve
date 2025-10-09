@@ -12,7 +12,7 @@ CXXFLAGS := -Wall -Wextra -Werror -I$(INCLUDE_DIR) -O$(OPTIM_LEVEL) -std=c++$(CP
 EXTRA_FLAGS := -pthread
 TARGET := $(BIN_DIR)/main
 
-INSTALL_PATH := /usr/bin
+INSTALL_PATH := /usr/local/bin
 
 all: $(TARGET)
 
