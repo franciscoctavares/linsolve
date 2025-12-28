@@ -92,7 +92,7 @@ class SimplexSolver {
 
         void computeOriginalProblemSolution(std::pair<const Matrix&, SolutionType>& simplifiedResult, SimplifierHelper& helper);
 
-        std::size_t computePivotColumn(Matrix& cj_minus_zj);
+        int computePivotColumn(Matrix& cj_minus_zj);
 };
 
 bool isNumberCloseToInteger(double number, int integerToCheck, double epsilon = 1e-10);

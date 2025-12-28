@@ -528,11 +528,15 @@ Matrix basisVector(int size, int index) {
         throw std::invalid_argument(errorMsg.str());
     }
 
+    /*
     std::vector<double> vec;
     for(int i = 0; i < size; i++) {
         if(i == index) vec.push_back(1.0);
         else vec.push_back(0.0);
     }
+    */
+    std::vector<double> vec(size, 0.0);
+    vec[index] = 1.0;
     return Matrix(vec, size, 1);
 }
 

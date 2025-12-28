@@ -48,7 +48,6 @@ void BaBTree::updateIncumbentSolution(BaBNode* candidate, BaBNode*& incumbentSol
 
 void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes, bool multithreading) {
     if(multithreading) {
-        //std::cout << "Solving with multithreading..." << std::endl;
         std::thread t1(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 2]);
         std::thread t2(&BaBNode::solveNode, nodeQueue[nodeQueue.size() - 1]);
 
@@ -56,7 +55,6 @@ void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes
         t2.join();
     }
     else {
-        //std::cout << "Solving without multithreading..." << std::endl;
         nodeQueue[nodeQueue.size() - 2]->solveNode();
         nodeQueue[nodeQueue.size() - 1]->solveNode();
     }
@@ -65,28 +63,32 @@ void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes
 }
 
 void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrategy strategy) {
-	if(strategy == ExplorationStrategy::BEST_VALUE) {
-		std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
-			if(node1->getProblem().getType() == LP::MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
-			else return node1->getObjectiveFunctionValue() < node2->getObjectiveFunctionValue();
-		});
-	}
-	else if(strategy == ExplorationStrategy::RANDOM_NODE) {
-		std::random_device rd;
-		std::mt19937 g(rd());
-
-		std::shuffle(nodeQueue.begin(), nodeQueue.end(), g);
-	}
-	else if(strategy == ExplorationStrategy::WIDTH) {
-		std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
-			return node1->getDepth() < node2->getDepth();
-		});
-	}
-	else if(strategy == ExplorationStrategy::DEPTH) {
-		std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
-			return node1->getDepth() > node2->getDepth();
-		});
-	}
+    switch (strategy) {
+        case ExplorationStrategy::BEST_VALUE:
+            std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
+			    if(node1->getProblem().getType() == LP::MAX) return node1->getObjectiveFunctionValue() > node2->getObjectiveFunctionValue();
+			    else return node1->getObjectiveFunctionValue() < node2->getObjectiveFunctionValue();
+		    });
+            break;
+        case ExplorationStrategy::RANDOM_NODE: {
+            std::random_device rd;
+		    std::mt19937 g(rd());
+		    std::shuffle(nodeQueue.begin(), nodeQueue.end(), g);
+            break;
+        }
+        case ExplorationStrategy::WIDTH:
+            std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
+			    return node1->getDepth() < node2->getDepth();
+	        });
+            break;
+        case ExplorationStrategy::DEPTH:
+            std::sort(nodeQueue.begin(), nodeQueue.end(), [](BaBNode*& node1, BaBNode*& node2) {
+			    return node1->getDepth() > node2->getDepth();
+		    });
+            break;
+        default:
+            break;
+    }
 }
 
 // PUBLIC METHODS

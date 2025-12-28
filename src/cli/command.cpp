@@ -44,11 +44,10 @@ void Command::parseOptions(std::vector<std::string>& args) {
 void Command::displayHelpMessage() {
     std::cout << std::format("Usage: linsolve {} [OPTIONS] [ARGS]...\n\n", name);
 
-    //std::cout << "A command line tool for solving Linear and Integer Programming problems.\n\n";
     std::cout << std::format("{}\n\n", description);
 
     std::cout << "\nOptions:\n";
-    for(Option& currentOption : options) {
+    for(const Option& currentOption : options) {
         std::cout << "  ";
         if(currentOption.getFlags().first.has_value())
             std::cout << currentOption.getFlags().first.value();

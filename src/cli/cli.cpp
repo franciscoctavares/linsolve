@@ -9,6 +9,7 @@
 
 #include "cli/commands/default_command.hpp"
 #include "cli/commands/solve.hpp"
+#include "cli/commands/benchmark.hpp"
 
 // PRIVATE METHODS
 
@@ -37,7 +38,7 @@ void CLI::run() {
         else if(typedCommandIndex == -1 && isFlag(args[1])) typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
         //else typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
 
-        //std::cout << "Typed command is " << typedCommandIndex << " " << commands[typedCommandIndex]->getName() << std::endl;
+        //std::cout << "Typed command is " << commands[typedCommandIndex]->getName() << std::endl;
         commands[typedCommandIndex]->parseOptions(args);
         commands[typedCommandIndex]->runCommand();
     }
@@ -55,4 +56,5 @@ CLI::CLI(int argc, char** argv) {
 
     commands.push_back(std::make_unique<Commands::DefaultCommand>("A command line tool to solve Linear and Integer programming problems"));
     commands.push_back(std::make_unique<Commands::Solve>("Solve a Linear or Integer programming problem"));
+    commands.push_back(std::make_unique<Commands::Benchmark>());
 }

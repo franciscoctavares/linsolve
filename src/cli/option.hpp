@@ -8,7 +8,7 @@
 
 class Option {
     public:
-        constexpr Option(const std::pair<std::optional<std::string_view>, std::optional<std::string_view>> newFlags, bool argReq, bool argForce, bool exclusive, const std::string& optionDescription)
+        constexpr Option(const std::pair<std::optional<std::string_view>, std::optional<std::string_view>> newFlags, bool argReq, bool argForce, bool exclusive, const std::string_view optionDescription)
             : flags(newFlags), description(optionDescription), argForce(argReq), argForceType(argForce), isExclusive(exclusive), isUsed(false), arg(std::nullopt) {
 
             if(!flags.first.has_value() && !flags.second.has_value())

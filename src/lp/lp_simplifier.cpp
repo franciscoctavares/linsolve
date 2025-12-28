@@ -155,14 +155,7 @@ SimplifierHelper LPSimplifier::computeSimplifierHelper(LpProblem& originalProble
     return helper;
 }
 
-void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelper& helper) {
-    /*
-    for(uint currentConstraintToRemove : helper.constraintsToRemove) {
-        std::cout << currentConstraintToRemove << " ";
-    }
-    */
-
-    
+void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelper& helper) {    
     if(helper.isHelperEmpty()) {
         return;
     }
@@ -172,26 +165,14 @@ void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelpe
         for(int i = helper.constraintsToRemove.size() - 1; i >= 0; i--) {
             problemToSimplify.removeConstraint(helper.constraintsToRemove[i]);
         }
-        /*
-        for(int i = 0; i < helper.constraintsToRemove.size(); i++) {
-            problemToSimplify.removeConstraint(helper.constraintsToRemove[i]);
-        }
-        */
     }
 
     // remove all fixed variables
     if(helper.fixedVariables.size() > 0) {
-        /*
-        for(std::pair<uint, double>& currentFixedVar : helper.fixedVariables) {
-            problemToSimplify.removeFixedVariable(currentFixedVar.first, currentFixedVar.second);
-        }
-        */
-
         for(int i =  helper.fixedVariables.size() - 1; i >= 0; i--) {
             problemToSimplify.removeFixedVariable(helper.fixedVariables[i].first, helper.fixedVariables[i].second);
         }
     }
-
 }
 
 }

@@ -3,8 +3,10 @@
 #include "matrix.hpp"
 #include <sys/types.h>
 #include <vector>
-#include <string>
+#include <string_view>
 #include <stdexcept>
+#include <cstddef>
+#include <array>
 
 enum class BranchingStrategy {
     FIRST_INDEX,
@@ -27,46 +29,48 @@ struct PerformanceMetrics {
     uint optimalSolutionDepth;
 };
 
-template<typename T>
+template<typename T, std::size_t N>
 class StratMap {
     public:
-        StratMap(std::vector<std::pair<std::string, T>> newMap) { map = newMap; }
+        constexpr StratMap(const std::array<std::pair<std::string_view, T>, N> newMap) : map(newMap) {}
 
-        void insert(std::pair<std::string, T> newPair) { map.insert(newPair); }
-
-        T operator[](const std::string& key) const {
-            for(const std::pair<std::string, T>& currentPair : map) {
+        constexpr T operator[](const std::string_view& key) const {
+            for(const std::pair<std::string_view, T>& currentPair : map) {
                 if(currentPair.first == key) return currentPair.second;
             }
 
             throw std::invalid_argument("Key not found");
         }
 
-        std::string operator[](T value) const {
-            for(const std::pair<std::string, T>& currentPair : map) {
+        constexpr std::string_view operator[](T value) const {
+            for(const std::pair<std::string_view, T>& currentPair : map) {
                 if(currentPair.second == value) return currentPair.first;
             }
 
             throw std::invalid_argument("Value not found");
         }
 
-        std::vector<T> getAllStrats() {
-            std::vector<T> resultMap;
-            for(const std::pair<std::string, T>& currentPair : map) {
-                resultMap.push_back(currentPair.second);
+        std::array<T, N> getAllStrats() const {
+            std::array<T, N> resultMap;
+            for(std::size_t i = 0; i < map.size(); i++) {
+                resultMap[i] = map[i].second;
             }
             return resultMap;
         }
     private:
-        std::vector<std::pair<std::string, T>> map;
+        const std::array<std::pair<std::string_view, T>, N> map;
 };
 
-inline StratMap<ExplorationStrategy> explorMap({{"EXPLORE_ALL_NODES", ExplorationStrategy::EXPLORE_ALL_NODES},
-                                         {"BEST_VALUE", ExplorationStrategy::BEST_VALUE},
-                                         {"WIDTH", ExplorationStrategy::WIDTH},
-                                         {"DEPTH", ExplorationStrategy::DEPTH},
-                                         {"RANDOM_NODE", ExplorationStrategy::RANDOM_NODE}});
+inline constexpr StratMap<ExplorationStrategy, 5> explorMap({{
+                                        {"EXPLORE_ALL_NODES", ExplorationStrategy::EXPLORE_ALL_NODES},
+                                        {"BEST_VALUE", ExplorationStrategy::BEST_VALUE},
+                                        {"WIDTH", ExplorationStrategy::WIDTH},
+                                        {"DEPTH", ExplorationStrategy::DEPTH},
+                                        {"RANDOM_NODE", ExplorationStrategy::RANDOM_NODE}
+                                        }});
 
-inline StratMap<BranchingStrategy> branchMap({{"FIRST_INDEX", BranchingStrategy::FIRST_INDEX},
-                                       {"RANDOM_VAR", BranchingStrategy::RANDOM_VAR},
-                                       {"BEST_COEFFICIENT", BranchingStrategy::BEST_COEFFICIENT}});
+inline constexpr StratMap<BranchingStrategy, 3> branchMap({{
+                                        {"FIRST_INDEX", BranchingStrategy::FIRST_INDEX},
+                                        {"RANDOM_VAR", BranchingStrategy::RANDOM_VAR},
+                                        {"BEST_COEFFICIENT", BranchingStrategy::BEST_COEFFICIENT}
+                                        }});

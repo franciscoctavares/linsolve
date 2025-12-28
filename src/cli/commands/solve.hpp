@@ -18,7 +18,7 @@ struct SolverSettings {
 
 class Solve : public Command {
     public:
-        Solve(const std::string& newHelpMessage);
+        Solve(const std::string& commandDescription);
         void prepareSettings();
         void runCommand() override;
     private:

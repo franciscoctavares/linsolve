@@ -7,6 +7,8 @@
 #include <cmath>
 #include <format>
 #include <cstddef>
+#include <optional>
+#include <array>
 
 namespace LP {
     
@@ -42,42 +44,33 @@ std::size_t SimplexSolver::getPivotRow(Matrix& simplexAux, Matrix& bAux) {
 }
 
 Matrix SimplexSolver::getBasisIndexes(Matrix& extraCj) {
-    std::vector<std::pair<int, int>> restrictionsIndices(problem.getConstraints().size(), {-1, -1});
-    std::vector<ConstraintType> constraintsTypes;
-
-    for(const Constraint& currentConstraint : problem.getConstraints()) {
-        constraintsTypes.push_back(currentConstraint.getType());
-    }
-
+    // -2   -> non existant
+    // -1   -> no value
+    // >= 0 -> valid value
+    std::vector<std::pair<int, int>> restrictionsIndices;
 
     unsigned n_slack_surplus_variables = 0;
     unsigned totalExtraVariables = extraCj.getNColumns();
     unsigned currentCoefficient = 0;
     for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
-        if(constraintsTypes[i] == LESS_THAN_OR_EQUAL) {
-            restrictionsIndices[i].first = currentCoefficient;
-            currentCoefficient++;
-            restrictionsIndices[i].second = -2; // nas restrições <= não há variáveis artificiais
-            n_slack_surplus_variables++;
-        }
-        else if(constraintsTypes[i] == GREATER_THAN_OR_EQUAL) {
-            restrictionsIndices[i].first = currentCoefficient;
+        if(problem.getConstraints()[i].getType() == LESS_THAN_OR_EQUAL) {
+            // nas restrições <= não há variáveis artificiais
+            restrictionsIndices.emplace_back(currentCoefficient, -2);
             currentCoefficient++;
             n_slack_surplus_variables++;
         }
-        else if(constraintsTypes[i] == EQUAL) {
-            restrictionsIndices[i].first = -2; // nas restrições = não há coeficiente do zero
+        else if(problem.getConstraints()[i].getType() == GREATER_THAN_OR_EQUAL) {
+            restrictionsIndices.emplace_back(currentCoefficient, -1);
+            currentCoefficient++;
+            n_slack_surplus_variables++;
+        }
+        else if(problem.getConstraints()[i].getType() == EQUAL) {
+            restrictionsIndices.emplace_back(-2, -1);
         }
     }
 
-
-
     std::vector<unsigned> artificialRestrictions;
-    for(std::size_t i = 0; i < constraintsTypes.size(); i++) {
-        /*
-        if(restrictionsIndices[i].second == -2) continue;
-        else if(restrictionsIndices[i].second == -1) artificialRestrictions.push_back(i);
-        */
+    for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
         if(restrictionsIndices[i].second == -1) artificialRestrictions.push_back(i);
     }
 
@@ -94,16 +87,12 @@ Matrix SimplexSolver::getBasisIndexes(Matrix& extraCj) {
     }
 
     std::vector<double> basisIndices;
-    for(std::size_t i = 0; i < constraintsTypes.size(); i++) {
-        if(constraintsTypes[i] == LESS_THAN_OR_EQUAL) basisIndices.push_back(restrictionsIndices[i].first);
+    for(std::size_t i = 0; i < problem.getConstraints().size(); i++) {
+        if(problem.getConstraints()[i].getType() == LESS_THAN_OR_EQUAL) basisIndices.push_back(restrictionsIndices[i].first);
         else basisIndices.push_back(restrictionsIndices[i].second);
-        /*
-        else if(constraintsTypes[i] == GREATER_THAN_OR_EQUAL) basisIndices.push_back(restrictionsIndices[i].second);
-        else if(constraintsTypes[i] == EQUAL) basisIndices.push_back(restrictionsIndices[i].second);
-        */
     }
     
-    return Matrix(basisIndices, constraintsTypes.size(), 1);
+    return Matrix(basisIndices, problem.getConstraints().size(), 1);
 }
 
 Matrix SimplexSolver::getConstraintsLHS() {
@@ -486,42 +475,37 @@ void SimplexSolver::computeOriginalProblemSolution(std::pair<const Matrix&, Solu
     }
 }
 
-std::size_t SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
-    std::vector<std::pair<std::size_t, double>> validIndexes;
-    std::vector<std::size_t> zeroIndexes;
-
-    for(size_t i = 0; i < cj_minus_zj.getNColumns(); i++) {
-        if(cj_minus_zj.getElement(0, i) == 0) {
-            zeroIndexes.push_back(i);
-            validIndexes.push_back({i, cj_minus_zj.getElement(0, i)});
-        }
-        else if(cj_minus_zj.getElement(0, i) > 0) {
-            validIndexes.push_back({i, cj_minus_zj.getElement(0, i)});
-        }
-    }
-
-    //std::cout << std::format("valid({}), zeros({})", validIndexes.size(), zeroIndexes.size()) << std::endl;
+int SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
     /*
-    for(size_t i = 0; i < validIndexes.size(); i++) {
-        std::cout << validIndexes[i].second << " ";
+    int maxColumnIndex = -1;
+
+    for(std::size_t i = 0; i < cj_minus_zj.getNColumns(); i++) {
+        if(cj_minus_zj.getElement(0, i) >= 0) {
+            if(maxColumnIndex == -1) maxColumnIndex = i;
+            else {
+                if(cj_minus_zj.getElement(0, i) > cj_minus_zj.getElement(0, maxColumnIndex))
+                    maxColumnIndex = i;
+            }
+        }
     }
-    std::cout << std::endl;
-    for(size_t i = 0; i < zeroIndexes.size(); i++) {
-        std::cout << cj_minus_zj.getElement(0, zeroIndexes[i]) << " ";
-    }
-    std::cout << std::endl;
+
+    return maxColumnIndex;
     */
-    /*
-    if(zeroIndexes.size() > 0 && validIndexes.size() == zeroIndexes.size()) {
-        //std::cout << "Bland's rule..." << std::endl;
-        return validIndexes[0].first;
+
+    std::optional<int> maxColumnIndex = std::nullopt;
+    double currentElement, maxElement;
+
+    for(std::size_t i = 0; i < cj_minus_zj.getNColumns(); i++) {
+        currentElement = cj_minus_zj.getElement(0, i);
+        if(currentElement >= 0) {
+            if(!maxColumnIndex.has_value() || (maxColumnIndex.has_value() && currentElement > maxElement)) {
+                maxColumnIndex = i;
+                maxElement = currentElement;
+            }
+        }
     }
-    else {
-        //std::cout << "Normal pivoting..." << std::endl;
-        return cj_minus_zj.maxValueIndex();
-    }
-    */
-    return cj_minus_zj.maxValueIndex();
+
+    return maxColumnIndex.has_value() ? maxColumnIndex.value() : -1;
 }
 
 // PUBLIC METHODS
