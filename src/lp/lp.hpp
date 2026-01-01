@@ -96,7 +96,6 @@ class LpProblem {
          * @throw std::invalid_argument - if `varIndex` < 0 or `varIndex` >= `objectiveFunction.getNColumns()`
          */
         void removeFixedVariable(int varIndex, double fixedVarValue);
-
 };
 
 }

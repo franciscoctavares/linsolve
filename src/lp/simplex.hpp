@@ -95,6 +95,4 @@ class SimplexSolver {
         int computePivotColumn(Matrix& cj_minus_zj);
 };
 
-bool isNumberCloseToInteger(double number, int integerToCheck, double epsilon = 1e-10);
-
 }

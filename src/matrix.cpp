@@ -11,12 +11,12 @@
 Matrix::Matrix(std::vector<double> newElements, int rows, int columns) {
     if(rows <= 0) {
         std::ostringstream errorMsg;
-        errorMsg << "Error using Matrix(class constructor): nRows must be a positive number but the value provided was " << nRows;
+        errorMsg << "Error using Matrix(class constructor): nRows must be a positive number but the value provided was " << rows;
         throw std::invalid_argument(errorMsg.str());
     }
     if(columns <= 0) {
         std::ostringstream errorMsg;
-        errorMsg << "Error using Matrix(class constructor): nColumns must be a positive number but the value provided was " << nColumns;
+        errorMsg << "Error using Matrix(class constructor): nColumns must be a positive number but the value provided was " << columns;
         throw std::invalid_argument(errorMsg.str());
     }
     if(static_cast<std::size_t>(rows * columns) != newElements.size()) {

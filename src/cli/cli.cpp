@@ -38,7 +38,6 @@ void CLI::run() {
         else if(typedCommandIndex == -1 && isFlag(args[1])) typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
         //else typedCommandIndex++; // commands[0] is default, "linsolve --help" for example
 
-        //std::cout << "Typed command is " << commands[typedCommandIndex]->getName() << std::endl;
         commands[typedCommandIndex]->parseOptions(args);
         commands[typedCommandIndex]->runCommand();
     }

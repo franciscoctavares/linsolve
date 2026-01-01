@@ -208,8 +208,7 @@ Matrix SimplexSolver::extraVariablesMatrix() {
 
 std::vector<Matrix> SimplexSolver::initialSimplexTableau() {
     Matrix simplexTableau = getConstraintsLHS();
-
-    Matrix extraVars = extraVariablesMatrix();    
+    Matrix extraVars = extraVariablesMatrix();
     simplexTableau.stackHorizontal(extraVars);
 
     Matrix b = getConstraintsRHS();
@@ -408,6 +407,11 @@ void SimplexSolver::solveSimplex() {
 
             problem.setOptimalSolution(Matrix({0}, 1, 1));
             isOptimalSolutionWhole();
+
+            if(problem.getOptimalSolution() == Matrix({0}, 1, 1)) {
+                //std::cout << "Its infeasible\n\n";
+                problem.setSolutionType(INFEASIBLE);
+            }
             return;
         }
     }
@@ -456,6 +460,21 @@ void SimplexSolver::computeOriginalProblemSolution(std::pair<const Matrix&, Solu
 
             for(const std::pair<uint, double>& fixedVars : helper.fixedVariables) {
                 problem.getOptimalSolution().setElement(0, fixedVars.first, fixedVars.second);
+            }
+
+            if(!isSolutionAdmissible(problem.getOptimalSolution())) {
+                problem.setSolutionType(INFEASIBLE);
+            }
+        }
+
+        if(!helper.isHelperEmpty()) {
+            if(!isSolutionAdmissible(problem.getOptimalSolution())) {
+                problem.setSolutionType(INFEASIBLE);
+            }
+        }
+        else {
+            if(!isSolutionAdmissible(problem.getOptimalSolution())) {
+                problem.setSolutionType(INFEASIBLE);
             }
         }
     }
@@ -513,23 +532,48 @@ int SimplexSolver::computePivotColumn(Matrix& cj_minus_zj) {
 std::pair<Matrix, SolutionType> SimplexSolver::runSolver() {
     SimplifierHelper helper = LPSimplifier::computeSimplifierHelper(problem);
 
+    //problem.displayProblem();
+
     if(helper.isHelperEmpty()) {
         solveSimplex();
         return std::make_pair(problem.getOptimalSolution(), problem.getSolutionType());
     }
     else {
-        LpProblem simplifiedProblem(problem);
 
-        LPSimplifier::simplifyProblem(simplifiedProblem, helper);
+        if(helper.fixedVariables.size() == problem.getObjectiveFunction().getNColumns()) {
+            std::vector<double> wholeSolution(problem.getObjectiveFunction().getNColumns(), 0.0);
+            for(const std::pair<uint, double>& i : helper.fixedVariables) {
+                wholeSolution[i.first] = i.second;
+            }
 
-        SimplexSolver simplifiedSolver(simplifiedProblem);
-        simplifiedSolver.solveSimplex();
+            if(problem.isSolutionAdmissible(Matrix(wholeSolution, 1, problem.getObjectiveFunction().getNColumns()))) {
+                return std::make_pair(Matrix(wholeSolution, 1, problem.getObjectiveFunction().getNColumns()), WHOLE_SOLUTION);
+            }
+            else {
+                return std::make_pair(Matrix(wholeSolution, 1, problem.getObjectiveFunction().getNColumns()), INFEASIBLE);
+            }
+        }
+        else {
+            LpProblem simplifiedProblem(problem);
 
-        std::pair<const Matrix&, SolutionType> simplifiedResult = {simplifiedProblem.getOptimalSolution(), simplifiedProblem.getSolutionType()};
+            LPSimplifier::simplifyProblem(simplifiedProblem, helper);
 
-        computeOriginalProblemSolution(simplifiedResult, helper);
+            SimplexSolver simplifiedSolver(simplifiedProblem);
+            simplifiedSolver.solveSimplex();
 
-        return std::make_pair(problem.getOptimalSolution(), problem.getSolutionType());
+            std::pair<const Matrix&, SolutionType> simplifiedResult = {simplifiedProblem.getOptimalSolution(), simplifiedProblem.getSolutionType()};
+
+            computeOriginalProblemSolution(simplifiedResult, helper);
+
+            /*
+            if(!problem.isSolutionAdmissible(problem.getOptimalSolution())) {
+                problem.setSolutionType(INFEASIBLE);
+                return std::make_pair(problem.getOptimalSolution(), INFEASIBLE);
+            }
+            */
+
+            return std::make_pair(problem.getOptimalSolution(), problem.getSolutionType());
+        }
     }
 }
 

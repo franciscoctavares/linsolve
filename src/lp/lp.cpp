@@ -55,7 +55,7 @@ void LpProblem::displayProblem() {
             std::cout << std::format("{:.3f}\n", currentElement);
             //std::cout << std::setprecision(3) << std::fixed << objectiveFunction.getElement(0, i);
         else if(currentElement != 1 && isNumberAnInteger(currentElement))
-            std::cout << std::format("{:d}", static_cast<std::size_t>(currentElement));
+            std::cout << std::format("{:d}", static_cast<std::size_t>(std::round(currentElement)));
             //std::cout << unsigned(currentElement);
         std::cout << "x" << i + 1;
 
@@ -106,7 +106,8 @@ void LpProblem::displayProblem() {
         }
         std::cout << ") = (";
         for(std::size_t i = 0; i < optimalSolution.getNColumns(); i++) {
-            if(floor(optimalSolution.getElement(0, i)) == optimalSolution.getElement(0, i)) std::cout << unsigned(optimalSolution.getElement(0, i));
+            //if(floor(optimalSolution.getElement(0, i)) == optimalSolution.getElement(0, i)) std::cout << unsigned(optimalSolution.getElement(0, i));
+            if(isNumberAnInteger(optimalSolution.getElement(0, i))) std::cout << unsigned(optimalSolution.getElement(0, i));
             else std::cout << std::setprecision(3) << std::fixed << optimalSolution.getElement(0, i);
             if(i < optimalSolution.getNColumns() - 1) std::cout << ", ";
         }

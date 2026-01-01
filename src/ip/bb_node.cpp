@@ -74,9 +74,6 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
                 return a.second < b.second;
             });
 
-
-        //std::cout << std::format("Branching var = {}, Branching var value = {}", continuousVars[0].first, currentSolution.getElement(0, continuousVars[0].first)) << std::endl;
-
         return std::make_pair(continuousVars[0].first, currentSolution.getElement(0, continuousVars[0].first));
     }
 
