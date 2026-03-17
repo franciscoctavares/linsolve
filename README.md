@@ -45,20 +45,8 @@ By default, this command will copy the binary to a directory which most systems 
 ## Usage
 
 ## Features
-* Simplex method for LP problems
-* Branch and Bound method for pure IP problems
-    * Exploration strategies:
-        * EXPLORE_ALL_NODES
-        * BEST_OBJECTIVE_FUNCTION_VALUE
-        * RANDOM
-        * WIDTH
-        * DEPTH
-    * Branching strategies
-        * FIRST_INDEX
-        * RANDOM_VAR
-        * BEST_COEFFICIENT
-    * Fathoming of nodes with continuous solutions worse than current incumbent solution
-    * Performance metrics(explored nodes and execution time)
+* Simplex method as base solver
+* Branch and Bound method for Integer Programming problems
 
 ## Currently working on
 * MILP(Mixed Integer Linear Programming) support, in which any variable can be a real number(continuous), an integer, or binary
