@@ -61,7 +61,6 @@ By default, this command will copy the binary to a directory which most systems 
     * Performance metrics(explored nodes and execution time)
 
 ## Currently working on
-* PBP(Pure Binary programming) support
 * MILP(Mixed Integer Linear Programming) support, in which any variable can be a real number(continuous), an integer, or binary
 
 ## Planned Features
