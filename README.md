@@ -49,9 +49,10 @@ By default, this command will copy the binary to a directory which most systems 
 * Branch and Bound method for Integer Programming problems
 
 ## Currently working on
-* MILP(Mixed Integer Linear Programming) support, in which any variable can be a real number(continuous), an integer, or binary
+* Reworking the simplifier to improve Branch and Bound efficiency
 
 ## Planned Features
+* MILP(Mixed Integer Linear Programming) support, in which any variable can be a real number(continuous), an integer, or binary
 * More branching/exploration strategies
 * Better syntax support(easier model comprehension)
 * Support for more model file formats, similar to LPSolve
