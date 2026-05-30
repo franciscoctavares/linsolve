@@ -41,7 +41,7 @@ class Option {
         }
 
         const std::pair<std::optional<std::string_view>, std::optional<std::string_view>>& getFlags() const { return flags; }
-        const std::string_view& getDescription() const { return description; }
+        const std::string& getDescription() const { return description; }
         bool getArgForce() const { return argForce; }
         bool getArgForceType() const { return argForceType; }
         bool getIsExclusive() const { return isExclusive; }
@@ -53,7 +53,7 @@ class Option {
 
     private:
         const std::pair<std::optional<std::string_view>, std::optional<std::string_view>> flags; // example - {"-h", "--help"}
-        const std::string_view description;
+        const std::string description;
 
         const bool argForce;
         const bool argForceType;

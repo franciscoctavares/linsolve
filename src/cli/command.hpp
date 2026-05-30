@@ -15,14 +15,14 @@ class Command {
     public:
         constexpr Command(const std::string_view commandName, const std::string_view commandDescription) : name(commandName), description(commandDescription) {}
         
-        const std::string_view getName() const { return name; }
-        const std::string_view getDescription() const { return description; }
+        const std::string& getName() const { return name; }
+        const std::string& getDescription() const { return description; }
 
         virtual void parseOptions(std::vector<std::string>& args);
         virtual void displayHelpMessage();
         virtual void runCommand() = 0;
     protected:
         std::vector<Option> options;
-        const std::string_view name;
-        const std::string_view description;
+        const std::string name;
+        const std::string description;
 };
