@@ -149,7 +149,8 @@ Matrix Matrix::operator*(Matrix matrix) {
             for(std::size_t j = 0; j < matrix.nColumns; j++) {
                 aux = 0;
                 for(std::size_t k = 0; k < nColumns; k++) {
-                    aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nRows + j];
+                    //aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nRows + j];
+                    aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nColumns + j];
                 }
                 newMatrix.elements[i * matrix.nColumns + j] = aux;
             }
