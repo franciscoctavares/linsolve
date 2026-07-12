@@ -1,6 +1,9 @@
 add_executable(unit_tests)
 
-add_subdirectory(matrix)
+target_sources(unit_tests
+    PRIVATE
+        matrix.cpp
+)
 
 target_link_libraries(unit_tests
     PRIVATE
