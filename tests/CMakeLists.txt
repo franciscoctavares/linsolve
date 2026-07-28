@@ -3,6 +3,7 @@ add_executable(unit_tests)
 target_sources(unit_tests
     PRIVATE
         matrix.cpp
+        constraint.cpp
 )
 
 target_link_libraries(unit_tests
