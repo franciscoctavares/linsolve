@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
 add_subdirectory(external/Catch2)
+add_subdirectory(external/tabulate)
 add_subdirectory(tests)
 
 file(GLOB_RECURSE LINSOLVE_SOURCES
@@ -19,11 +20,13 @@ list(REMOVE_ITEM LINSOLVE_SOURCES
 
 add_library(linsolve_lib
     ${LINSOLVE_SOURCES}
+
 )
 
 target_include_directories(linsolve_lib
     PUBLIC
     src
+    external/tabulate
 )
 
 target_compile_options(linsolve_lib

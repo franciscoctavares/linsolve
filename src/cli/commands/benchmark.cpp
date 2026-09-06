@@ -1,5 +1,5 @@
 #include "cli/commands/benchmark.hpp"
-#include "tabulate.hpp"
+#include "single_include/tabulate/tabulate.hpp"
 #include <algorithm>
 #include "lp/lp.hpp"
 #include "model_reader.hpp"
@@ -79,7 +79,10 @@ void Benchmark::runBenchmark() {
 
             for(std::size_t k = 0; k < settings.iterations; k++) {
                 LP::LpProblem initialProblem = ModelFileReader::readModel(settings.file);
-                BaBTree tree(initialProblem);
+                std::vector<VariableType> varTypes;
+                for(uint i = 0; i < initialProblem.getObjectiveFunction().getNColumns(); i++) varTypes.push_back(VariableType::INTEGER);
+
+                BaBTree tree(initialProblem, varTypes);
                 bool multithreading = false;
                 Matrix optimalWholeSolution = tree.solveTree(currentExplorStrat, currentBranchStrat, multithreading);
 
