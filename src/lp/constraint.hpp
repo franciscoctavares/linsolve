@@ -13,7 +13,7 @@ class Constraint {
     public:
         Constraint(void) = default;
 
-        Constraint(std::vector<double>& newLhs, const std::string& newConstraintType, double newRhs);
+        Constraint(const std::vector<double>& newLhs, const std::string& newConstraintType, double newRhs);
 
         const std::vector<double>& getLhs() const { return lhs; }
 
