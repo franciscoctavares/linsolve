@@ -4,6 +4,7 @@ target_sources(unit_tests
     PRIVATE
         matrix.cpp
         constraint.cpp
+        lp_simplifier.cpp
 )
 
 target_link_libraries(unit_tests

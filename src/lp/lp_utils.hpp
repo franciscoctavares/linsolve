@@ -21,6 +21,8 @@ struct SimplifierHelper {
     bool isHelperEmpty() { return fixedVariables.size() == 0 && constraintsToRemove.size() == 0 && pairsOfVars.size() == 0; }
 
     void displayConstraintsToRemove();
+
+    void displayHelper();
 };
 
 enum SolvingMethod {

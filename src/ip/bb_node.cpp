@@ -25,11 +25,60 @@ BaBNode::BaBNode(const BaBNode& otherNode) {
     depth = otherNode.depth;
 }
 
-std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchStrat) {
+uint BaBNode::getBranchVariableInfo(BranchingStrategy branchStrat, std::vector<VariableType> variableTypes) {
     Matrix currentSolution = problem.getOptimalSolution();
     
-    std::pair<uint, double> branchVarInfo;
+    //std::pair<uint, double> branchVarInfo;
 
+    std::vector<uint> notComplyingVariables;
+
+    uint branchVarInfo;
+
+    for(uint i = 0; i < currentSolution.getNColumns(); i++) {
+        if(!doesVariableComplyWithIntegralityConstraints(currentSolution.getElement(0, i), variableTypes[i]))
+            notComplyingVariables.push_back(i);
+    }
+
+    switch(branchStrat) {
+        case BranchingStrategy::FIRST_INDEX:
+            //return notComplyingVariables[0];
+            branchVarInfo = notComplyingVariables[0];
+            break;
+        case BranchingStrategy::RANDOM_VAR: {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dist(0, notComplyingVariables.size() - 1);
+
+            int num = dist(gen);
+
+            //return notComplyingVariables[num];
+            branchVarInfo = notComplyingVariables[num];
+            break;
+        }
+        case BranchingStrategy::BEST_COEFFICIENT: {
+            Matrix objectiveFunction = problem.getObjectiveFunction();
+
+            if(problem.getType() == LP::MAX) {
+                std::sort(notComplyingVariables.begin(), notComplyingVariables.end(), [](const uint& a, const uint& b) {
+                    return a > b;
+                });
+            }
+            else {
+                std::sort(notComplyingVariables.begin(), notComplyingVariables.end(), [](const uint& a, const uint& b) {
+                    return a < b;
+                });
+            }
+
+            //return notComplyingVariables[0];
+            branchVarInfo = notComplyingVariables[0];
+            break;
+        }
+    }
+
+    return branchVarInfo;
+
+
+    /*
     if(branchStrat == BranchingStrategy::FIRST_INDEX) {
         for(uint i = 0; i < currentSolution.getNColumns(); i++) {
             if(!LP::isNumberAnInteger(currentSolution.getElement(0, i))) {
@@ -78,6 +127,7 @@ std::pair<uint, double> BaBNode::getBranchVariableInfo(BranchingStrategy branchS
     }
 
     return branchVarInfo;
+    */
 }
 
 Matrix BaBNode::solveNode() {
@@ -86,7 +136,7 @@ Matrix BaBNode::solveNode() {
     return problem.getOptimalSolution();
 }
 
-BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
+BaBNode* BaBNode::branchLeft(int varIndex, VariableType varType) {
     if(varIndex < 0 || static_cast<std::size_t>(varIndex) >= problem.getObjectiveFunction().getNColumns()) {
         std::ostringstream errorMsg;
         errorMsg << "Error using branchRight: the model has " << problem.getObjectiveFunction().getNColumns()
@@ -95,7 +145,17 @@ BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
     }
 
     std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().getNColumns(), varIndex).getElements();
-    Constraint newConstraint(newLhs, "<=", floor(varValue));
+    Constraint newConstraint;
+
+    if(varType == VariableType::BINARY) {
+        newConstraint = Constraint(newLhs, "=", 0);
+    }
+    else if(varType == VariableType::INTEGER) {
+        double currentValue = problem.getOptimalSolution().getElement(0, varIndex);
+        newConstraint = Constraint(newLhs, "<=", floor(currentValue));
+    }
+
+    //Constraint newConstraint(newLhs, "<=", floor(varValue));
     LP::LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
     leftChild = new BaBNode(newProblem, depth + 1);
@@ -103,7 +163,7 @@ BaBNode* BaBNode::branchLeft(int varIndex, double varValue) {
     return leftChild;
 }
 
-BaBNode* BaBNode::branchRight(int varIndex, double varValue) {
+BaBNode* BaBNode::branchRight(int varIndex, VariableType varType) {
     if(varIndex < 0 || static_cast<std::size_t>(varIndex) >= problem.getObjectiveFunction().getNColumns()) {
         std::ostringstream errorMsg;
         errorMsg << "Error using branchRight: the model has " << problem.getObjectiveFunction().getNColumns()
@@ -112,7 +172,17 @@ BaBNode* BaBNode::branchRight(int varIndex, double varValue) {
     }
 
     std::vector<double> newLhs = basisVector(problem.getObjectiveFunction().getNColumns(), varIndex).getElements();
-    Constraint newConstraint(newLhs, ">=", ceil(varValue));
+    Constraint newConstraint;
+
+    //Constraint newConstraint(newLhs, ">=", ceil(varValue));
+
+    if(varType == VariableType::BINARY)
+        newConstraint = Constraint(newLhs, "=", 1);
+    else if(varType == VariableType::INTEGER) {
+        double currentValue = problem.getOptimalSolution().getElement(0, varIndex);
+        newConstraint = Constraint(newLhs, ">=", ceil(currentValue));
+    }
+
     LP::LpProblem newProblem = problem;
     newProblem.addConstraint(newConstraint);
     rightChild = new BaBNode(newProblem, depth + 1);
@@ -143,4 +213,19 @@ bool BaBNode::isBetter(BaBNode* otherNode) {
         return getObjectiveFunctionValue() > otherNode->getObjectiveFunctionValue();
     }
     else return getObjectiveFunctionValue() < otherNode->getObjectiveFunctionValue();
+}
+
+bool BaBNode::isNodeDone(std::vector<VariableType> varTypes) {
+    for(uint i = 0; i < problem.getOptimalSolution().getNColumns(); i++) {
+        double var = problem.getOptimalSolution().getElement(0, i);
+        if(varTypes[i] == VariableType::CONTINUOUS) continue;
+        else if(varTypes[i] == VariableType::INTEGER) {
+            if(!LP::isNumberAnInteger(var)) return false;
+        }
+        else if(varTypes[i] == VariableType::BINARY) {
+            if(!LP::isNumberAnInteger(var) || (LP::isNumberAnInteger(var) && !(std::round(var) == 0 || std::round(var) == 1))) return false;
+        }
+    }
+
+    return true;
 }

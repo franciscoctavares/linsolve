@@ -1,5 +1,5 @@
 #include "matrix.hpp"
-#include "tabulate.hpp"
+#include "single_include/tabulate/tabulate.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -364,13 +364,9 @@ void Matrix::setRow(int row, const Matrix& newRow, double factor) {
         throw std::invalid_argument(errorMsg.str());
     }
 
-    //std::vector<double> aux = elements;
     for(std::size_t j = 0; j < nColumns; j++) {
-        //aux[row * nColumns + j] = newRow.elements[j];
-        //elements[row * nColumns + j] = newRow.elements[j];
         elements[row * nColumns + j] = newRow.elements[row * nColumns + j] * factor;
     }
-    //return Matrix(aux, nRows, nColumns);
 }
 
 void Matrix::setColumn(int column, Matrix& newColumn) {
@@ -397,7 +393,6 @@ Matrix Matrix::removeRow(int row) {
         errorMsg << "Error using removeRow: the row argument must be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
     }
-
 
     std::vector<double> aux;
     for(std::size_t i = 0; i < nRows; i++) {
@@ -486,7 +481,7 @@ int Matrix::isBasisVector() {
         }
         else return false;
 
-        if(one_count > 1) return false;
+        if(one_count > 1) return -1;
     }
     if(one_count == 1 && zero_count == elements.size() - 1) return index_of_only_one;
     else return -1;

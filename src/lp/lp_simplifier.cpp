@@ -21,13 +21,13 @@ void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, Simplif
     for(std::size_t i = 0; i < basisConstraintsInfo.size(); i++) {
         int currentBasisConstraint_i = basisConstraintsInfo[i].first;
 
-        // Check for constraints of the form xi = k, where i = 1,...,n and k is a real number
+        // Check for constraints of the form x_i = k
         if(problemToSimplify.getConstraints()[currentBasisConstraint_i].getType() == EQUAL) {
             helper.constraintsToRemove.push_back(currentBasisConstraint_i);
             helper.fixedVariables.emplace_back(basisConstraintsInfo[currentBasisConstraint_i].second, problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs());
         }
 
-        // checks for any constraint of the types xi <= k and xi >= k   
+        // checks for any constraint of the types x_i <= k and x_i >= k   
         for(std::size_t j = i + 1; j < basisConstraintsInfo.size(); j++) {
             int currentBasisConstraint_j = basisConstraintsInfo[j].first;
             if(problemToSimplify.getConstraints()[currentBasisConstraint_i].getLhs() == problemToSimplify.getConstraints()[currentBasisConstraint_j].getLhs() &&
@@ -40,7 +40,7 @@ void LPSimplifier::searchForFixedVariables(LpProblem& problemToSimplify, Simplif
             }
         }
 
-        // Check for constraints of the form xi <= 0
+        // Check for constraints of the form x_i <= 0
         if(problemToSimplify.getConstraints()[currentBasisConstraint_i].getType() == LESS_THAN_OR_EQUAL && problemToSimplify.getConstraints()[currentBasisConstraint_i].getRhs() == 0) {
             helper.fixedVariables.emplace_back(basisConstraintsInfo[i].second, 0);
             //helper->fixedVariables.emplace_back(basisConstraintsInfo[i].second, 0);
@@ -170,6 +170,7 @@ void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelpe
     // remove all fixed variables
     if(helper.fixedVariables.size() > 0) {
         for(int i =  helper.fixedVariables.size() - 1; i >= 0; i--) {
+            //std::cout << "removing variable " << helper.fixedVariables[i].first << ", with value " << helper.fixedVariables[i].second << "\n";
             problemToSimplify.removeFixedVariable(helper.fixedVariables[i].first, helper.fixedVariables[i].second);
         }
     }
