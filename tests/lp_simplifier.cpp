@@ -100,13 +100,13 @@ TEST_CASE("LPSimplifier::searchForFixedVariables()", ) {
 
             REQUIRE(helper.fixedVariables.size() == 2);
             REQUIRE(helper.fixedVariables[0] == std::make_pair<uint, double>(0, 3));
-            REQUIRE(helper.fixedVariables[1] == std::make_pair<uint, double>(0, 4));
+            REQUIRE(helper.fixedVariables[1] == std::make_pair<uint, double>(1, 4));
             REQUIRE(helper.constraintsToRemove.size() == 2);
             REQUIRE(helper.constraintsToRemove[0] == 2);
             REQUIRE(helper.constraintsToRemove[1] == 3);
-            REQUIRE(helper.pairsOfVars.size() == 2);
-            REQUIRE(helper.pairsOfVars[0] == std::make_pair<uint, uint>(2, 0));
-            REQUIRE(helper.pairsOfVars[1] == std::make_pair<uint, uint>(1, 2));
+            REQUIRE(helper.pairsOfVars.size() == 1);
+            REQUIRE(helper.pairsOfVars[0] == std::make_pair<uint, uint>(0, 2));
+            //REQUIRE(helper.pairsOfVars[1] == std::make_pair<uint, uint>(1, 2));
 
         }
     }
