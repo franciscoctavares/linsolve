@@ -34,6 +34,7 @@ target_compile_options(linsolve_lib
     -Wall
     -Wextra
     -Werror
+    -Wno-unused-variable
 )
 
 add_executable(linsolve
@@ -44,3 +45,39 @@ target_link_libraries(linsolve
     PRIVATE
     linsolve_lib
 )
+
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+
+if(ENABLE_COVERAGE)
+    target_compile_options(linsolve_lib PRIVATE
+        --coverage
+        -O0
+        -g
+    )
+
+    target_compile_options(unit_tests PRIVATE
+        --coverage
+        -O0
+        -g
+    )
+
+    target_link_options(unit_tests PRIVATE
+        --coverage
+    )
+
+    target_link_options(linsolve PRIVATE
+        --coverage
+    )
+
+    find_program(GCOVR_EXECUTABLE gcovr REQUIRED)
+
+    set(COVERAGE_DIR "${CMAKE_SOURCE_DIR}/docs/coverage")
+
+    file(MAKE_DIRECTORY "${COVERAGE_DIR}")
+
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/CTestCustom.cmake.in"
+        "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
+        @ONLY
+    )
+endif()
