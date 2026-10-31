@@ -4,6 +4,12 @@
 
 static std::vector<double> v1 = {1, 2, 3, 4};
 
+TEST_CASE("Constraint::Constraint()(default)", "[Constraint][Constructor]") {
+    Constraint cons;
+
+    REQUIRE(cons.getLhs().size() == 0);
+}
+
 TEST_CASE("Constraint::Constraint()", "[Constraint][Constructor]") {
 
     SECTION("Constraint::Constraint() throws an exception if newConstraintType is not <=, >= or =") {
@@ -17,11 +23,75 @@ TEST_CASE("Constraint::Constraint()", "[Constraint][Constructor]") {
     }
 
     SECTION("Constraint::Constraint() produces the correct result") {
+        /*
+        std::vector<double> v2;
+        Constraint t({1, 2, 3}, "<=", 3);
+        REQUIRE(t.getLhs().size() == 3);
+        REQUIRE(t.getLhs() == std::vector<double>{1, 2, 3});
+        REQUIRE(t.getRhs() == 3);
+        REQUIRE(t.getType() == LESS_THAN_OR_EQUAL);
+        */
+
         Constraint a(v1, "<=", 3);
         REQUIRE(a.getLhs() == v1);
         REQUIRE(a.getRhs() == 3);
         REQUIRE(a.getType() == LESS_THAN_OR_EQUAL);
+
+        Constraint c(v1, "=", 3);
+        REQUIRE(c.getLhs() == v1);
+        REQUIRE(c.getRhs() == 3);
+        REQUIRE(c.getType() == EQUAL);
+
+        Constraint b(v1, ">=", 3);
+        REQUIRE(b.getLhs() == v1);
+        REQUIRE(b.getRhs() == 3);
+        REQUIRE(b.getType() == GREATER_THAN_OR_EQUAL);
     }
+
+}
+
+TEST_CASE("Constraint::operator==()", "[Constraint][operator==]") {
+    std::vector<double> v2 = {2, 3, 4, 5};
+    
+    // = = =
+    Constraint a(v1, "<=", 1);
+    Constraint b(v1, "<=", 1);
+    REQUIRE(a == b);
+
+    // != = =
+    a = Constraint(v1, "<=", 1);
+    b = Constraint({1, 2, 4, 5}, "<=", 1);
+    REQUIRE_FALSE(a == b);
+
+    // = != =
+    a = Constraint(v1, "<=", 1);
+    b = Constraint(v1, ">=", 1);
+    REQUIRE_FALSE(a == b);
+
+    // = = !=
+    a = Constraint(v1, "<=", 1);
+    b = Constraint(v1, "<=", 2);
+    REQUIRE_FALSE(a == b);
+
+    // != != =
+    a = Constraint(v1, "<=", 1);
+    b = Constraint({1, 2, 4, 5}, ">=", 1);
+    REQUIRE_FALSE(a == b);
+
+    // = != !=
+    a = Constraint(v1, "<=", 1);
+    b = Constraint(v1, ">=", 2);
+    REQUIRE_FALSE(a == b);
+
+    // != = !=
+    a = Constraint(v1, "<=", 1);
+    b = Constraint({1, 2, 4, 5}, "<=", 2);
+    REQUIRE_FALSE(a == b);   
+
+    // != != !=
+    a = Constraint(v1, "<=", 1);
+    b = Constraint({1, 2, 4, 5}, ">=", 2);
+    REQUIRE_FALSE(a == b);
 
 }
 
