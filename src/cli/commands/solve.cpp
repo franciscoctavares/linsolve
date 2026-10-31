@@ -48,7 +48,11 @@ void Solve::runCommand() {
     }
     else {
         LP::LpProblem problem = ModelFileReader::readModel(settings.fileName);
-        BaBTree tree(problem);
+
+        std::vector<VariableType> varTypes;
+        for(uint i = 0; i < problem.getObjectiveFunction().getNColumns(); i++) varTypes.push_back(VariableType::INTEGER);
+        
+        BaBTree tree(problem, varTypes);
         Matrix optimalWholeSolution = tree.solveTree(settings.explorStrat, settings.branchStrat, settings.multithreading);
 
         if(settings.showResults) tree.displayProblem();

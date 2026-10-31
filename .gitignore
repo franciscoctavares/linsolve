@@ -5,8 +5,7 @@ build/*
 bin/*
 
 # Documentation files
-Doxyfile
-html/*
+docs/*
 
 # Extra stuff
 .vscode/*

@@ -8,7 +8,7 @@
 #include <chrono>
 
 #include <format>
-#include "tabulate.hpp"
+#include "single_include/tabulate/tabulate.hpp"
 
 #include <thread>
 
@@ -20,6 +20,26 @@ void BaBTree::fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrat
 			*nodeQueue[i] = FATHOMED;
 			nodeQueue.erase(nodeQueue.begin() + i);
 		}
+		else if(nodeQueue[i]->isNodeDone(varTypes)) {
+			updateIncumbentSolution(nodeQueue[i], incumbentSolution);
+			*nodeQueue[i] = FATHOMED;
+			nodeQueue.erase(nodeQueue.begin() + i);
+		}
+		else {
+            if(!nodeQueue[i]->isNodeValid()) {
+				*nodeQueue[i] = FATHOMED;
+				nodeQueue.erase(nodeQueue.begin() + i);
+                continue;
+            }
+
+			if(strategy != ExplorationStrategy::EXPLORE_ALL_NODES) {
+				if(incumbentSolution != NULL && !nodeQueue[i]->isBetter(incumbentSolution)) {
+					*nodeQueue[i] = FATHOMED;
+					nodeQueue.erase(nodeQueue.begin() + i);
+				}
+			}
+		}
+		/*
 		else if(*nodeQueue[i] == LP::WHOLE_SOLUTION) {
 			updateIncumbentSolution(nodeQueue[i], incumbentSolution);
 			*nodeQueue[i] = FATHOMED;
@@ -39,6 +59,7 @@ void BaBTree::fathomLeafNodes(std::vector<BaBNode*>& nodeQueue, ExplorationStrat
 				}
 			}
 		}
+		*/
 	}
 }
 
@@ -58,6 +79,9 @@ void BaBTree::solveNodeQueue(std::vector<BaBNode*>& nodeQueue, uint& solvedNodes
         t2.join();
     }
     else {
+		//nodeQueue[nodeQueue.size() - 2]->getProblem().displayProblem();
+		//std::cout << "\n\n";
+		//nodeQueue[nodeQueue.size() - 1]->getProblem().displayProblem();
         nodeQueue[nodeQueue.size() - 2]->solveNode();
         nodeQueue[nodeQueue.size() - 1]->solveNode();
     }
@@ -96,8 +120,9 @@ void BaBTree::sortNodeQueue(std::vector<BaBNode*>& nodeQueue, ExplorationStrateg
 
 // PUBLIC METHODS
 
-BaBTree::BaBTree(LP::LpProblem initialProblem) {
+BaBTree::BaBTree(LP::LpProblem initialProblem, std::vector<VariableType> newVarTypes) {
 	headNode = new BaBNode(initialProblem, 0);
+	varTypes = newVarTypes;
 }
 
 Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrategy branchingStrat, bool multithreading) {
@@ -110,13 +135,33 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
 	headNode->solveNode();
 	solvedNodes++;
 
+	/*
 	if(*headNode == LP::CONTINUOUS_SOLUTION) {
-		std::pair<uint, double> branchVarInfo = headNode->getBranchVariableInfo(branchingStrat);
+		uint branchVarIndex = headNode->getBranchVariableInfo(branchingStrat, varTypes);
 
-		nodeQueue.push_back(headNode->branchLeft(branchVarInfo.first, branchVarInfo.second));
-		nodeQueue.push_back(headNode->branchRight(branchVarInfo.first, branchVarInfo.second));
+		nodeQueue.push_back(headNode->branchLeft(branchVarIndex, varTypes[branchVarIndex]));
+		nodeQueue.push_back(headNode->branchRight(branchVarIndex, varTypes[branchVarIndex]));
 	}
 	else if(*headNode == LP::WHOLE_SOLUTION) {
+		auto end = std::chrono::steady_clock::now();
+		std::chrono::duration<double, std::milli> elapsed = end - start;
+
+		metrics.execution_time = elapsed.count();
+		metrics.explored_nodes = solvedNodes;
+		metrics.optimalWholeSolution = headNode->getProblem().getOptimalSolution();
+		metrics.optimalSolutionDepth = headNode->getDepth();
+	
+		return headNode->getProblem().getOptimalSolution();
+	}
+	*/
+
+	if(!headNode->isNodeDone(varTypes)) {
+		uint branchVarIndex = headNode->getBranchVariableInfo(branchingStrat, varTypes);
+
+		nodeQueue.push_back(headNode->branchLeft(branchVarIndex, varTypes[branchVarIndex]));
+		nodeQueue.push_back(headNode->branchRight(branchVarIndex, varTypes[branchVarIndex]));
+	}
+	else {
 		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double, std::milli> elapsed = end - start;
 
@@ -137,10 +182,17 @@ Matrix BaBTree::solveTree(ExplorationStrategy explorationStrat, BranchingStrateg
 
 		sortNodeQueue(nodeQueue, explorationStrat);
 
+		/*
 		if(*nodeQueue[0] == LP::CONTINUOUS_SOLUTION) {
-			std::pair<uint, double> branchVarInfo = nodeQueue[0]->getBranchVariableInfo(branchingStrat);
-			nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarInfo.first, branchVarInfo.second));
-			nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarInfo.first, branchVarInfo.second));
+			uint branchVarIndex = nodeQueue[0]->getBranchVariableInfo(branchingStrat, varTypes);
+			nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarIndex, varTypes[branchVarIndex]));
+			nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarIndex, varTypes[branchVarIndex]));
+		}
+		*/
+		if(!nodeQueue[0]->isNodeDone(varTypes)) {
+			uint branchVarIndex = nodeQueue[0]->getBranchVariableInfo(branchingStrat, varTypes);
+			nodeQueue.push_back(nodeQueue[0]->branchLeft(branchVarIndex, varTypes[branchVarIndex]));
+			nodeQueue.push_back(nodeQueue[0]->branchRight(branchVarIndex, varTypes[branchVarIndex]));	
 		}
 
 		if(nodeQueue.size() != 0) nodeQueue.erase(nodeQueue.begin());

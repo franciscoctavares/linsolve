@@ -18,9 +18,13 @@ struct SimplifierHelper {
     std::vector<uint> constraintsToRemove;
     std::vector<std::pair<uint, uint>> pairsOfVars;
 
+    std::vector<std::pair<uint, uint>> basisConstraintsInfo;
+
     bool isHelperEmpty() { return fixedVariables.size() == 0 && constraintsToRemove.size() == 0 && pairsOfVars.size() == 0; }
 
     void displayConstraintsToRemove();
+
+    void displayHelper();
 };
 
 enum SolvingMethod {

@@ -31,4 +31,19 @@ void SimplifierHelper::displayConstraintsToRemove() {
     std::cout << std::endl;
 }
 
+void SimplifierHelper::displayHelper() {
+    std::cout << "Fixed variables:\n";
+
+    for(const std::pair<uint, double>& fixedVar : fixedVariables) {
+        std::cout << "x" << fixedVar.first + 1 << " = " << fixedVar.second << "\n";
+    }
+
+    std::cout << "Pairs of vars:\n";
+
+    for(const std::pair<uint, uint>& currentPair : pairsOfVars) {
+        std::cout << currentPair.first << " <-> " << currentPair.second << "\n";
+    }
+
+}
+
 }

@@ -7,6 +7,7 @@ class BaBTree {
     private:
         BaBNode* headNode;
         PerformanceMetrics metrics;
+        std::vector<VariableType> varTypes;
 
         /**
          * @brief Fathoms(cuts) all necessary leaf nodes and updates `incumbentSolution` if necessary
@@ -33,7 +34,7 @@ class BaBTree {
         /**
          * @brief Standard constructor. Allocates memory and initializes the head node(or root node) of the tree with `initialProblem`
          */
-        BaBTree(LP::LpProblem initialProblem);
+        BaBTree(LP::LpProblem initialProblem, std::vector<VariableType> newVarTypes);
 
         /**
          * @brief Given an exploration strategy and a branching strategy, solve the IP model using the Branch and Bound method
@@ -48,4 +49,6 @@ class BaBTree {
         void deleteTree();
 
         PerformanceMetrics& getMetrics() { return metrics; }
+
+        const std::vector<VariableType>& getVarTypes() { return varTypes; }
 };

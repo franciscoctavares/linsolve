@@ -66,6 +66,8 @@ class LpProblem {
         Matrix& getOptimalSolution() { return optimalSolution; }
 
         const std::vector<Constraint>& getConstraints() const { return constraints; }
+
+        void setConstraints(const std::vector<Constraint>& newConstraints) { constraints = newConstraints; }
         
         ProblemType getType() const { return type; }
 
