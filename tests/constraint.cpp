@@ -23,15 +23,6 @@ TEST_CASE("Constraint::Constraint()", "[Constraint][Constructor]") {
     }
 
     SECTION("Constraint::Constraint() produces the correct result") {
-        /*
-        std::vector<double> v2;
-        Constraint t({1, 2, 3}, "<=", 3);
-        REQUIRE(t.getLhs().size() == 3);
-        REQUIRE(t.getLhs() == std::vector<double>{1, 2, 3});
-        REQUIRE(t.getRhs() == 3);
-        REQUIRE(t.getType() == LESS_THAN_OR_EQUAL);
-        */
-
         Constraint a(v1, "<=", 3);
         REQUIRE(a.getLhs() == v1);
         REQUIRE(a.getRhs() == 3);

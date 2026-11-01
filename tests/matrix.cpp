@@ -1,6 +1,8 @@
 #include "catch2/catch_test_macros.hpp"
 #include "matrix.hpp"
 #include <vector>
+#include <iostream>
+#include <iomanip>
 
 static std::vector<double> m1 = {1, 2, 3, 4};
 static std::vector<double> m2 = {1, 2, 3, 4, 5, 6};
@@ -35,6 +37,85 @@ TEST_CASE("Matrix::Matrix()", "[Matrix][Constructor]") {
     }
 
 }
+
+TEST_CASE("Matrix::Matrix() (move constructor)", "[Matrix][Constructor]") {
+    Matrix A(m1, 2, 2);
+
+    SECTION("Move Constructor works as expected") {
+        Matrix B(std::move(A));
+
+        REQUIRE(B.getElements().size() == 4);
+        REQUIRE(B.getElement(0, 0) == 1);
+        REQUIRE(B.getElement(0, 1) == 2);
+        REQUIRE(B.getElement(1, 0) == 3);
+        REQUIRE(B.getElement(1, 1) == 4);
+        REQUIRE(B.getNRows() == 2);
+        REQUIRE(B.getNColumns() == 2);
+        REQUIRE(A.getNRows() == 0);
+        REQUIRE(A.getNColumns() == 0);
+    }
+}
+
+TEST_CASE("Matrix::operator=() (copy assignment operator)", "[Matrix][operator=]") {
+    Matrix A(m1, 2, 2);
+
+    SECTION("The copy assignment operator works as expected") {
+        Matrix B;
+        B = A;
+    
+        REQUIRE(B.getNRows() == 2);
+        REQUIRE(B.getNColumns() == 2);
+        REQUIRE(B.getElements().size() == 4);
+        REQUIRE(B.getElement(0, 0) == 1);
+        REQUIRE(B.getElement(0, 1) == 2);
+        REQUIRE(B.getElement(1, 0) == 3);
+        REQUIRE(B.getElement(1, 1) == 4);
+
+        REQUIRE_NOTHROW(A = A);
+    }
+}
+
+TEST_CASE("Matrix::operator=() (move assignment operator)", "[Matrix][operator=]") {
+    Matrix A(m1, 2, 2);
+
+    SECTION("The move assignment operator works as expected") {
+        Matrix B;
+        B = std::move(A);
+    
+        REQUIRE(B.getNRows() == 2);
+        REQUIRE(B.getNColumns() == 2);
+        REQUIRE(B.getElements().size() == 4);
+        REQUIRE(B.getElement(0, 0) == 1);
+        REQUIRE(B.getElement(0, 1) == 2);
+        REQUIRE(B.getElement(1, 0) == 3);
+        REQUIRE(B.getElement(1, 1) == 4);
+        REQUIRE(A.getNRows() == 0);
+        REQUIRE(A.getNColumns() == 0);
+
+        REQUIRE_NOTHROW(A = std::move(A));
+    }
+}
+
+TEST_CASE("Matrix::displayMatrix()", "[Matrix][displayMatrix]") {
+    Matrix A({1, 2, 3, 4.456}, 2, 2);
+
+    SECTION("displayMatrix works as expected") {
+        std::ostringstream output;
+        auto* originalBuffer = std::cout.rdbuf(output.rdbuf());
+
+        A.displayMatrix();
+
+        std::cout.rdbuf(originalBuffer);
+
+        REQUIRE(output.str().find("1") != std::string::npos);
+        REQUIRE(output.str().find("2") != std::string::npos);
+        REQUIRE(output.str().find("3") != std::string::npos);
+        REQUIRE(output.str().find("4.456000") == std::string::npos);
+
+        REQUIRE(output.str().find("1.000") == std::string::npos);
+    }
+}
+
 
 TEST_CASE("Matrix::operator+()", "[Matrix][operator+]") {
     Matrix a(m1, 2, 2);
@@ -166,6 +247,9 @@ TEST_CASE("Matrix::operator*()", "[Matrix][operator*]") {
         REQUIRE(multResult1.getElement(1, 0) == 19);
         REQUIRE(multResult1.getElement(1, 1) == 26);
         REQUIRE(multResult1.getElement(1, 2) == 33);
+
+        REQUIRE(c.getNRows() == 2);
+        REQUIRE(c.getNColumns() == 3);
     }
 
 }
@@ -278,29 +362,41 @@ TEST_CASE("Matrix::columnOperation()", "[Matrix][columnOperation]") {
 
 TEST_CASE("Matrix::dotProduct()", "[Matrix][dotProduct]") {
 
-    SECTION("Matrix::dotProduct() throws an exception when either of the Matrices are not row or column vectors") {
+    SECTION("Matrix::dotProduct() throws an exception when both matrices have different sizes") {
         Matrix a(m1, 2, 2);
-        Matrix b(m1, 1, 4);
+        Matrix b(m2, 3, 2);
+        Matrix c(m2, 6, 1);
+        Matrix d(m2, 6, 1);
+
         REQUIRE_THROWS(a.dotProduct(b));
-
-        Matrix c(m1, 1, 4);
-        Matrix d(m1, 2, 2);
-        REQUIRE_THROWS(c.dotProduct(d));
-
-        Matrix e(m1, 2, 2);
-        Matrix f(m1, 2, 2);
-        REQUIRE_THROWS(e.dotProduct(f));
-
-        Matrix g(m1, 1, 4);
-        Matrix h(m1, 1, 4);
-        REQUIRE_NOTHROW(g.dotProduct(h));
+        REQUIRE_NOTHROW(c.dotProduct(d));
     }
 
-    SECTION("Matrix::dotProduct() throws an exception when both row/column matrices don't have the same dimentions") {
-        Matrix a(m1, 1, 4);
-        Matrix b(m2, 1, 6);
+    SECTION("Matrix::dotProduct() throws an exception when both matrices have different number of rows") {
+        Matrix a(m2, 2, 3);
+        Matrix b(m2, 3, 2);
+        //Matrix c(m2, 6, 1);
+        //Matrix d(m2, 6, 1);
+        
         REQUIRE_THROWS(a.dotProduct(b));
-        REQUIRE_NOTHROW(a.dotProduct(a));
+        //REQUIRE_NOTHROW(c.dotProduct(d));
+    }
+
+    SECTION("Matrix::dotProduct() throws an exception when both matrices have different number of columns") {
+        Matrix a(m2, 2, 3);
+        Matrix b(m2, 3, 2);
+        
+        REQUIRE_THROWS(a.dotProduct(b));
+    }
+
+    SECTION("Matrix::dotProduct() throws an exception when neither matrix is a row/column vector.") {
+        Matrix a(m2, 2, 3);
+        Matrix b(m2, 2, 3);
+        Matrix c(m2, 6, 1);
+        Matrix d(m2, 6, 1);
+        
+        REQUIRE_THROWS(a.dotProduct(b));
+        REQUIRE_NOTHROW(c.dotProduct(d));
     }
 
     SECTION("Matrix::dotProduct() produces the correct result") {
@@ -717,10 +813,13 @@ TEST_CASE("Matrix::subMatrix()", "[Matrix][subMatrix]") {
 TEST_CASE("Matrix::isBasisVector()", "[Matrix][isBasisVector]") {
     std::vector<double> v1 = {1, 1, 3, 4};
     std::vector<double> v2 = {1, 0, 0, 0};
+    std::vector<double> v3 = {4, 0, 0, 0};
     Matrix a(v1, 2, 2);
     Matrix b(v2, 2, 2);
+    Matrix c(v3, 2, 2);
 
     SECTION("Matrix::isBasisVector() produces the correct result") {
+        REQUIRE(c.isBasisVector() == -1);
         REQUIRE(a.isBasisVector() == -1);
         REQUIRE(b.isBasisVector() == 0);
     }
@@ -789,6 +888,19 @@ TEST_CASE("basisVector()", "[Matrix][basisVector]") {
         REQUIRE(a.getElement(1, 0) == 1);
         REQUIRE(a.getElement(2, 0) == 0);
         REQUIRE(a.getElement(3, 0) == 0);
+    }
+
+}
+
+TEST_CASE("isBasisVector()", "[Matrix][isBasisVector]") {
+    std::vector<double> v1 = {1, 1, 3, 4};
+    std::vector<double> v2 = {1, 0, 0, 0};
+    std::vector<double> v3 = {4, 0, 0, 0};
+
+    SECTION("isBasisVector() produces the correct result") {
+        REQUIRE(isBasisVector(v1) == -1);
+        REQUIRE(isBasisVector(v2) == 0);
+        REQUIRE(isBasisVector(v3) == -1);
     }
 
 }

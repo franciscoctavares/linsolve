@@ -86,7 +86,7 @@ class Matrix {
          * 
          * @throw std::invalid_argument - if `matrix`.rows() != number of columns of the first matrix
          */
-        Matrix operator*(Matrix matrix);
+        Matrix operator*(const Matrix& matrix) const;
 
         /**
          * @brief Returns a specified row of the matrix
