@@ -9,6 +9,7 @@ bool isNumberAnInteger(double number, double epsilon) {
     return std::fabs(number - std::round(number)) < epsilon;
 }
 
+// GCOVR_EXCL_START
 void SimplifierHelper::displayConstraintsToRemove() {
     if(constraintsToRemove.size() == 0) {
         std::cout << "There are no constraints to remove" << std::endl;
@@ -30,7 +31,9 @@ void SimplifierHelper::displayConstraintsToRemove() {
     }
     std::cout << std::endl;
 }
+// GCOVR_EXCL_STOP
 
+// GCOVR_EXCL_START
 void SimplifierHelper::displayHelper() {
     std::cout << "Fixed variables:\n";
 
@@ -45,5 +48,6 @@ void SimplifierHelper::displayHelper() {
     }
 
 }
+// GCOVR_EXCL_STOP
 
 }

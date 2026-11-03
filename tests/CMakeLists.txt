@@ -5,6 +5,7 @@ target_sources(unit_tests
         matrix.cpp
         constraint.cpp
         lp_simplifier.cpp
+        lp_utils.cpp
 )
 
 target_link_libraries(unit_tests
