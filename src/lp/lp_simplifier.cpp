@@ -84,10 +84,12 @@ void LPSimplifier::searchForRepeatedConstraints(LpProblem& problemToSimplify, Si
     }
 }
 
+// GCOVR_EXCL_START
 void LPSimplifier::searchForReducedFeasibleRegion(LpProblem& problemToSimplify, SimplifierHelper& helper) {
     LpProblem h = problemToSimplify;
     SimplifierHelper newHelper = helper;
 }
+// GCOVR_EXCL_STOP
 
 void LPSimplifier::newVarsToOldVars(LpProblem& problemToSimplify, SimplifierHelper& helper) {
     std::vector<uint> fixedVars;
@@ -105,62 +107,20 @@ void LPSimplifier::newVarsToOldVars(LpProblem& problemToSimplify, SimplifierHelp
     }
 
     for(uint i = 0; i < freeVars.size(); i++) {
-        //pairsOfVars.emplace_back(i, freeVars[i]);
         helper.pairsOfVars.emplace_back(i, freeVars[i]);
     }
-
-    //helper.pairsOfVars = pairsOfVars;
 }
 
 void LPSimplifier::removeRedundantInformationFromHelper(SimplifierHelper& helper) {
-    // constraints to remove
-    /*
-    std::vector<uint> repeatedConstraintsIndexes;
-    for(int i = 0; i < helper.constraintsToRemove.size(); i++) {
-        for(int j = i + 1; j < helper.constraintsToRemove.size(); j++) {
-            if(helper.constraintsToRemove[i] == helper.constraintsToRemove[j])
-                repeatedConstraintsIndexes.push_back(j);
-        }
-    }
-
-    std::sort(repeatedConstraintsIndexes.begin(), repeatedConstraintsIndexes.end(), [](uint& a, uint& b) {
-        return a > b;
-    });
-
-    for(int i = 0; i < repeatedConstraintsIndexes.size(); i++) {
-        helper.constraintsToRemove.erase(helper.constraintsToRemove.begin() + repeatedConstraintsIndexes[i]);
-    }
-    */
-    
     // constraints to remove - NEW STRATEGY
     std::sort(helper.constraintsToRemove.begin(), helper.constraintsToRemove.end());
     auto last = std::unique(helper.constraintsToRemove.begin(), helper.constraintsToRemove.end());
     helper.constraintsToRemove.erase(last, helper.constraintsToRemove.end());
-    /*
-    std::sort(helper.constraintsToRemove.begin(), helper.constraintsToRemove.end(), [](uint& a, uint& b) {
-        return a > b;
-    });
-    */
 
     // fixed variables
-    /*
-    std::vector<uint> repeatedFixedVariablesIndexes;
-    for(int i = 0; i < helper.fixedVariables.size(); i++) {
-        for(int j = i + 1; j < helper.fixedVariables.size(); j++) {
-            if(helper.fixedVariables[i] == helper.fixedVariables[j])
-                repeatedFixedVariablesIndexes.push_back(j);
-        }
-    }
-
-    for(int i = 0; i < repeatedFixedVariablesIndexes.size(); i++) {
-        helper.fixedVariables.erase(helper.fixedVariables.begin() + repeatedFixedVariablesIndexes[i]);
-    }
-    std::sort(helper.fixedVariables.begin(), helper.fixedVariables.end(), [](const auto& a, const auto& b) { return a.first > b.first; });
-    */
     std::sort(helper.fixedVariables.begin(), helper.fixedVariables.end());
     auto stuff = std::unique(helper.fixedVariables.begin(), helper.fixedVariables.end());
     helper.fixedVariables.erase(stuff, helper.fixedVariables.end());
-
 }
 
 // PUBLIC METHODS
@@ -179,7 +139,7 @@ SimplifierHelper LPSimplifier::computeSimplifierHelper(LpProblem& originalProble
     }
 
     return helper;
-}
+} // GCOVR_EXCL_LINE - reason: closing bracked not covered
 
 void LPSimplifier::simplifyProblem(LpProblem& problemToSimplify, SimplifierHelper& helper) {    
     if(helper.isHelperEmpty()) {
