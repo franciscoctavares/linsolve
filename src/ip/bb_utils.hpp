@@ -8,6 +8,12 @@
 #include <cstddef>
 #include <array>
 
+enum class VariableType {
+    CONTINUOUS,
+    INTEGER,
+    BINARY
+};
+
 enum class BranchingStrategy {
     FIRST_INDEX,
     RANDOM_VAR,
@@ -74,3 +80,5 @@ inline constexpr StratMap<BranchingStrategy, 3> branchMap({{
                                         {"RANDOM_VAR", BranchingStrategy::RANDOM_VAR},
                                         {"BEST_COEFFICIENT", BranchingStrategy::BEST_COEFFICIENT}
                                         }});
+
+bool doesVariableComplyWithIntegralityConstraints(double var, VariableType type);

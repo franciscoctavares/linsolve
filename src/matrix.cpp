@@ -1,5 +1,5 @@
 #include "matrix.hpp"
-#include "tabulate.hpp"
+#include "single_include/tabulate/tabulate.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -139,7 +139,7 @@ void Matrix::operator-=(Matrix matrix) {
     }
 }
 
-Matrix Matrix::operator*(Matrix matrix) {
+Matrix Matrix::operator*(const Matrix& matrix) const {
     if(nColumns == matrix.nRows) {
         std::vector<double> newStuff(nRows * matrix.nColumns, 0.0);
         //for(std::size_t i = 0; i < nRows * matrix.nColumns; i++) newStuff.push_back(0.0);
@@ -149,7 +149,8 @@ Matrix Matrix::operator*(Matrix matrix) {
             for(std::size_t j = 0; j < matrix.nColumns; j++) {
                 aux = 0;
                 for(std::size_t k = 0; k < nColumns; k++) {
-                    aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nRows + j];
+                    //aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nRows + j];
+                    aux += elements[i * nColumns + k] * matrix.elements[k * matrix.nColumns + j];
                 }
                 newMatrix.elements[i * matrix.nColumns + j] = aux;
             }
@@ -222,6 +223,19 @@ void Matrix::columnOperation(int sourceColumn, int targetColumn, double factor) 
 }
 
 double Matrix::dotProduct(const Matrix& matrix) {
+    if(elements.size() != matrix.elements.size()) {
+        std::ostringstream errorMsg;
+        errorMsg << "Error using dotProduct: cannot calculate the dot product when matrix 1 and matrix 2 have " << elements.size() 
+                 << " and " << matrix.elements.size() << " elements, respectively";
+        throw std::invalid_argument(errorMsg.str());
+    }
+    else if(nRows != matrix.nRows) {
+        throw std::invalid_argument("Error using dotProduct: both matrices must have the same number of rows.");
+    }
+    else if(nRows != 1 && nColumns != 1) {
+        throw std::invalid_argument("Error using dotProduct: both matrices must be row or column vectors.");
+    }
+    /*
     if((nRows != 1 && nColumns != 1) || (matrix.nRows != 1 && matrix.nColumns != 1)) {
         std::ostringstream errorMsg;
         errorMsg << "Error using dotProduct: Both matrices have to be vector(row or column) matrices";
@@ -233,6 +247,7 @@ double Matrix::dotProduct(const Matrix& matrix) {
                  << " and " << matrix.elements.size() << " elements, respectively";
         throw std::invalid_argument(errorMsg.str());
     }
+    */
 
     double result = 0;
     for(std::size_t i = 0; i < elements.size(); i++) {
@@ -363,13 +378,9 @@ void Matrix::setRow(int row, const Matrix& newRow, double factor) {
         throw std::invalid_argument(errorMsg.str());
     }
 
-    //std::vector<double> aux = elements;
     for(std::size_t j = 0; j < nColumns; j++) {
-        //aux[row * nColumns + j] = newRow.elements[j];
-        //elements[row * nColumns + j] = newRow.elements[j];
         elements[row * nColumns + j] = newRow.elements[row * nColumns + j] * factor;
     }
-    //return Matrix(aux, nRows, nColumns);
 }
 
 void Matrix::setColumn(int column, Matrix& newColumn) {
@@ -396,7 +407,6 @@ Matrix Matrix::removeRow(int row) {
         errorMsg << "Error using removeRow: the row argument must be between 0 and " << nRows - 1 << ", but the value provided was " << row;
         throw std::invalid_argument(errorMsg.str());
     }
-
 
     std::vector<double> aux;
     for(std::size_t i = 0; i < nRows; i++) {
@@ -483,12 +493,12 @@ int Matrix::isBasisVector() {
             one_count++;
             index_of_only_one = i;
         }
-        else return false;
+        else return -1;
 
-        if(one_count > 1) return false;
+        if(one_count > 1) return -1;
     }
-    if(one_count == 1 && zero_count == elements.size() - 1) return index_of_only_one;
-    else return -1;
+    if(one_count == 1) return index_of_only_one;
+    else return -1; // GCOVR_EXCL_LINE: impossible by construction
 }
 
 bool Matrix::operator==(const Matrix& matrix) const {
@@ -498,12 +508,12 @@ bool Matrix::operator==(const Matrix& matrix) const {
 // Non Matrix class functions
 
 Matrix zeros(int rows, int columns) {
-    if(rows <= 0) {
+    if(rows < 0) {
         std::ostringstream errorMsg;
         errorMsg << "Error using zeros: rows must be a positive integer";
         throw std::invalid_argument(errorMsg.str());
     }
-    if(columns <= 0) {
+    if(columns < 0) {
         std::ostringstream errorMsg;
         errorMsg << "Error using zeros: columns must be a positive integer";
         throw std::invalid_argument(errorMsg.str());
@@ -556,6 +566,6 @@ int isBasisVector(const std::vector<double>& vector) {
 
         if(one_count > 1) return -1;
     }
-    if(one_count == 1 && zero_count == vector.size() - 1) return index_of_only_one;
-    else return -1;
+    if(one_count == 1) return index_of_only_one;
+    else return -1; // GCOVR_EXCL_LINE: impossible by construction
 }

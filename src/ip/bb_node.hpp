@@ -37,6 +37,11 @@ class BaBNode {
         bool operator==(NodeStatus statusToCheck) { return status == statusToCheck; }
 
         /**
+         * @brief Checks if solution is final (if solution complies with integrality constraints)
+         */
+        bool isNodeDone(std::vector<VariableType> varTypes);
+
+        /**
          * @brief Checks if the `status` of the node's problem is equal to `statusToCheck`
          */
         bool operator==(LP::SolutionType typeToCheck) { return problem.getSolutionType() == typeToCheck; }
@@ -47,9 +52,9 @@ class BaBNode {
         bool operator!=(LP::SolutionType typeToCheck) { return problem.getSolutionType() != typeToCheck; }
 
         /**
-         * @brief Computes and returns the branching variable and its current value based on the branching strategy(`branchStrat`)
+         * @brief Computes and returns the index of the branching variable based on the branching strategy(`branchStrat`)
          */
-        std::pair<uint, double> getBranchVariableInfo(BranchingStrategy branchStrat);
+        uint getBranchVariableInfo(BranchingStrategy branchStrat, std::vector<VariableType> variableTypes);
 
         /**
          * @brief Solves the node's LP `problem`
@@ -59,22 +64,22 @@ class BaBNode {
         LP::LpProblem& getProblem() { return problem; }
 
         /**
-         * @brief Given the branching variable and its value, creates the left branch
+         * @brief Given the branching variable inbdex, creates the left branch
          * 
          * @throw std::invalid_argument - if `varIndex` < 0 or `varIndex` >= `problem.getObjectiveFunction().getNColumns()`
          * 
          * @return pointer to the newly created node
          */
-        BaBNode* branchLeft(int varIndex, double varValue);
+        BaBNode* branchLeft(int varIndex, VariableType varType);
 
         /**
-         * @brief Given the branching variable and its value, creates the right branch
+         * @brief Given the branching variable index, creates the right branch
          * 
          * @throw std::invalid_argument - if `varIndex` < 0 or `varIndex` >= `problem.getObjectiveFunction().getNColumns()`
          * 
          * @return pointer to the newly created node
          */
-        BaBNode* branchRight(int varIndex, double varValue);
+        BaBNode* branchRight(int varIndex, VariableType varType);
 
         /**
          * @brief Delete all the caller's children nodes

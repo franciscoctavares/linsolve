@@ -1,7 +1,7 @@
 #include "lp/constraint.hpp"
 #include <sstream>
 
-Constraint::Constraint(std::vector<double>& newLhs, const std::string& newConstraintType, double newRhs) {
+Constraint::Constraint(const std::vector<double>& newLhs, const std::string& newConstraintType, double newRhs) {
     lhs = newLhs;
     if(newConstraintType == "<=") type = LESS_THAN_OR_EQUAL;
     else if(newConstraintType == "=") type = EQUAL;

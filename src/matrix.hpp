@@ -46,7 +46,7 @@ class Matrix {
         /**
          * @brief Retrieves the elements of the matrix
          */
-        std::vector<double> getElements() { return elements; }
+        const std::vector<double>& getElements() const { return elements; }
 
         /**
          * @brief Displays the matrix on the terminal
@@ -86,7 +86,7 @@ class Matrix {
          * 
          * @throw std::invalid_argument - if `matrix`.rows() != number of columns of the first matrix
          */
-        Matrix operator*(Matrix matrix);
+        Matrix operator*(const Matrix& matrix) const;
 
         /**
          * @brief Returns a specified row of the matrix

@@ -556,7 +556,10 @@ std::pair<Matrix, SolutionType> SimplexSolver::runSolver() {
         else {
             LpProblem simplifiedProblem(problem);
 
+            helper.displayHelper();
             LPSimplifier::simplifyProblem(simplifiedProblem, helper);
+
+            //simplifiedProblem.displayProblem();
 
             SimplexSolver simplifiedSolver(simplifiedProblem);
             simplifiedSolver.solveSimplex();
