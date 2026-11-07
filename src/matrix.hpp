@@ -46,7 +46,7 @@ class Matrix {
         /**
          * @brief Retrieves the elements of the matrix
          */
-        std::vector<double> getElements() { return elements; }
+        const std::vector<double>& getElements() const { return elements; }
 
         /**
          * @brief Displays the matrix on the terminal

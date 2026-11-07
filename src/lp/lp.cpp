@@ -40,6 +40,7 @@ LpProblem& LpProblem::operator=(const LpProblem& otherProblem) {
     return *this;
 }
 
+// GCOVR_EXCL_START
 void LpProblem::displayProblem() {
     // Objective function
     if(type == MAX) std::cout << "max z: ";
@@ -118,6 +119,7 @@ void LpProblem::displayProblem() {
         else std::cout << std::setprecision(3) << std::fixed << optimalSolution.dotProduct(objectiveFunction) << std::endl;
     }
 }
+// GCOVR_EXCL_STOP
 
 void LpProblem::addConstraint(const Constraint& newConstraint) {
     constraints.push_back(newConstraint);
